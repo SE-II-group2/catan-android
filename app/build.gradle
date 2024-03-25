@@ -37,6 +37,8 @@ android {
     }
 }
 
+
+
 tasks.register('jacocoTestReport', JacocoReport) {
     dependsOn 'testDebugUnitTest'
 
@@ -76,4 +78,7 @@ dependencies {
     implementation libs.okhttp
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
+    implementation libs.stomp
+    implementation libs.reactivex
+    implementation libs.rxandroid
 }

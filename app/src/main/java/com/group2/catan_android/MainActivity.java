@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void messageReceivedFromServer(String message) {
         // TODO handle received messages
-        Log.d("Network", message);
         textViewServerResponse.setText(message);
     }
 }
