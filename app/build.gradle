@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     id 'jacoco'
+    id "org.sonarqube" version "4.4.1.3373"
 }
 
 android {
@@ -51,6 +52,16 @@ tasks.register('jacocoTestReport', JacocoReport) {
     sourceDirectories.from = files([mainSrc])
     classDirectories.from = files([debugTree])
     executionData.from = files("${project.layout.buildDirectory.get().asFile}/jacoco/testDebugUnitTest.exec")
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "SE-II-group2_catan-android"
+        property "sonar.organization", "se-ii-group2"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+    }
 }
 
 dependencies {
