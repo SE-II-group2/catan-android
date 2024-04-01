@@ -5,6 +5,7 @@ public class Hexagon {
     private int[] resourceValue;
     private int rollValue;
     private Building[] buildings;
+    private int numOfBuildings=0;
 
     public Hexagon(String type, int[] resourceValue, int rollValue) {
         this.type = type;
@@ -25,6 +26,7 @@ public class Hexagon {
         for (int i = 0; i < buildings.length; i++) {
             if (buildings[i] == null) {
                 buildings[i] = building;
+                numOfBuildings++;
                 break;
             }
         }
@@ -45,8 +47,12 @@ public class Hexagon {
         return buildings;
     }
 
+    public int getNumOfBuildings(){
+        return numOfBuildings;
+    }
+
     @Override
     public String toString() {
-        return String.format("Hexagon Type: %s; Rollvalue: %d; Number of Buildings adjecent: %d\n",type, rollValue, buildings.length);
+        return String.format("Hexagon Type: %s; Rollvalue: %d; Number of Buildings adjecent: %d\n",type, rollValue, numOfBuildings);
     }
 }
