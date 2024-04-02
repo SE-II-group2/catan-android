@@ -93,12 +93,13 @@ public class Board {
     }
 
     public Building[][] getIntersections() {
-        Building intersection = new Village(0); //eigene Klasse intersection?? playerID?
+        Building intersection = new Village(0);
 
+        //fill first 3 rows from the top and the last 3 from below at the same time
         for (int i = 0; i <= 2; i++) {
             for (int j = 2 - i; j <= 8 + i; j++) {
-                intersections[i][j] = intersection; //obere Hälfte befüllen
-                intersections[intersections.length - 1 - i][j] = intersection; //untere Hälfte befüllen
+                intersections[i][j] = intersection;
+                intersections[intersections.length - 1 - i][j] = intersection;
             }
         }
 
@@ -132,7 +133,7 @@ public class Board {
             return true;
         }
 
-        //bei gerade gerade oder ungerade ungerade nach unten schauen sonst nach oben
+        //if even even check or uneven uneven check below, else above if there is a building next to the position where it should be built
         if((evenRow && evenCol) || (!evenRow && !evenCol)){
             if(intersections[row-1][col].getPlayerID()!=0){
                 nextToBuilding = true;
@@ -150,6 +151,7 @@ public class Board {
     public boolean isNextToOwnRoad(int row, int col, int playerID){
         intersection = translateIntersectionToAdjacencyMatrix(row,col);
 
+        //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
             if((adjacencyMatrix[intersection][i].getPlayerID()!= 0 || adjacencyMatrix[intersection][i] != null) && adjacencyMatrix[intersection][i].getPlayerID() == playerID){
                 return true;
@@ -159,7 +161,18 @@ public class Board {
     }
 
     public int translateIntersectionToAdjacencyMatrix(int row, int col) {
-        return 0;
+        int intersection = 0;
+
+        switch(row){
+            case 0: intersection = col - 2;
+            case 1: intersection = 6 + col;
+            case 2: intersection = 16 + col;
+            case 3: intersection = 27 + col;
+            case 4: intersection = 37 + col;
+            case 5: intersection = 45 + col;
+        }
+
+        return intersection;
     }
 
 
