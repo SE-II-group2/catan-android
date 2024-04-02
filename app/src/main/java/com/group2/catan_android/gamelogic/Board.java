@@ -1,7 +1,5 @@
 package com.group2.catan_android.gamelogic;
 
-import android.view.animation.LinearInterpolator;
-
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
@@ -20,7 +18,7 @@ public class Board {
     public Board(){
         hexagonList=generateHexagons();
         adjacencyMatrix = getAdjacencyMatrix();
-        intersections = new Building[6][11];
+        intersections = getIntersections();
     }
 
     public void distributeResourcesByDiceRoll(int diceRoll) {
@@ -95,12 +93,12 @@ public class Board {
     }
 
     public Building[][] getIntersections() {
-        Building intersection = new Village(0); //eigene Klasse intersection??
+        Building intersection = new Village(0); //eigene Klasse intersection?? playerID?
 
         for (int i = 0; i <= 2; i++) {
             for (int j = 2 - i; j <= 8 + i; j++) {
-                intersections[i][j] = intersection; // obere Hälfte
-                intersections[intersections.length - 1 - i][j] = intersection; // untere Hälfte (gespiegelt)
+                intersections[i][j] = intersection; //obere Hälfte befüllen
+                intersections[intersections.length - 1 - i][j] = intersection; //untere Hälfte befüllen
             }
         }
 
