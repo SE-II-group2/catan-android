@@ -113,8 +113,54 @@ public class Board {
         }
     }
 
+    public void addVillage(int playerID, int row, int col){
 
+        if(!isNextToBuilding(row,col) && isNextToOwnRoad(row,col,playerID)){
+            intersections[row][col] = new Village(playerID);
+        }
 
+    }
+
+    public boolean isNextToBuilding(int row, int col){
+
+        boolean evenCol = col % 2 == 0;
+        boolean evenRow = row % 2 == 0;
+
+        boolean nextToBuilding = (intersections[row][col - 1].getPlayerID() != 0 || intersections[row][col + 1].getPlayerID() != 0);
+
+        if(nextToBuilding) {
+            return true;
+        }
+
+        //bei gerade gerade oder ungerade ungerade nach unten schauen sonst nach oben
+        if((evenRow && evenCol) || (!evenRow && !evenCol)){
+            if(intersections[row-1][col].getPlayerID()!=0){
+                nextToBuilding = true;
+            }
+
+        } else{
+            if(intersections[row + 1][col].getPlayerID() != 0) {
+                nextToBuilding = true;
+            }
+        }
+
+        return nextToBuilding;
+    }
+
+    public boolean isNextToOwnRoad(int row, int col, int playerID){
+        intersection = translateIntersectionToAdjacencyMatrix(row,col);
+
+        for(int i = 0; i < 54; i++){
+            if((adjacencyMatrix[intersection][i].getPlayerID()!= 0 || adjacencyMatrix[intersection][i] != null) && adjacencyMatrix[intersection][i].getPlayerID() == playerID){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int translateIntersectionToAdjacencyMatrix(int row, int col) {
+        return 0;
+    }
 
 
 }
