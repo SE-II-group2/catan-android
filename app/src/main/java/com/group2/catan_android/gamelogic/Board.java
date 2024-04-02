@@ -105,5 +105,17 @@ public class Board {
         return intersections;
     }
 
+    public void addRoad(int playerID, int from, int to){
+        //player has enough Ressources
+
+        if(adjacencyMatrix[from][to].getPlayerID()==0){ // PlayerID = 0 means empty connection
+            adjacencyMatrix[from][to] = new Road(playerID);
+        }
+    }
+
+
+
+
+
 }
 
