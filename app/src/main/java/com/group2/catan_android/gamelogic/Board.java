@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.UNINITIALIZED_VALUE;
-
 public class Board {
 
     private List<Hexagon> hexagonList;
@@ -120,23 +118,23 @@ public class Board {
         return surroundingHexagons;
     }
 
-    public void addRoad(int playerID, int from, int to){
+    public void addRoad(int playerID, int row, int col){
         // player has enough Ressources
-        // check if road is next to
 
-        if(!(adjacencyMatrix[from][to] instanceof Road) && (adjacencyMatrix[from][to] != null)){
+        if(!(adjacencyMatrix[from][to] instanceof Road) && (adjacencyMatrix[from][to] != null) && isNextToOwnRoad(col,playerID)){
             adjacencyMatrix[from][to] = new Road(playerID);
         }
     }
 
     public void addVillage(int playerID, int row, int col){
-
         // player has enough Ressources
 
-        if(!isNextToBuilding(row,col) && isNextToOwnRoad(row,col,playerID) && !(intersections[row][col] instanceof Building) && (intersections[row][col] != null)){
+        int intersection = translateIntersectionToAdjacencyMatrix(row,col);
+
+        if(!isNextToBuilding(row,col) && isNextToOwnRoad(intersection,playerID) && !(intersections[row][col] instanceof Building) && (intersections[row][col] != null)){
             intersections[row][col] = new Building(playerID,Building.BuildingType.VILLAGE);
             Building village = (Building)intersections[row][col];
-            addToHexagons(row,col, village);
+            addToHexagons(intersection,village);
         }
 
     }
@@ -260,9 +258,7 @@ public class Board {
         return nextToBuilding;
     }
 
-    public boolean isNextToOwnRoad(int row, int col, int playerID){
-        int intersection = translateIntersectionToAdjacencyMatrix(row,col);
-
+    public boolean isNextToOwnRoad(int intersection, int playerID){
         //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
             if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayerID() == playerID)){
