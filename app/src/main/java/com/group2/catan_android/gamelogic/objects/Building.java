@@ -2,6 +2,7 @@ package com.group2.catan_android.gamelogic.objects;
 
 public class Building extends Intersection {
 
+    // Vorteile von type: Einfacher upgraden, einfach beim überprüfen muss nur nach building gecheckt werden und nicht village und city
     public enum BuildingType { CITY, VILLAGE }
     BuildingType type;
 

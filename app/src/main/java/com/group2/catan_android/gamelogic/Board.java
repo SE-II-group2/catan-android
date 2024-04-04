@@ -10,18 +10,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import kotlin.UNINITIALIZED_VALUE;
+
 public class Board {
 
     private List<Hexagon> hexagonList;
-    private Connection [][] adjacencyMatrix;
-    private Intersection [][] intersections;
-
+    private Connection [][] adjacencyMatrix = new Connection[54][54];
+    private Intersection [][] intersections = new Intersection[6][11];
+    private int[][] surroundingHexagons = new int[4][54];
     private static final int UNEXISTING_HEXAGON = 19;
 
     public Board(){
-        hexagonList=generateHexagons();
+        hexagonList = generateHexagons();
         adjacencyMatrix = getAdjacencyMatrix();
         intersections = getIntersections();
+        surroundingHexagons = getSurroundingHexagons();
     }
 
     public void distributeResourcesByDiceRoll(int diceRoll) {
@@ -109,6 +112,14 @@ public class Board {
         return intersections;
     }
 
+    private int[][] getSurroundingHexagons() {
+        surroundingHexagons[0] = new int[] {0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53};
+        surroundingHexagons[1] = new int[] {0 ,0 ,0 ,1 ,1 ,2 ,2 ,3 ,3 ,3,0 ,1 ,1 ,2 ,2 ,6 ,7 ,7 ,7 ,3 ,4 ,5 ,5 ,5 ,6 ,6 ,11,7 ,7 ,7 ,8 ,8 ,9 ,9 ,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,16,17,17,18,18};
+        surroundingHexagons[2] = new int[] {19,19,1 ,19,2 ,19,19,19,0 ,4,1 ,4 ,2 ,5 ,6 ,19,19,3 ,8 ,4 ,8 ,9 ,9 ,6 ,10,11,19,19,12,8 ,12,9 ,13,10,14,11,15,19,19,16,13,16,14,17,15,18,19,19,19,17,19,18,19,19};
+        surroundingHexagons[3] = new int[] {19,19,19,19,19,19,19,19,19,0,4 ,5 ,5 ,6 ,19,19,19,19,3 ,8 ,9 ,9 ,10,10,11,19,19,19,19,12,13,13,14,14,15,15,19,19,19,19,16,17,17,18,18,19,19,19,19,19,19,19,19,19};
+        return surroundingHexagons;
+    }
+
     public void addRoad(int playerID, int from, int to){
         // player has enough Ressources
         // check if road is next to
@@ -120,7 +131,7 @@ public class Board {
 
     public void addVillage(int playerID, int row, int col){
 
-        // enough ressources
+        // player has enough Ressources
 
         if(!isNextToBuilding(row,col) && isNextToOwnRoad(row,col,playerID) && !(intersections[row][col] instanceof Building) && (intersections[row][col] != null)){
             intersections[row][col] = new Building(playerID,Building.BuildingType.VILLAGE);
@@ -130,62 +141,78 @@ public class Board {
 
     }
 
+    private void addToHexagons(int intersection, Building building){
+        int firstHexagon = surroundingHexagons[1][intersection];
+        int secondHexagon = surroundingHexagons[2][intersection];
+        int thirdHexagon = surroundingHexagons[3][intersection];
+
+        if(firstHexagon != UNEXISTING_HEXAGON){
+            hexagonList.get(firstHexagon).addBuilding(building);
+        }
+        if(secondHexagon != UNEXISTING_HEXAGON){
+            hexagonList.get(secondHexagon).addBuilding(building);
+        }
+        if(thirdHexagon != UNEXISTING_HEXAGON){
+            hexagonList.get(thirdHexagon).addBuilding(building);
+        }
+    }
+
+/*
     private void addToHexagons(int row, int col, Building building) {
         boolean evenCol = col % 2 == 0;
-        int belowHexagon = 0;
-        int aboveHexagon = 0;
-        int leftHexagon = 0;
+        int belowAboveHexagon = 0;
         int rightHexagon = 0;
+        int leftHexagon;
 
         if(evenCol){
             switch(row){
                 case 0: rightHexagon = col / 2 - 1;
-                        aboveHexagon = UNEXISTING_HEXAGON;
+                        belowAboveHexagon = UNEXISTING_HEXAGON;
                         break;
 
-                case 1: belowHexagon = 2 + col / 2;
+                case 1: belowAboveHexagon = 2 + col / 2;
                         rightHexagon = col / 2 - 1;
                         break;
 
                 case 2: rightHexagon = 7 + col / 2;
-                        aboveHexagon = 2 + col / 2;
+                        belowAboveHexagon = 2 + col / 2;
                         break;
 
-                case 3: belowHexagon = 11 + col / 2;
+                case 3: belowAboveHexagon = 11 + col / 2;
                         rightHexagon = 7 + col / 2;
                         break;
 
                 case 4: rightHexagon = 15 + col / 2;
-                        aboveHexagon = 11 + col / 2;
+                        belowAboveHexagon = 11 + col / 2;
                         break;
 
-                case 5: belowHexagon = UNEXISTING_HEXAGON;
+                case 5: belowAboveHexagon = UNEXISTING_HEXAGON;
                         rightHexagon = 15 + col / 2;
                         break;
             }
         } else{
             switch(row){
-                case 0: belowHexagon = col / 2 - 1;
+                case 0: belowAboveHexagon = col / 2 - 1;
                         rightHexagon = UNEXISTING_HEXAGON;
                         break;
 
                 case 1: rightHexagon = 2 + col / 2 + 1;
-                        aboveHexagon = col / 2 - 1;
+                        belowAboveHexagon = col / 2 - 1;
                         break;
 
-                case 2: belowHexagon = 7 + col / 2;
+                case 2: belowAboveHexagon = 7 + col / 2;
                         rightHexagon = 2 + col / 2 + 1;
                         break;
 
                 case 3: rightHexagon = 11 + col / 2 + 1;
-                        aboveHexagon = 7 + col / 2;
+                        belowAboveHexagon = 7 + col / 2;
                         break;
 
-                case 4: belowHexagon = 15 + col / 2;
+                case 4: belowAboveHexagon = 15 + col / 2;
                         rightHexagon = 11 + col / 2 + 1;
                         break;
 
-                case 5: aboveHexagon = 15 + col / 2;
+                case 5: belowAboveHexagon = 15 + col / 2;
                         rightHexagon = UNEXISTING_HEXAGON;
                         break;
             }
@@ -193,19 +220,19 @@ public class Board {
 
         leftHexagon = rightHexagon - 1;
 
-        if(aboveHexagon != -1){
-            hexagonList.get(aboveHexagon).addBuilding(building);
+        // AUSNAHMEN...
+
+        if(belowAboveHexagon != UNEXISTING_HEXAGON){
+            hexagonList.get(belowAboveHexagon).addBuilding(building);
         }
-        if(belowHexagon != -1){
-            hexagonList.get(belowHexagon).addBuilding(building);
-        }
-        if(rightHexagon != -1){
+        if(rightHexagon != UNEXISTING_HEXAGON){
             hexagonList.get(rightHexagon).addBuilding(building);
         }
-        if(leftHexagon != -1){
+        if(leftHexagon != UNEXISTING_HEXAGON){
             hexagonList.get(leftHexagon).addBuilding(building);
         }
     }
+*/
 
     public boolean isNextToBuilding(int row, int col){
 
@@ -238,7 +265,7 @@ public class Board {
 
         //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
-            if((adjacencyMatrix[intersection][i] instanceof Road) && (adjacencyMatrix[intersection][i].getPlayerID() == playerID)){
+            if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayerID() == playerID)){
                 return true;
             }
         }
