@@ -3,8 +3,8 @@ package com.group2.catan_android.gamelogic;
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
-import com.group2.catan_android.gamelogic.objects.Village;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,9 @@ public class Board {
 
     private List<Hexagon> hexagonList;
     private Connection [][] adjacencyMatrix;
-    private Building [][] intersections;
+    private Intersection [][] intersections;
+
+    private static final int UNEXISTING_HEXAGON = 19;
 
     public Board(){
         hexagonList=generateHexagons();
@@ -93,8 +95,8 @@ public class Board {
         return adjacencyMatrix;
     }
 
-    public Building[][] getIntersections() {
-        Building intersection = new Village(0); //PlayerID for initializing empty Villages / Roads ??
+    public Intersection[][] getIntersections() {
+        Intersection intersection = new Intersection();
 
         //fill first 3 rows from the top and the last 3 from below at the same time
         for (int i = 0; i <= 2; i++) {
@@ -111,7 +113,7 @@ public class Board {
         // player has enough Ressources
         // check if road is next to
 
-        if(adjacencyMatrix[from][to] instanceof Connection){ // PlayerID = 0 means empty connection
+        if(!(adjacencyMatrix[from][to] instanceof Road) && (adjacencyMatrix[from][to] != null)){
             adjacencyMatrix[from][to] = new Road(playerID);
         }
     }
@@ -120,9 +122,9 @@ public class Board {
 
         // enough ressources
 
-        if(!isNextToBuilding(row,col) && isNextToOwnRoad(row,col,playerID)){
-            intersections[row][col] = new Village(playerID);
-            Village village = (Village)intersections[row][col];
+        if(!isNextToBuilding(row,col) && isNextToOwnRoad(row,col,playerID) && !(intersections[row][col] instanceof Building) && (intersections[row][col] != null)){
+            intersections[row][col] = new Building(playerID,Building.BuildingType.VILLAGE);
+            Building village = (Building)intersections[row][col];
             addToHexagons(row,col, village);
         }
 
@@ -130,50 +132,62 @@ public class Board {
 
     private void addToHexagons(int row, int col, Building building) {
         boolean evenCol = col % 2 == 0;
-        int belowHexagon = -1;
-        int aboveHexagon = -1;
-        int leftHexagon = -1;
-        int rightHexagon = -1;
+        int belowHexagon = 0;
+        int aboveHexagon = 0;
+        int leftHexagon = 0;
+        int rightHexagon = 0;
 
         if(evenCol){
             switch(row){
                 case 0: rightHexagon = col / 2 - 1;
-                        aboveHexagon = -1; // does not exist
+                        aboveHexagon = UNEXISTING_HEXAGON;
+                        break;
 
                 case 1: belowHexagon = 2 + col / 2;
                         rightHexagon = col / 2 - 1;
+                        break;
 
                 case 2: rightHexagon = 7 + col / 2;
                         aboveHexagon = 2 + col / 2;
+                        break;
 
                 case 3: belowHexagon = 11 + col / 2;
                         rightHexagon = 7 + col / 2;
+                        break;
 
                 case 4: rightHexagon = 15 + col / 2;
                         aboveHexagon = 11 + col / 2;
+                        break;
 
-                case 5: belowHexagon = -1; // was tun wenn below Hexagon nicht existiert?? intminval
+                case 5: belowHexagon = UNEXISTING_HEXAGON;
                         rightHexagon = 15 + col / 2;
+                        break;
             }
         } else{
             switch(row){
                 case 0: belowHexagon = col / 2 - 1;
-                        rightHexagon = -1;
+                        rightHexagon = UNEXISTING_HEXAGON;
+                        break;
 
                 case 1: rightHexagon = 2 + col / 2 + 1;
                         aboveHexagon = col / 2 - 1;
+                        break;
 
                 case 2: belowHexagon = 7 + col / 2;
                         rightHexagon = 2 + col / 2 + 1;
+                        break;
 
                 case 3: rightHexagon = 11 + col / 2 + 1;
                         aboveHexagon = 7 + col / 2;
+                        break;
 
                 case 4: belowHexagon = 15 + col / 2;
                         rightHexagon = 11 + col / 2 + 1;
+                        break;
 
                 case 5: aboveHexagon = 15 + col / 2;
-                        rightHexagon = -1;
+                        rightHexagon = UNEXISTING_HEXAGON;
+                        break;
             }
         }
 
@@ -198,7 +212,7 @@ public class Board {
         boolean evenCol = col % 2 == 0;
         boolean evenRow = row % 2 == 0;
 
-        boolean nextToBuilding = (intersections[row][col - 1].getPlayerID() != 0 || intersections[row][col + 1].getPlayerID() != 0);
+        boolean nextToBuilding = (intersections[row][col - 1] instanceof Building || intersections[row][col + 1] instanceof Building);
 
         if(nextToBuilding) {
             return true;
@@ -206,12 +220,12 @@ public class Board {
 
         //if even even check or uneven uneven check below, else above if there is a building next to the position where it should be built
         if((evenRow && evenCol) || (!evenRow && !evenCol)){
-            if(intersections[row-1][col].getPlayerID()!=0){
+            if(intersections[row-1][col] instanceof Building){
                 nextToBuilding = true;
             }
 
         } else{
-            if(intersections[row + 1][col].getPlayerID() != 0) {
+            if(intersections[row + 1][col] instanceof Building) {
                 nextToBuilding = true;
             }
         }
@@ -224,7 +238,7 @@ public class Board {
 
         //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
-            if((adjacencyMatrix[intersection][i].getPlayerID()!= 0 || adjacencyMatrix[intersection][i] != null) && adjacencyMatrix[intersection][i].getPlayerID() == playerID){
+            if((adjacencyMatrix[intersection][i] instanceof Road) && (adjacencyMatrix[intersection][i].getPlayerID() == playerID)){
                 return true;
             }
         }
@@ -235,12 +249,12 @@ public class Board {
         int intersection = 0;
 
         switch(row){
-            case 0: intersection = col - 2;
-            case 1: intersection = 6 + col;
-            case 2: intersection = 16 + col;
-            case 3: intersection = 27 + col;
-            case 4: intersection = 37 + col;
-            case 5: intersection = 45 + col;
+            case 0: intersection = col - 2; break;
+            case 1: intersection = 6 + col; break;
+            case 2: intersection = 16 + col; break;
+            case 3: intersection = 27 + col; break;
+            case 4: intersection = 37 + col; break;
+            case 5: intersection = 45 + col; break;
         }
         return intersection;
     }
