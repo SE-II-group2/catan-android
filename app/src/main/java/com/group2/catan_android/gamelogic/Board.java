@@ -13,10 +13,10 @@ import java.util.List;
 public class Board {
 
     private List<Hexagon> hexagonList;
-    private Connection [][] adjacencyMatrix = new Connection[54][54];
-    private Intersection [][] intersections = new Intersection[6][11];
-    private int[][] surroundingHexagons = new int[4][54];
-    private static final int UNEXISTING_HEXAGON = 19;
+    private Connection [][] adjacencyMatrix;
+    private Intersection [][] intersections;
+    private int[][] surroundingHexagons;
+    private static final int NON_EXISTING_HEXAGON = 19;
 
     public Board(){
         hexagonList = generateHexagons();
@@ -119,15 +119,15 @@ public class Board {
     }
 
     public void addRoad(int playerID, int row, int col){
-        // player has enough Ressources
+        // player has enough Resources
 
-        if(!(adjacencyMatrix[from][to] instanceof Road) && (adjacencyMatrix[from][to] != null) && isNextToOwnRoad(col,playerID)){
-            adjacencyMatrix[from][to] = new Road(playerID);
+        if(!(adjacencyMatrix[row][col] instanceof Road) && (adjacencyMatrix[row][col] != null) && isNextToOwnRoad(col,playerID)){
+            adjacencyMatrix[row][col] = new Road(playerID);
         }
     }
 
     public void addVillage(int playerID, int row, int col){
-        // player has enough Ressources
+        // player has enough Resources
 
         int intersection = translateIntersectionToAdjacencyMatrix(row,col);
 
@@ -144,17 +144,18 @@ public class Board {
         int secondHexagon = surroundingHexagons[2][intersection];
         int thirdHexagon = surroundingHexagons[3][intersection];
 
-        if(firstHexagon != UNEXISTING_HEXAGON){
+        if(firstHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(firstHexagon).addBuilding(building);
         }
-        if(secondHexagon != UNEXISTING_HEXAGON){
+        if(secondHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(secondHexagon).addBuilding(building);
         }
-        if(thirdHexagon != UNEXISTING_HEXAGON){
+        if(thirdHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(thirdHexagon).addBuilding(building);
         }
     }
 
+    //old addToHexagonMethod
 /*
     private void addToHexagons(int row, int col, Building building) {
         boolean evenCol = col % 2 == 0;
@@ -165,7 +166,7 @@ public class Board {
         if(evenCol){
             switch(row){
                 case 0: rightHexagon = col / 2 - 1;
-                        belowAboveHexagon = UNEXISTING_HEXAGON;
+                        belowAboveHexagon = NON_EXISTING_HEXAGON;
                         break;
 
                 case 1: belowAboveHexagon = 2 + col / 2;
@@ -184,14 +185,14 @@ public class Board {
                         belowAboveHexagon = 11 + col / 2;
                         break;
 
-                case 5: belowAboveHexagon = UNEXISTING_HEXAGON;
+                case 5: belowAboveHexagon = NON_EXISTING_HEXAGON;
                         rightHexagon = 15 + col / 2;
                         break;
             }
         } else{
             switch(row){
                 case 0: belowAboveHexagon = col / 2 - 1;
-                        rightHexagon = UNEXISTING_HEXAGON;
+                        rightHexagon = NON_EXISTING_HEXAGON;
                         break;
 
                 case 1: rightHexagon = 2 + col / 2 + 1;
@@ -211,7 +212,7 @@ public class Board {
                         break;
 
                 case 5: belowAboveHexagon = 15 + col / 2;
-                        rightHexagon = UNEXISTING_HEXAGON;
+                        rightHexagon = NON_EXISTING_HEXAGON;
                         break;
             }
         }
@@ -220,13 +221,13 @@ public class Board {
 
         // AUSNAHMEN...
 
-        if(belowAboveHexagon != UNEXISTING_HEXAGON){
+        if(belowAboveHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(belowAboveHexagon).addBuilding(building);
         }
-        if(rightHexagon != UNEXISTING_HEXAGON){
+        if(rightHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(rightHexagon).addBuilding(building);
         }
-        if(leftHexagon != UNEXISTING_HEXAGON){
+        if(leftHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(leftHexagon).addBuilding(building);
         }
     }
