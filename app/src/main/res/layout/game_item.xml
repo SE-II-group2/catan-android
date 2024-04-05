@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/gameIDLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GameID:"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/gameID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:text="none"
+        app:layout_constraintStart_toEndOf="@+id/gameIDLabel"
+        app:layout_constraintTop_toTopOf="@+id/gameIDLabel"
+        android:layout_marginStart="10dp"/>
+    <TextView
+        android:id="@+id/playersConnectedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PlayersConnected:"
+        app:layout_constraintTop_toBottomOf="@+id/gameIDLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="16sp"/>
+    <TextView
+        android:id="@+id/playersConnected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/playersConnectedLabel"
+        app:layout_constraintTop_toTopOf="@id/playersConnectedLabel"
+        android:layout_marginStart="5dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

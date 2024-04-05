@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">catan_android</string>
+    <string name="connect_to_game">Connect to Game</string>
 </resources>
