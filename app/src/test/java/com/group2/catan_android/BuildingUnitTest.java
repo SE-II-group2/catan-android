@@ -16,8 +16,8 @@ public class BuildingUnitTest {
 
     @Test
     public void testBuildingPlayerID() {
-        Building building1 = new Village(1);
-        Building building2 = new City(1);
+        Building building1 = new Building(1, Building.BuildingType.VILLAGE);
+        Building building2 = new Building(1, Building.BuildingType.CITY);
 
         assertEquals(1, building1.getPlayerID());
         assertEquals(1, building2.getPlayerID());

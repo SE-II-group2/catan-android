@@ -86,6 +86,16 @@ public class BoardUnitTests {
         verify(buildingMock, times(2)).giveResources(any());
 
     }
+
+    @Test
+    public void testAddVillage(){
+
+    }
+
+    @Test
+    public void testAddRoad(){
+
+    }
 }
 
 

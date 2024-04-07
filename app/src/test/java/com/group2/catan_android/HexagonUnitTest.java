@@ -17,7 +17,7 @@ public class HexagonUnitTest {
     @Test
     public void testAddBuilding() {
         Hexagon hexagon = new Hexagon("Forest", new int[]{0, 0, 1, 0, 0}, 6);
-        Building building1 = new Village(1);
+        Building building1 = new Building(1, Building.BuildingType.VILLAGE);
         hexagon.addBuilding(building1);
 
         assertEquals(1, hexagon.getNumOfBuildings());
