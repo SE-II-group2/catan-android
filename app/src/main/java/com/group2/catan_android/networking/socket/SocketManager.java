@@ -37,6 +37,9 @@ public class SocketManager {
     }
 
     public void connect(String token){
+        if(isConnected()){
+            disconnect();
+        }
         Map<String, String> auth = Map.of("Authorization", token);
         client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SOCKET_URI, auth);
         client.connect();
@@ -65,7 +68,9 @@ public class SocketManager {
     }
 
     public boolean isConnected(){
-        return client.isConnected();
+        if(client != null)
+            return client.isConnected();
+        return false;
     }
 
 
