@@ -19,6 +19,10 @@ import java.util.List;
 
 public class BoardUnitTests {
 
+    enum Location {
+        HILLS, FOREST, MOUNTAINS, FIELDS, PASTURE, DESERT
+    }
+
     private Board board;
 
     @Mock
@@ -42,9 +46,9 @@ public class BoardUnitTests {
         List<Integer> valuesWanted = new ArrayList<>();
 
         // Copy locations and values lists to ensure original lists remain unchanged
-        Collections.addAll(locationsWanted, "Hills", "Hills", "Hills", "Forest", "Forest", "Forest", "Forest",
-                "Mountains", "Mountains", "Mountains", "Fields", "Fields", "Fields", "Fields",
-                "Pasture", "Pasture", "Pasture", "Pasture", "Desert");
+        Collections.addAll(locationsWanted, "HILLS", "HILLS", "HILLS", "FOREST", "FOREST", "FOREST", "FOREST",
+                "MOUNTAINS", "MOUNTAINS", "MOUNTAINS", "FIELDS", "FIELDS", "FIELDS", "FIELDS",
+                "PASTURE", "PASTURE", "PASTURE", "PASTURE", "DESERT");
         Collections.addAll(valuesWanted, 0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
 
         List<String> locationsActual = new ArrayList<>();
@@ -65,12 +69,12 @@ public class BoardUnitTests {
 
     @Test
     public void testGenerateHexagonsDesertTileCorrectness() {
-        boolean hasDesertTile=false;
+        boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.getType().equals("Desert")) {
+            if (hexagon.getType().equals(Location.DESERT.name())) {
                 assertEquals(0, hexagon.getRollValue());
-                assertArrayEquals(new int[]{0,0,0,0,0}, hexagon.getResourceValue());
-                hasDesertTile=true;
+                assertArrayEquals(new int[]{0, 0, 0, 0, 0}, hexagon.getResourceValue());
+                hasDesertTile = true;
             }
         }
         assertTrue(hasDesertTile);
@@ -88,13 +92,35 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddVillage(){
+    public void testAddVillageNormalCase(){
+        board.addVillage(1,2,5);
+        board.addVillage(1, 2, 7);
+        board.addVillage(1, 1, 6);
+        List<Hexagon> hexList= board.getHexagonList();
+        assertEquals(3, hexList.get(5).getNumOfBuildings());
+        assertEquals(1, hexList.get(2).getNumOfBuildings());
+        assertEquals(0,hexList.get(3).getNumOfBuildings());
 
+        board.addVillage(1, 2, 6);
+        assertEquals(3, hexList.get(5).getNumOfBuildings());
+    }
+
+    @Test
+    public void testAddVillageEdgeOfBoard(){
+        board.addVillage(1, 2, 0);
+        board.addVillage(1, 1, 1);
+
+        List<Hexagon> hexList= board.getHexagonList();
+        assertEquals(1, hexList.get(7).getNumOfBuildings());
+        assertEquals(1,hexList.get(3).getNumOfBuildings());
     }
 
     @Test
     public void testAddRoad(){
-
+        board.addRoad(1, 0, 1);
+        assertTrue(board.isNextToOwnRoad(1, 1));
+        assertTrue(board.isNextToOwnRoad(0, 1));
+        assertFalse(board.isNextToOwnRoad(8, 1));
     }
 }
 
