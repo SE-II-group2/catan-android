@@ -101,6 +101,7 @@ public class ConnectToGameActivity extends AppCompatActivity {
             public void onFailure(Throwable throwable) {
                 Log.d("Networking", "Failed to fetch games", throwable);
                 showMessage("Failed to fetch games");
+                setLoading(false);
             }
         });
     }
