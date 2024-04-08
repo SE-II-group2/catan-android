@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
         Button connection = findViewById(R.id.btnConnection);
         connection.setOnClickListener(v -> navigate(ConnectToGameActivity.class));
+
+        Button demoBoard = findViewById(R.id.demoBoard);
+        demoBoard.setOnClickListener(v -> navigate(demoboard.class));
     }
 
     private void navigate(Class<?> cl){
