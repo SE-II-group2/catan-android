@@ -1,6 +1,7 @@
 package com.group2.catan_android;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,28 +53,30 @@ public class demoboard extends AppCompatActivity {
                 R.drawable.hexagon_wood_svg
         };
 
-        ImageView[] imageViews = new ImageView[ids.length];
+        ImageView[] hexagonViews = new ImageView[ids.length];
 
         for (int i = 0; i < ids.length; i++){
-            ImageView imageView = new ImageView(this);
-            imageView.setId(ViewCompat.generateViewId());
-            imageView.setImageDrawable(ContextCompat.getDrawable(this, ids[i]));
+            ImageView hexagonView = new ImageView(this);
+            hexagonView.setId(ViewCompat.generateViewId());
+            Log.d("ImageView IDs", "ImageView ID: " + hexagonView.getId()); //log HexagonID
+            hexagonView.setImageDrawable(ContextCompat.getDrawable(this, ids[i]));
+
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (width), (int) (height));
-            constraintLayout.addView(imageView, params);
-            imageViews[i] = imageView;
+            constraintLayout.addView(hexagonView, params);
+            hexagonViews[i] = hexagonView;
         }
 
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
-            applyConstraints(constraintLayout, imageViews, layoutWidth, layoutHeight);
+            applyConstraints(constraintLayout, hexagonViews, layoutWidth, layoutHeight);
         });
     }
+
     private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] imageViews, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
-        //TODO: Maybe revise the margins sometime
         int topMargin = -20;
         int sideMargin = 0;
         int thirdRow = (int) Math.round((layoutWidth/2)-(2.5*width));
@@ -126,4 +129,3 @@ public class demoboard extends AppCompatActivity {
     }
 
 }
-
