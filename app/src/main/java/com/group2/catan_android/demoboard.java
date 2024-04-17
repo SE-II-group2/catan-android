@@ -14,9 +14,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class demoboard extends AppCompatActivity {
 
-    // hexagon icon measurements
-    static int height = 220;
-    static int width = 220;
+    // hexagon icon measurements (square)
+    static int hexagonSize = 220;
+    static int halfHexagonSize = hexagonSize/2;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +63,7 @@ public class demoboard extends AppCompatActivity {
             Log.d("ImageView IDs", "ImageView ID: " + hexagonView.getId()); //log HexagonID
             hexagonView.setImageDrawable(ContextCompat.getDrawable(this, ids[i]));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (width), (int) (height));
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (hexagonSize), (int) (hexagonSize));
             constraintLayout.addView(hexagonView, params);
             hexagonViews[i] = hexagonView;
         }
@@ -77,12 +79,11 @@ public class demoboard extends AppCompatActivity {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
-        int topMargin = -48;
-        int sideMargin = -24;
-        int thirdRow = (int) Math.round((layoutWidth/2.0)-(2.5*width + sideMargin) - sideMargin); // 2,5 Hexagons to the left, starting in the middle
-        int secondRow = (int) Math.round(thirdRow + (width + sideMargin)/2.0); // 0,5 Hexagons to the right, starting from the third row + sidemargin
-        int firstRow = (int) Math.round(thirdRow + width + sideMargin); // 1 Hexagon to the right, starting from the third row + sidemargin
-        int firstTop = (int) Math.round((layoutHeight/2.0)-(2.5*height)-(2*topMargin)-getStatusBarHeight());
+        int margin = -24;
+        int thirdRow = (layoutWidth / 2) - (2*hexagonSize + halfHexagonSize) - (2*margin);
+        int secondRow = thirdRow + halfHexagonSize + (margin/2);
+        int firstRow = thirdRow + hexagonSize + margin;
+        int firstTop = (layoutHeight/2) - (2*hexagonSize+halfHexagonSize) - (4*margin) - getStatusBarHeight();
 
         int prevDrawable = ConstraintSet.PARENT_ID;
         int firstDrawableInRow = hexagonViews[0].getId();
@@ -110,10 +111,10 @@ public class demoboard extends AppCompatActivity {
 
                 // if not the first-element in the FIRST line consider topMargin to the hex above
                 if (i != 0) {
-                    set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.BOTTOM, topMargin);
+                    set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.BOTTOM, margin*2);
                 }
             } else {
-                set.connect(hexagonView.getId(), ConstraintSet.START, prevDrawable, ConstraintSet.END, sideMargin);
+                set.connect(hexagonView.getId(), ConstraintSet.START, prevDrawable, ConstraintSet.END, margin);
                 set.connect(hexagonView.getId(), ConstraintSet.TOP, firstDrawableInRow, ConstraintSet.TOP, 0);
             }
 
