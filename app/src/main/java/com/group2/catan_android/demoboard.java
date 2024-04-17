@@ -15,8 +15,8 @@ import androidx.core.view.WindowInsetsCompat;
 public class demoboard extends AppCompatActivity {
 
     // hexagon icon measurements
-    static int height = 200;
-    static int width = 200;
+    static int height = 220;
+    static int width = 220;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,59 +73,72 @@ public class demoboard extends AppCompatActivity {
         });
     }
 
-    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] imageViews, int layoutWidth, int layoutHeight) {
+    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
-        int topMargin = -20;
-        int sideMargin = 0;
-        int thirdRow = (int) Math.round((layoutWidth/2)-(2.5*width));
-        int secondRow = (int) Math.round(thirdRow + (width / 2));
-        int firstRow = (int) Math.round(thirdRow + width);
-        int firstTop = (int) Math.round((layoutHeight/2)-(2.5*height)+(topMargin));
+        int topMargin = -48;
+        int sideMargin = -24;
+        int thirdRow = (int) Math.round((layoutWidth/2.0)-(2.5*width + sideMargin) - sideMargin); // 2,5 Hexagons to the left, starting in the middle
+        int secondRow = (int) Math.round(thirdRow + (width + sideMargin)/2.0); // 0,5 Hexagons to the right, starting from the third row + sidemargin
+        int firstRow = (int) Math.round(thirdRow + width + sideMargin); // 1 Hexagon to the right, starting from the third row + sidemargin
+        int firstTop = (int) Math.round((layoutHeight/2.0)-(2.5*height)-(2*topMargin)-getStatusBarHeight());
 
         int prevDrawable = ConstraintSet.PARENT_ID;
-        int firstDrawableInRow = imageViews[0].getId();
+        int firstDrawableInRow = hexagonViews[0].getId();
 
-        for (int i = 0; i < imageViews.length; i++) {
-            ImageView imageView = imageViews[i];
+        for (int i = 0; i < hexagonViews.length; i++) {
+            ImageView hexagonView = hexagonViews[i];
 
             // first hexagons in each line
             if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) { // start of new line 3-4-5-4-3
                 switch(i) {
                     case 0:
                     case 16:
-                        set.connect(imageView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
+                        set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
                         break;
                     case 3:
                     case 12:
-                        set.connect(imageView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
+                        set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
                         break;
                     case 7:
-                        set.connect(imageView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, thirdRow);
+                        set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, thirdRow);
                         break;
                 }
 
-                firstDrawableInRow = imageView.getId(); // beginning of current line
+                firstDrawableInRow = hexagonView.getId(); // beginning of current line
 
                 // if not the first-element in the FIRST line consider topMargin to the hex above
                 if (i != 0) {
-                    set.connect(imageView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.BOTTOM, topMargin);
+                    set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.BOTTOM, topMargin);
                 }
             } else {
-                set.connect(imageView.getId(), ConstraintSet.START, prevDrawable, ConstraintSet.END, sideMargin);
-                set.connect(imageView.getId(), ConstraintSet.TOP, firstDrawableInRow, ConstraintSet.TOP, 0);
+                set.connect(hexagonView.getId(), ConstraintSet.START, prevDrawable, ConstraintSet.END, sideMargin);
+                set.connect(hexagonView.getId(), ConstraintSet.TOP, firstDrawableInRow, ConstraintSet.TOP, 0);
             }
 
             // first-line first-element constraint top
             if (i == 0) {
-                set.connect(imageView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, firstTop);
+                set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.TOP, firstTop);
             }
 
-            prevDrawable = imageView.getId();
+            prevDrawable = hexagonView.getId();
         }
 
         set.applyTo(constraintLayout);
     }
 
+    //TODO: find alternative Method to get StatusBarHeight
+    // Status Bar Height needed to center Board
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
 }
+
+
