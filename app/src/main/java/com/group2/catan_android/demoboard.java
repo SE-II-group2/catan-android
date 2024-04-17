@@ -1,7 +1,6 @@
 package com.group2.catan_android;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,12 +11,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.objects.Hexagon;
+
+import java.util.List;
+
 public class demoboard extends AppCompatActivity {
 
     // hexagon icon measurements (square)
     static int hexagonSize = 220;
     static int halfHexagonSize = hexagonSize/2;
 
+    //should be moved to backend
+    Board board = new Board();
+    List<Hexagon> hexagonList = board.getHexagonList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,35 +39,38 @@ public class demoboard extends AppCompatActivity {
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
-        //TODO: Insert these drawables according to the playing field from the server (not ready yet)
-        int[] ids = {
-                R.drawable.hexagon_brick_svg,
-                R.drawable.hexagon_wood_svg,
-                R.drawable.hexagon_stone_svg,
-                R.drawable.hexagon_brick_svg,
-                R.drawable.hexagon_sheep_svg,
-                R.drawable.hexagon_sheep_svg,
-                R.drawable.hexagon_wheat_svg,
-                R.drawable.hexagon_wood_svg,
-                R.drawable.hexagon_sheep_svg,
-                R.drawable.hexagon_wheat_svg,
-                R.drawable.hexagon_wheat_svg,
-                R.drawable.hexagon_wood_svg,
-                R.drawable.hexagon_stone_svg,
-                R.drawable.hexagon_brick_svg,
-                R.drawable.hexagon_sheep_svg,
-                R.drawable.hexagon_stone_svg,
-                R.drawable.hexagon_brick_svg,
-                R.drawable.hexagon_wheat_svg,
-                R.drawable.hexagon_wood_svg
-        };
+        int[] ids = new int[19];
+
+        for (int i = 0; i < ids.length; i++) {
+            Hexagon hexagon = hexagonList.get(i);
+
+            switch (hexagon.getType()) {
+                case "HILLS":
+                    ids[i] = R.drawable.hexagon_brick_svg;
+                    break;
+                case "FOREST":
+                    ids[i] = R.drawable.hexagon_wood_svg;
+                    break;
+                case "MOUNTAINS":
+                    ids[i] = R.drawable.hexagon_stone_svg;
+                    break;
+                case "PASTURE":
+                    ids[i] = R.drawable.hexagon_sheep_svg;
+                    break;
+                case "FIELDS":
+                    ids[i] = R.drawable.hexagon_wheat_svg;
+                    break;
+                default:
+                    ids[i] = R.drawable.hexagon_wheat_svg; //should be desert (svg missing)
+                    break;
+            }
+        }
 
         ImageView[] hexagonViews = new ImageView[ids.length];
 
         for (int i = 0; i < ids.length; i++){
             ImageView hexagonView = new ImageView(this);
             hexagonView.setId(ViewCompat.generateViewId());
-            Log.d("ImageView IDs", "ImageView ID: " + hexagonView.getId()); //log HexagonID
             hexagonView.setImageDrawable(ContextCompat.getDrawable(this, ids[i]));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (hexagonSize), (int) (hexagonSize));
