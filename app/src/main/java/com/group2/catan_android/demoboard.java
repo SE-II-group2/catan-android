@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
@@ -18,11 +19,13 @@ import java.util.List;
 
 public class demoboard extends AppCompatActivity {
 
-    // hexagon icon measurements (square)
-    static int hexagonSize = 220;
+    // hexagon icon measurements
+    static int hexagonSize = 200;
     static int halfHexagonSize = hexagonSize/2;
 
-    //should be moved to backend
+    static int intersectionSize = 10;
+
+    //TODO: should be moved to backend
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
 
@@ -61,10 +64,12 @@ public class demoboard extends AppCompatActivity {
                     ids[i] = R.drawable.hexagon_wheat_svg;
                     break;
                 default:
-                    ids[i] = R.drawable.hexagon_wheat_svg; //should be desert (svg missing)
+                    ids[i] = R.drawable.oasis_svgrepo_com; //should be desert (svg missing)
                     break;
             }
         }
+
+        //TODO: Make Desert Hexagon always the [9] element (should be done in backend)
 
         ImageView[] hexagonViews = new ImageView[ids.length];
 
@@ -78,14 +83,26 @@ public class demoboard extends AppCompatActivity {
             hexagonViews[i] = hexagonView;
         }
 
+        ImageView[] intersectionViews = new ImageView[54];
+
+        for (int i = 0; i < 54; i++){
+            ImageView intersectionView = new ImageView(this);
+            intersectionView.setId(ViewCompat.generateViewId());
+            intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.dot_drawable));
+
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (intersectionSize), (int) (intersectionSize));
+            constraintLayout.addView(intersectionView, params);
+            intersectionViews[i] = intersectionView;
+        }
+
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
-            applyConstraints(constraintLayout, hexagonViews, layoutWidth, layoutHeight);
+            applyConstraints(constraintLayout, hexagonViews, intersectionViews, layoutWidth, layoutHeight);
         });
     }
 
-    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, int layoutWidth, int layoutHeight) {
+    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
@@ -98,8 +115,10 @@ public class demoboard extends AppCompatActivity {
         int prevDrawable = ConstraintSet.PARENT_ID;
         int firstDrawableInRow = hexagonViews[0].getId();
 
+
         for (int i = 0; i < hexagonViews.length; i++) {
             ImageView hexagonView = hexagonViews[i];
+            ImageView intersectionView = intersectionViews[i];
 
             // first hexagons in each line
             if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) { // start of new line 3-4-5-4-3
@@ -131,10 +150,18 @@ public class demoboard extends AppCompatActivity {
             // first-line first-element constraint top
             if (i == 0) {
                 set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.TOP, firstTop);
+
             }
+
+            set.connect(intersectionView.getId(), ConstraintSet.START, hexagonView.getId(), ConstraintSet.START, 0);
+            set.connect(intersectionView.getId(), ConstraintSet.END, hexagonView.getId(), ConstraintSet.END, 0);
+            set.connect(intersectionView.getId(), ConstraintSet.TOP, hexagonView.getId(), ConstraintSet.TOP, 0);
+            set.connect(intersectionView.getId(), ConstraintSet.BOTTOM, hexagonView.getId(), ConstraintSet.BOTTOM, 0);
 
             prevDrawable = hexagonView.getId();
         }
+
+
 
         set.applyTo(constraintLayout);
     }
@@ -152,4 +179,4 @@ public class demoboard extends AppCompatActivity {
 
 }
 
-
+//TODO: weitere Buttons erstellen um zu interagieren
