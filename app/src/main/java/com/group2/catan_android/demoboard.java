@@ -64,12 +64,10 @@ public class demoboard extends AppCompatActivity {
                     ids[i] = R.drawable.hexagon_wheat_svg;
                     break;
                 default:
-                    ids[i] = R.drawable.oasis_svgrepo_com; //should be desert (svg missing)
+                    ids[i] = R.drawable.desert_hexagon_svg;
                     break;
             }
         }
-
-        //TODO: Make Desert Hexagon always the [9] element (should be done in backend)
 
         ImageView[] hexagonViews = new ImageView[ids.length];
 
@@ -118,7 +116,8 @@ public class demoboard extends AppCompatActivity {
 
         for (int i = 0; i < hexagonViews.length; i++) {
             ImageView hexagonView = hexagonViews[i];
-            ImageView intersectionView = intersectionViews[i];
+            ImageView intersectionViewTop = intersectionViews[i];
+            ImageView intersectionViewRight = intersectionViews[i+30];
 
             // first hexagons in each line
             if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) { // start of new line 3-4-5-4-3
@@ -153,10 +152,18 @@ public class demoboard extends AppCompatActivity {
 
             }
 
-            set.connect(intersectionView.getId(), ConstraintSet.START, hexagonView.getId(), ConstraintSet.START, 0);
-            set.connect(intersectionView.getId(), ConstraintSet.END, hexagonView.getId(), ConstraintSet.END, 0);
-            set.connect(intersectionView.getId(), ConstraintSet.TOP, hexagonView.getId(), ConstraintSet.TOP, 0);
-            set.connect(intersectionView.getId(), ConstraintSet.BOTTOM, hexagonView.getId(), ConstraintSet.BOTTOM, 0);
+            set.connect(intersectionViewTop.getId(), ConstraintSet.START, hexagonView.getId(), ConstraintSet.START, -halfHexagonSize);
+            set.connect(intersectionViewTop.getId(), ConstraintSet.END, hexagonView.getId(), ConstraintSet.END, -halfHexagonSize);
+            set.connect(intersectionViewTop.getId(), ConstraintSet.TOP, hexagonView.getId(), ConstraintSet.TOP, -hexagonSize);
+            set.connect(intersectionViewTop.getId(), ConstraintSet.BOTTOM, hexagonView.getId(), ConstraintSet.BOTTOM, 0);
+
+            set.connect(intersectionViewRight.getId(), ConstraintSet.START, hexagonView.getId(), ConstraintSet.START, 0);
+            set.connect(intersectionViewRight.getId(), ConstraintSet.END, hexagonView.getId(), ConstraintSet.END, hexagonSize+margin);
+            set.connect(intersectionViewRight.getId(), ConstraintSet.TOP, hexagonView.getId(), ConstraintSet.TOP, -halfHexagonSize);
+            set.connect(intersectionViewRight.getId(), ConstraintSet.BOTTOM, hexagonView.getId(), ConstraintSet.BOTTOM, 0);
+
+
+
 
             prevDrawable = hexagonView.getId();
         }
