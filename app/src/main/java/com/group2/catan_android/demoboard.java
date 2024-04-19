@@ -83,6 +83,11 @@ public class demoboard extends AppCompatActivity {
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams((int) (hexagonSize), (int) (hexagonSize));
             constraintLayout.addView(hexagonView, params);
             hexagonViews[i] = hexagonView;
+
+            // toast for testing
+            hexagonView.setOnClickListener(v -> {
+                Toast.makeText(getApplicationContext(), "index " + (hexagonView.getId()), Toast.LENGTH_SHORT).show();
+            });
         }
 
         ImageView[] intersectionViews = new ImageView[60];
@@ -116,6 +121,73 @@ public class demoboard extends AppCompatActivity {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
+        final int margin = -24;
+        int thirdRow = (layoutWidth / 2) - (2*hexagonSize + halfHexagonSize) - (2*margin);
+        int secondRow = thirdRow + halfHexagonSize + (margin/2);
+        int firstRow = thirdRow + hexagonSize + margin;
+        int firstHexagonMargin = (layoutHeight/2) - (2*hexagonSize+halfHexagonSize) - (4*margin) - getStatusBarHeight();
+
+        int prevDrawableTop = ConstraintSet.PARENT_ID;
+        int prevDrawableBottom = ConstraintSet.PARENT_ID;
+        int hexagonID = hexagonViews[0].getId();
+        int intersectionTopID = intersectionViews[0].getId();
+        int intersectionBottomID = intersectionTopID + intersectionViews.length-1;
+
+        for (int i = 0; i < hexagonViews.length/2; i++) {
+            int hexagonTopID = hexagonID++;
+            int hexagonBottomID = hexagonID;
+
+            if (i == 0 || i == 3 || i == 7){//start of new line
+
+                switch(i) {
+                    case 0:
+                        set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
+                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.TOP, firstHexagonMargin);
+                        set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, firstRow);
+                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.BOTTOM, firstHexagonMargin);
+                        break;
+
+                    case 3:
+                        set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
+                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, margin*2);
+                        set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, secondRow);
+                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, margin*2);
+                        break;
+                    case 7:
+                        set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, thirdRow);
+                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, margin*2);
+                        set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, thirdRow);
+                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, margin*2);
+                        break;
+                }
+
+                //draw intersections to Hexagons on the left border
+                //drawIntersection(set,hexagonTop,intersectionTopID,0,hexagonSize+margin,-halfHexagonSize,0); //topLeft
+
+            } else {
+                set.connect(hexagonTopID, ConstraintSet.START, prevDrawableTop, ConstraintSet.END, margin);
+                set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.TOP, 0);
+
+                set.connect(hexagonBottomID, ConstraintSet.END, prevDrawableBottom, ConstraintSet.START, margin);
+                set.connect(hexagonBottomID, ConstraintSet.TOP, prevDrawableBottom, ConstraintSet.TOP, 0);
+            }
+
+            prevDrawableTop = hexagonID - 1;
+            prevDrawableBottom = hexagonID++;
+        }
+
+        //draw last Hexagon in the middle
+        set.connect(hexagonID, ConstraintSet.START, prevDrawableTop, ConstraintSet.END, margin);
+        set.connect(hexagonID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.TOP, 0);
+
+        set.applyTo(constraintLayout);
+    }
+
+/*
+    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, int layoutWidth, int layoutHeight) {
+        ConstraintSet set = new ConstraintSet();
+        set.clone(constraintLayout);
+
         int margin = -24;
         int thirdRow = (layoutWidth / 2) - (2*hexagonSize + halfHexagonSize) - (2*margin);
         int secondRow = thirdRow + halfHexagonSize + (margin/2);
@@ -132,29 +204,34 @@ public class demoboard extends AppCompatActivity {
             ImageView intersectionView = intersectionViews[intersectionID];
 
             // first hexagons in each line
-            if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) {// start of new line 3-4-5-4-3
+            if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) {// start of new line 3-4-5-4-3 or last / right bottom row (draw missing intersection
 
                 switch(i) {
                     case 0:
-                    case 16:
                         set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
                         break;
+                    case 16:
+                        set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
+                        drawIntersection(set,hexagonView,intersectionViews[intersectionID],-(hexagonSize+margin),hexagonSize+margin,-hexagonSize,0); //topLeft
+                        intersectionID++;
+                        drawIntersection(set,hexagonView,intersectionViews[intersectionID],-(hexagonSize+margin),0,0,-halfHexagonSize); //topLeft
+                        intersectionID++;
+                        break;
                     case 3:
+                        set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
+                        break;
                     case 12:
                         set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
-
+                        drawIntersection(set,hexagonView,intersectionViews[intersectionID],-(hexagonSize+margin),hexagonSize+margin,-hexagonSize,0); //topLeft
+                        intersectionID++;
                         break;
                     case 7:
                         set.connect(hexagonView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, thirdRow);
                         break;
                 }
 
-                //draw Intersections to Hexagon
+                //draw intersections to Hexagons on the left border
                 drawIntersection(set,hexagonView,intersectionViews[intersectionID],0,hexagonSize+margin,-halfHexagonSize,0); //topLeft
-                intersectionID++;
-                drawIntersection(set,hexagonView,intersectionViews[intersectionID],-halfHexagonSize,-halfHexagonSize,-hexagonSize,0); //topMiddle
-                intersectionID++;
-                drawIntersection(set,hexagonView,intersectionViews[intersectionID],hexagonSize+margin,0,-halfHexagonSize,0); //topRight
                 intersectionID++;
 
                 firstDrawableInRow = hexagonView.getId(); // beginning of current line
@@ -163,18 +240,17 @@ public class demoboard extends AppCompatActivity {
                 if (i != 0) {
                     set.connect(hexagonView.getId(), ConstraintSet.TOP, prevDrawable, ConstraintSet.BOTTOM, margin*2);
                 }
+
             } else {
                 set.connect(hexagonView.getId(), ConstraintSet.START, prevDrawable, ConstraintSet.END, margin);
                 set.connect(hexagonView.getId(), ConstraintSet.TOP, firstDrawableInRow, ConstraintSet.TOP, 0);
-
-                //dot on top of Hexagon
-                drawIntersection(set,hexagonView,intersectionViews[intersectionID],-halfHexagonSize,-halfHexagonSize,-hexagonSize,0);
-                intersectionID++;
-
-                //dot on the right of Hexagon
-                drawIntersection(set,hexagonView,intersectionViews[intersectionID],hexagonSize+margin,0,-halfHexagonSize,0);
-                intersectionID++;
             }
+
+            //draw Intersections to Hexagon
+            drawIntersection(set,hexagonView,intersectionViews[intersectionID],-halfHexagonSize,-halfHexagonSize,-hexagonSize,0); //topMiddle
+            intersectionID++;
+            drawIntersection(set,hexagonView,intersectionViews[intersectionID],hexagonSize+margin,0,-halfHexagonSize,0); //topRight
+            intersectionID++;
 
             // first-line first-element constraint top
             if (i == 0) {
@@ -188,11 +264,13 @@ public class demoboard extends AppCompatActivity {
         set.applyTo(constraintLayout);
     }
 
-    public void drawIntersection(ConstraintSet set, ImageView hexagonView, ImageView intersectionView, int startMargin, int endMargin, int topMargin, int bottomMargin){
-        set.connect(intersectionView.getId(), ConstraintSet.START, hexagonView.getId(), ConstraintSet.START, startMargin);
-        set.connect(intersectionView.getId(), ConstraintSet.END, hexagonView.getId(), ConstraintSet.END, endMargin);
-        set.connect(intersectionView.getId(), ConstraintSet.TOP, hexagonView.getId(), ConstraintSet.TOP, topMargin);
-        set.connect(intersectionView.getId(), ConstraintSet.BOTTOM, hexagonView.getId(), ConstraintSet.BOTTOM, bottomMargin);
+ */
+
+    public void drawIntersection(ConstraintSet set, int hexagonID, int intersectionID, int startMargin, int endMargin, int topMargin, int bottomMargin){
+        set.connect(intersectionID, ConstraintSet.START, hexagonID, ConstraintSet.START, startMargin);
+        set.connect(intersectionID, ConstraintSet.END, hexagonID, ConstraintSet.END, endMargin);
+        set.connect(intersectionID, ConstraintSet.TOP, hexagonID, ConstraintSet.TOP, topMargin);
+        set.connect(intersectionID, ConstraintSet.BOTTOM, hexagonID, ConstraintSet.BOTTOM, bottomMargin);
     }
 
     //TODO: find alternative Method to get StatusBarHeight
