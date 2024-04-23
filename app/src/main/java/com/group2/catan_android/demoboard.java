@@ -67,6 +67,7 @@ public class demoboard extends AppCompatActivity {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
             applyConstraints(constraintLayout, imageViews, layoutWidth, layoutHeight);
+            addbuttons(constraintLayout);
         });
     }
     private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] imageViews, int layoutWidth, int layoutHeight) {
@@ -124,6 +125,54 @@ public class demoboard extends AppCompatActivity {
 
         set.applyTo(constraintLayout);
     }
+    private void addbuttons(ConstraintLayout main){
+
+        int size = main.getHeight()/3;
+        ConstraintSet set = new ConstraintSet();
+        set.clone(main);
+
+        ImageView buildbutton = new ImageView(this);
+        buildbutton.setId(ViewCompat.generateViewId());
+        buildbutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.build_button_svg));
+        main.addView(buildbutton);
+
+        set.constrainWidth(buildbutton.getId(), size);
+        set.constrainHeight(buildbutton.getId(), size);
+        set.connect(buildbutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
+        set.connect(buildbutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.connect(buildbutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
+        set.connect(buildbutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, -main.getHeight()+size);
+        set.applyTo(main);
+
+
+        ImageView tradebutton = new ImageView(this);
+        tradebutton.setId(ViewCompat.generateViewId());
+        tradebutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.trade_button_svg));
+        main.addView(tradebutton);
+        set.constrainWidth(tradebutton.getId(), size);
+        set.constrainHeight(tradebutton.getId(), size);
+        set.connect(tradebutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
+        set.connect(tradebutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.connect(tradebutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
+        set.connect(tradebutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+        set.applyTo(main);
+
+
+        ImageView usebutton = new ImageView(this);
+        usebutton.setId(ViewCompat.generateViewId());
+        usebutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.question1_svgrepo_com));
+        main.addView(usebutton);
+        set.constrainWidth(usebutton.getId(), size);
+        set.constrainHeight(usebutton.getId(), size);
+        set.connect(usebutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
+        set.connect(usebutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.connect(usebutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
+        set.connect(usebutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, main.getHeight()-size);
+        set.applyTo(main);
+
+    }
+
+
 
 }
 
