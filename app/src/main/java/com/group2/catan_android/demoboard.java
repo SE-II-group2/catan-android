@@ -170,8 +170,46 @@ public class demoboard extends AppCompatActivity {
         set.connect(usebutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, main.getHeight()-size);
         set.applyTo(main);
 
-    }
 
+        ImageView endturnbutton = new ImageView(this);
+        endturnbutton.setId(ViewCompat.generateViewId());
+        endturnbutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.end_turn_button));
+        main.addView(endturnbutton);
+        set.constrainWidth(endturnbutton.getId(), size);
+        set.constrainHeight(endturnbutton.getId(), size);
+        set.connect(endturnbutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
+        set.connect(endturnbutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.connect(endturnbutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+size);
+        set.connect(endturnbutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, -main.getHeight()+size);
+        set.applyTo(main);
+
+        int[] resources= {
+                R.drawable.count_brick_svg,
+                R.drawable.count_wood_svg,
+                R.drawable.count_sheep_svg,
+                R.drawable.count_wheat_svg,
+                R.drawable.count_stone_svg
+        };
+        int resource_size = main.getHeight()/4;
+        for(int i=0;i<5;i++){
+            ImageView resource = new ImageView(this);
+            resource.setId(ViewCompat.generateViewId());
+            resource.setImageDrawable(ContextCompat.getDrawable(this, resources[i]));
+            main.addView(resource);
+            set.constrainWidth(resource.getId(), resource_size);
+            set.constrainHeight(resource.getId(), resource_size);
+            set.connect(resource.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
+            set.connect(resource.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, -main.getHeight()+resource_size/2);
+            if(i==0){
+                set.connect(resource.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+resource_size/2);
+            }else{
+                set.connect(resource.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+resource_size/2+i*resource_size);
+            }
+            set.connect(resource.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+            set.applyTo(main);
+        }
+
+    }
 
 
 }
