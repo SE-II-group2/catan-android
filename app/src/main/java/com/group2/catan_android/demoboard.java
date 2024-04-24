@@ -1,9 +1,10 @@
 package com.group2.catan_android;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,11 +19,10 @@ import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import java.util.List;
 
-public class demoboard extends AppCompatActivity {
-
+public class demoboard extends AppCompatActivity{
     // hexagon icon measurements
     static int hexagonSize = 198;
-    static int intersectionSize = 20;
+    static int intersectionSize = 40;
     static int connectionSize = hexagonSize/2;
     static int halfHexagonSize = hexagonSize/2;
 
@@ -38,7 +38,7 @@ public class demoboard extends AppCompatActivity {
         setContentView(R.layout.activity_demoboard);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom);
             return insets;
         });
 
@@ -114,8 +114,8 @@ public class demoboard extends AppCompatActivity {
             intersectionView.setOnClickListener(v -> {
                 Toast.makeText(getApplicationContext(), "index " + (intersectionView.getId()), Toast.LENGTH_SHORT).show();
                 intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                params.width = intersectionSize * 2; // Beispiel für die Verdoppelung der Größe
-                params.height = intersectionSize * 2; // Beispiel für die Verdoppelung der Größe
+                params.width = intersectionSize; // Beispiel für die Verdoppelung der Größe
+                params.height = intersectionSize; // Beispiel für die Verdoppelung der Größe
             });
         }
 
@@ -132,9 +132,11 @@ public class demoboard extends AppCompatActivity {
 
         final int margin = -26;
         int thirdRow = layoutWidth/2 - 2*hexagonSize - halfHexagonSize - 2*margin;
+        Log.d("nav","t " + getNavBarHeight());
         int secondRow = thirdRow + halfHexagonSize + margin/2;
         int firstRow = thirdRow + hexagonSize + margin;
         int firstHexagonMargin = (layoutHeight/2) - 2*hexagonSize - getStatusBarHeight();
+        int secondHexagonMargin = (layoutHeight/2) + hexagonSize - getStatusBarHeight();
 
         int prevDrawableTop = ConstraintSet.PARENT_ID;
         int prevDrawableBottom = ConstraintSet.PARENT_ID;
@@ -155,7 +157,7 @@ public class demoboard extends AppCompatActivity {
                         set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
                         set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.TOP, firstHexagonMargin);
                         set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, firstRow);
-                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.BOTTOM, firstHexagonMargin);
+                        set.connect(hexagonBottomID, ConstraintSet.TOP, prevDrawableBottom, ConstraintSet.TOP, secondHexagonMargin);
                         break;
 
                     case 3:
@@ -260,5 +262,29 @@ public class demoboard extends AppCompatActivity {
         }
         return result;
     }
+
+    public void hideSystemUI() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    public int getNavBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+
 
 }
