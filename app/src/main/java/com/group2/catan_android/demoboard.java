@@ -1,9 +1,13 @@
 package com.group2.catan_android;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,16 +22,15 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import java.util.List;
+import java.util.Locale;
 
 public class demoboard extends AppCompatActivity{
+
     // hexagon icon measurements
     static int hexagonSize = 198;
     static int intersectionSize = 40;
     static int connectionSize = hexagonSize/2;
-    static int halfHexagonSize = hexagonSize/2;
 
-
-    //TODO: should be moved to backend
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
 
@@ -45,9 +48,12 @@ public class demoboard extends AppCompatActivity{
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
         int[] hexagonPictures = new int[19];
+        int[] hexagonRollValues = new int[19];
 
+        //get Roll Values and set images of Hexagons
         for (int i = 0; i < hexagonPictures.length; i++) {
             Hexagon hexagon = hexagonList.get(i);
+            hexagonRollValues[i] = hexagonList.get(i).getRollValue();
 
             switch (hexagon.getType()) {
                 case "HILLS":
@@ -74,7 +80,9 @@ public class demoboard extends AppCompatActivity{
         ImageView[] hexagonViews = new ImageView[hexagonPictures.length];
         ImageView[] intersectionViews = new ImageView[54];
         ImageView[] connectionViews = new ImageView[72];
+        TextView[] rollValueViews = new TextView[19];
 
+        //draw Hexagons
         for (int i = 0; i < hexagonPictures.length; i++){
             ImageView hexagonView = new ImageView(this);
             hexagonView.setId(ViewCompat.generateViewId());
@@ -83,8 +91,12 @@ public class demoboard extends AppCompatActivity{
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonSize,hexagonSize);
             constraintLayout.addView(hexagonView, params);
             hexagonViews[i] = hexagonView;
+            hexagonView.setOnClickListener(v -> {
+                Toast.makeText(getApplicationContext(), "index " + (hexagonView.getId()), Toast.LENGTH_SHORT).show();
+            });
         }
 
+        //draw Connections
         for (int i = 0; i < connectionViews.length; i++){
             ImageView connectionView = new ImageView(this);
             connectionView.setId(ViewCompat.generateViewId());
@@ -101,6 +113,7 @@ public class demoboard extends AppCompatActivity{
             });
         }
 
+        //draw Intersections
         for (int i = 0; i < 54; i++){
             ImageView intersectionView = new ImageView(this);
             intersectionView.setId(ViewCompat.generateViewId());
@@ -114,26 +127,40 @@ public class demoboard extends AppCompatActivity{
             intersectionView.setOnClickListener(v -> {
                 Toast.makeText(getApplicationContext(), "index " + (intersectionView.getId()), Toast.LENGTH_SHORT).show();
                 intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                params.width = intersectionSize; // Beispiel für die Verdoppelung der Größe
-                params.height = intersectionSize; // Beispiel für die Verdoppelung der Größe
             });
         }
 
+        //draw Roll Values
+        for (int i = 0; i < hexagonRollValues.length; i++){
+            TextView rollValueView = new TextView(this);
+            rollValueView.setId(ViewCompat.generateViewId());
+            String rollValue = String.format(Locale.getDefault(),"%d",hexagonRollValues[i]);
+            rollValueView.setText(rollValue);
+
+            rollValueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            rollValueView.setTextColor(Color.BLACK);
+            rollValueView.setGravity(Gravity.CENTER);
+
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            constraintLayout.addView(rollValueView, params);
+            rollValueViews[i] = rollValueView;
+        }
+
+        //constrain the drawn objects to the right position
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
-            applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, layoutWidth, layoutHeight);
+            applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
         });
     }
 
-    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, int layoutWidth, int layoutHeight) {
+    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews,int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
         final int margin = -26;
-        int thirdRow = layoutWidth/2 - 2*hexagonSize - halfHexagonSize - 2*margin;
-        Log.d("nav","t " + getNavBarHeight());
-        int secondRow = thirdRow + halfHexagonSize + margin/2;
+        int thirdRow = layoutWidth/2 - 2*hexagonSize - connectionSize - 2*margin;
+        int secondRow = thirdRow + connectionSize + margin/2;
         int firstRow = thirdRow + hexagonSize + margin;
         int firstHexagonMargin = (layoutHeight/2) - 2*hexagonSize - getStatusBarHeight();
         int secondHexagonMargin = (layoutHeight/2) + hexagonSize - getStatusBarHeight();
@@ -144,6 +171,7 @@ public class demoboard extends AppCompatActivity{
         int intersectionTopID = intersectionViews[0].getId();
         int intersectionBottomID = intersectionTopID + intersectionViews.length-1;
         int connectionID = connectionViews[0].getId();
+        int rollValueID = rollValueViews[0].getId();
         int hexagonWidth = hexagonSize+margin;
 
         for (int i = 0; i <= hexagonViews.length/2; i++) {
@@ -162,43 +190,43 @@ public class demoboard extends AppCompatActivity{
 
                     case 3:
                         set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, secondRow);
-                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, -halfHexagonSize/2);
+                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, -connectionSize/2);
                         set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, secondRow);
-                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, -halfHexagonSize/2);
+                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, -connectionSize/2);
                         break;
                     case 7:
                         set.connect(hexagonTopID, ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, thirdRow);
-                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, -halfHexagonSize/2-1);
+                        set.connect(hexagonTopID, ConstraintSet.TOP, prevDrawableTop, ConstraintSet.BOTTOM, -connectionSize/2-1);
                         set.connect(hexagonBottomID, ConstraintSet.END, constraintLayout.getId(), ConstraintSet.END, thirdRow);
-                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, -halfHexagonSize/2-1);
+                        set.connect(hexagonBottomID, ConstraintSet.BOTTOM, prevDrawableBottom, ConstraintSet.TOP, -connectionSize/2-1);
 
                         //draw missing intersections in the middle row
                         int missingIntersectionsID = intersectionTopID + 7;
                         drawIntersection(set,hexagonBottomID,missingIntersectionsID++,-hexagonSize-margin,hexagonSize+margin,-hexagonSize,0); //top middle of left Hexagon
-                        drawIntersection(set,hexagonBottomID,missingIntersectionsID++,0,hexagonSize+margin,-halfHexagonSize,0); // top left
+                        drawIntersection(set,hexagonBottomID,missingIntersectionsID++,0,hexagonSize+margin,-connectionSize,0); // top left
                         drawIntersection(set,hexagonBottomID,missingIntersectionsID++,0,0,-hexagonSize,0);// top middle
-                        drawIntersection(set,hexagonBottomID,missingIntersectionsID++,hexagonSize+margin,0,-halfHexagonSize,0); //top right
-                        drawIntersection(set,hexagonTopID,missingIntersectionsID++,0,hexagonSize+margin,0,-halfHexagonSize); //bottom left
+                        drawIntersection(set,hexagonBottomID,missingIntersectionsID++,hexagonSize+margin,0,-connectionSize,0); //top right
+                        drawIntersection(set,hexagonTopID,missingIntersectionsID++,0,hexagonSize+margin,0,-connectionSize); //bottom left
                         drawIntersection(set,hexagonTopID,missingIntersectionsID++,0,0,0,-hexagonSize); //bottom middle
-                        drawIntersection(set,hexagonTopID,missingIntersectionsID++,hexagonSize+margin,0,0,-halfHexagonSize); //bottom right
+                        drawIntersection(set,hexagonTopID,missingIntersectionsID++,hexagonSize+margin,0,0,-connectionSize); //bottom right
                         drawIntersection(set,hexagonTopID,missingIntersectionsID,hexagonSize+margin,-hexagonSize-margin,0,-hexagonSize); //bottom middle of right Hexagon
 
                         //draw missing connections in the middle row
-                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,0,-halfHexagonSize-halfHexagonSize/2,30); //bottom left
-                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,-halfHexagonSize-halfHexagonSize/2,0,30); //top right
-                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,0,-halfHexagonSize-halfHexagonSize/2,-30); //bottom right
-                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,-halfHexagonSize-halfHexagonSize/2,0,-30); //top left
-                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2-hexagonWidth*2,0,-halfHexagonSize-halfHexagonSize/2,30); //bottom left
-                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2-hexagonWidth*2,hexagonWidth/4-margin/2,-halfHexagonSize-halfHexagonSize/2,0,30); //top right
-                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2-hexagonWidth*2,0,-halfHexagonSize-halfHexagonSize/2,-30); //bottom right
-                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2-hexagonWidth*2,hexagonWidth/4*3-margin/2,-halfHexagonSize-halfHexagonSize/2,0,-30); //top left
+                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,0,-connectionSize-connectionSize/2,30); //bottom left
+                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,-connectionSize-connectionSize/2,0,30); //top right
+                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,0,-connectionSize-connectionSize/2,-30); //bottom right
+                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,-connectionSize-connectionSize/2,0,-30); //top left
+                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2-hexagonWidth*2,0,-connectionSize-connectionSize/2,30); //bottom left
+                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2-hexagonWidth*2,hexagonWidth/4-margin/2,-connectionSize-connectionSize/2,0,30); //top right
+                        drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2-hexagonWidth*2,0,-connectionSize-connectionSize/2,-30); //bottom right
+                        drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2-hexagonWidth*2,hexagonWidth/4*3-margin/2,-connectionSize-connectionSize/2,0,-30); //top left
                         break;
                 }
 
                 // draw intersections & connections on outside borders
-                drawIntersection(set,hexagonTopID,intersectionTopID++,0,hexagonSize+margin,-halfHexagonSize,0); //left top border
+                drawIntersection(set,hexagonTopID,intersectionTopID++,0,hexagonSize+margin,-connectionSize,0); //left top border
                 drawConnection(set,hexagonTopID,connectionID++,-hexagonWidth,0,0,0,90); //left top border
-                drawIntersection(set,hexagonBottomID,intersectionBottomID--,hexagonSize+margin,0,0,-halfHexagonSize); // right bottom border
+                drawIntersection(set,hexagonBottomID,intersectionBottomID--,hexagonSize+margin,0,0,-connectionSize); // right bottom border
                 drawConnection(set,hexagonBottomID,connectionID++,0,-hexagonWidth,0,0,90); //right bottom border
 
             } else {
@@ -216,22 +244,26 @@ public class demoboard extends AppCompatActivity{
 
             //draw intersections to Hexagon
             drawIntersection(set,hexagonTopID,intersectionTopID++,0,0,-hexagonSize,0);// top middle
-            drawIntersection(set,hexagonTopID,intersectionTopID++,hexagonSize+margin,0,-halfHexagonSize,0); //top right
+            drawIntersection(set,hexagonTopID,intersectionTopID++,hexagonSize+margin,0,-connectionSize,0); //top right
             drawIntersection(set,hexagonBottomID,intersectionBottomID--,0,0,0,-hexagonSize); //bottom middle
-            drawIntersection(set,hexagonBottomID,intersectionBottomID--,0,hexagonSize+margin,0,-halfHexagonSize); //bottom left
+            drawIntersection(set,hexagonBottomID,intersectionBottomID--,0,hexagonSize+margin,0,-connectionSize); //bottom left
 
             //draw connections to Hexagon
-            drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,-halfHexagonSize-halfHexagonSize/2,0,30); //top right
-            drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,-halfHexagonSize-halfHexagonSize/2,0,-30); //top left
+            drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,-connectionSize-connectionSize/2,0,30); //top right
+            drawConnection(set,hexagonTopID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,-connectionSize-connectionSize/2,0,-30); //top left
 
-            drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,0,-halfHexagonSize-halfHexagonSize/2,30); //bottom left
-            drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,0,-halfHexagonSize-halfHexagonSize/2,-30); //bottom right
+            drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4-margin/2,hexagonWidth/4*3-margin/2,0,-connectionSize-connectionSize/2,30); //bottom left
+            drawConnection(set,hexagonBottomID,connectionID++,hexagonWidth/4*3-margin/2,hexagonWidth/4-margin/2,0,-connectionSize-connectionSize/2,-30); //bottom right
 
             //all vertical connections already drawn before the last hexagon
             if (i!=9){
                 drawConnection(set,hexagonBottomID,connectionID++,-hexagonWidth,0,0,0,90); //top down
                 drawConnection(set,hexagonTopID,connectionID++,0,-hexagonWidth,0,0,90); //top down
             }
+
+            //drawRollValues
+            drawIntersection(set,hexagonTopID,rollValueID++,0,0,0,connectionSize/2);
+            drawIntersection(set,hexagonBottomID,rollValueID++,0,0,0,connectionSize/2);
 
             prevDrawableTop = hexagonID - 1;
             prevDrawableBottom = hexagonID++;
@@ -261,19 +293,6 @@ public class demoboard extends AppCompatActivity{
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
-    }
-
-    public void hideSystemUI() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     public int getNavBarHeight() {
