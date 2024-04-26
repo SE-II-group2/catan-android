@@ -124,7 +124,7 @@ public class demoboard extends AppCompatActivity{
         for (int i = 0; i < 54; i++){
             ImageView intersectionView = new ImageView(this);
             intersectionView.setId(ViewCompat.generateViewId());
-            intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
+            intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(intersectionSize,intersectionSize);
             constraintLayout.addView(intersectionView, params);
@@ -177,133 +177,63 @@ public class demoboard extends AppCompatActivity{
         int connection = connectionViews[0].getId();
         int prevHexagon = constraintLayout.getId();
 
+
         //margins
-        int conStartMargin = hexagonQuarterWidth;
-        int conEndMargin = hexagonQuarterWidth*3;
-        int conTopMargin = hexagonQuarterHeight*3;
-        int conBottomMargin = 0;
+        int[] conMargins = {hexagonQuarterWidth,hexagonQuarterWidth*3,hexagonQuarterHeight*3,0};
+        int[] intMargins = {0,hexagonWidth,-hexagonHalfHeight,0};
+        int intHeightOffset = hexagonHalfHeight;
 
         while (hexagon <= hexagonViews.length) {
+            int hexagonsInRow = 3;
 
             if (hexagon == 1 || hexagon == 4 || hexagon == 8 || hexagon == 13 || hexagon == 17){//start of new line
 
                 switch(hexagon) {
                     case 1:
                         drawHexagon(set,hexagon,prevHexagon,firstRowMargin,firstTopMargin);
-                        connection = drawConnectionRow(set,3, hexagon,connection,hexagonQuarterWidth,hexagonQuarterWidth*3,hexagonQuarterHeight*3,0);
                         break;
 
                     case 4:
+                        hexagonsInRow = 4;
                         drawHexagon(set,hexagon,prevHexagon,-10*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        connection = drawConnectionRow(set,4, hexagon,connection,hexagonQuarterWidth,hexagonQuarterWidth*3,hexagonQuarterHeight*3,0);
                         break;
 
                     case 8:
+                        hexagonsInRow = 5;
                         drawHexagon(set,hexagon,prevHexagon,-14*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        connection = drawConnectionRow(set,5, hexagon,connection,hexagonQuarterWidth,hexagonQuarterWidth*3,hexagonQuarterHeight*3,0);
-                        connection = drawConnectionRow(set,5, hexagon,connection,hexagonQuarterWidth*3,hexagonQuarterWidth,0,hexagonQuarterHeight*3);
+                        connection = drawHorizontalConnections(set,hexagonsInRow, hexagon,connection,conMargins[0],conMargins[1],conMargins[2],conMargins[3]);
+                        intersection = drawIntersections(set,hexagonsInRow*2+1,hexagon,intersection,intMargins[0],intMargins[1],intMargins[2],intMargins[3],intHeightOffset);
+
+                        //switch values of start/end and top/bottom margins for the bottom half of board to mirror the top half
+                        conMargins = switchMargins(conMargins);
+                        intMargins = switchMargins(intMargins);
+                        intHeightOffset = -intHeightOffset;
                         break;
 
                     case 13:
+                        hexagonsInRow = 4;
                         drawHexagon(set,hexagon,prevHexagon,-14*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        connection = drawConnectionRow(set,4, hexagon,connection,hexagonQuarterWidth*3,hexagonQuarterWidth,0,hexagonQuarterHeight*3);
                         break;
 
                     case 17:
                         drawHexagon(set,hexagon,prevHexagon,-10*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        connection = drawConnectionRow(set,3, hexagon,connection,hexagonQuarterWidth*3,hexagonQuarterWidth,0,hexagonQuarterHeight*3);
                         break;
                 }
 
-            } else {
+                //draw connections and intersections
+                connection = drawHorizontalConnections(set,hexagonsInRow, hexagon,connection,conMargins[0],conMargins[1],conMargins[2],conMargins[3]);
+                connection = drawVerticalConnections(set,hexagonsInRow,hexagon,connection);
+                intersection = drawIntersections(set,hexagonsInRow*2+1,hexagon,intersection,intMargins[0],intMargins[1],intMargins[2],intMargins[3],intHeightOffset);
+
+            } else { //draw all other hexagons that are not the first in a row
                 drawHexagon(set,hexagon,prevHexagon,hexagonWidth,0);
             }
 
-            //drawRollValues
-            drawIntersection(set,hexagon,rollValue++,0,0,0,hexagonQuarterHeight);
+            //draw RollValues
+            drawView(set,hexagon,rollValue++,0,0,0,hexagonQuarterHeight);
 
             prevHexagon = hexagon++;
         }
-
-        //in each iteration: draw a Hexagon with its roll value, 2 intersections and 3 connections
-        //and do the same mirrored starting from the bottom at the same time, making it easier to avoid exceptional cases
-
-        /*
-        for (int i = 0; i <= hexagonViews.length/2; i++) {
-            int hexagonTop = hexagon++;
-            int hexagonBottom = hexagon;
-
-            if (i == 0 || i == 3 || i == 7){//start of new line
-
-                switch(i) {
-                    case 0:
-                        drawHexagon(set,hexagonTop,prevHexagonTop,firstRowMargin,firstTopMargin);
-                        drawHexagon(set,hexagonBottom,prevHexagonBottom,firstRowMargin+2*hexagonWidth,firstBottomMargin);
-
-                        connectionTop = drawConnectionRow(set,3, hexagonTop,connectionTop);
-                        connectionTop = drawConnectionRow(set,3,hexagonBottom,connectionTop);
-
-                        break;
-
-                    case 3:
-                        drawHexagon(set,hexagonTop,prevHexagonTop,-10*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        drawHexagon(set,hexagonBottom,prevHexagonBottom,10*hexagonQuarterWidth,-3*hexagonQuarterHeight-1);
-
-                        connectionTop = drawConnectionRow(set,4, hexagonTop,connectionTop);
-                        connectionTop = drawConnectionRow(set,4,hexagonBottom,connectionTop);
-                        break;
-
-                    case 7:
-                        drawHexagon(set,hexagonTop,prevHexagonTop,-14*hexagonQuarterWidth,3*hexagonQuarterHeight+1);
-                        drawHexagon(set,hexagonBottom,prevHexagonBottom,14*hexagonQuarterWidth,-3*hexagonQuarterHeight-1);
-
-                        connectionTop = drawConnectionRow(set,5, hexagonTop,connectionTop);
-                        connectionTop = drawConnectionRow(set,5,hexagonBottom,connectionTop);
-
-                        break;
-                }
-
-                // draw intersections & connections on outside borders
-                drawIntersection(set,hexagonTop,intersectionTop++,0,hexagonWidth,-hexagonHalfHeight,0); //left top border
-                drawConnection(set,hexagonTop,connectionTop++,-hexagonWidth,0,0,0,90); //left top border
-                drawIntersection(set,hexagonBottom,intersectionBottom--,hexagonWidth,0,0,-hexagonHalfHeight); // right bottom border
-                drawConnection(set,hexagonBottom,connectionBottom--,0,-hexagonWidth,0,0,90); //right bottom border
-
-            } else {
-
-                if(i == 9){ // last Hexagon in the middle
-                    hexagonBottom = hexagonTop;
-                }
-
-                drawHexagon(set,hexagonTop,prevHexagonTop,hexagonWidth,0);
-                drawHexagon(set,hexagonBottom,prevHexagonBottom,-hexagonWidth,0);
-            }
-
-            //draw intersections to Hexagon
-            drawIntersection(set,hexagonTop,intersectionTop++,0,0,-hexagonHeight,0);// top middle
-            drawIntersection(set,hexagonTop,intersectionTop++,hexagonWidth,0,-hexagonHalfHeight,0); //top right
-            drawIntersection(set,hexagonBottom,intersectionBottom--,0,0,0,-hexagonHeight); //bottom middle
-            drawIntersection(set,hexagonBottom,intersectionBottom--,0,hexagonWidth,0,-hexagonHalfHeight); //bottom left
-
-
-            //all vertical connections already drawn before the last hexagon
-            /*
-            if (i!=9){
-                drawConnection(set,hexagonBottom,connectionBottom--,-hexagonWidth,0,0,0,90); //top down
-                drawConnection(set,hexagonTop,connectionTop++,0,-hexagonWidth,0,0,90); //top down
-            }
-
-
-            //drawRollValues
-            drawIntersection(set,hexagonTop,rollValue++,0,0,0,hexagonQuarterHeight);
-            drawIntersection(set,hexagonBottom,rollValue++,0,0,0,hexagonQuarterHeight);
-
-            prevHexagonTop = hexagon - 1;
-            prevHexagonBottom = hexagon++;
-        }
-
-         */
-
 
         set.applyTo(constraintLayout);
     }
@@ -358,14 +288,14 @@ public class demoboard extends AppCompatActivity{
 
                         //draw missing intersections in the middle row
                         int missingIntersections = intersectionTop + 7;
-                        drawIntersection(set,hexagonBottom,missingIntersections++,-hexagonWidth,hexagonWidth,-hexagonHeight,0); //top middle of left Hexagon
-                        drawIntersection(set,hexagonBottom,missingIntersections++,0,hexagonWidth,-hexagonHalfHeight,0); // top left
-                        drawIntersection(set,hexagonBottom,missingIntersections++,0,0,-hexagonHeight,0);// top middle
-                        drawIntersection(set,hexagonBottom,missingIntersections++,hexagonWidth,0,-hexagonHalfHeight,0); //top right
-                        drawIntersection(set,hexagonTop,missingIntersections++,0,hexagonWidth,0,-hexagonHalfHeight); //bottom left
-                        drawIntersection(set,hexagonTop,missingIntersections++,0,0,0,-hexagonHeight); //bottom middle
-                        drawIntersection(set,hexagonTop,missingIntersections++,hexagonWidth,0,0,-hexagonHalfHeight); //bottom right
-                        drawIntersection(set,hexagonTop,missingIntersections,hexagonWidth,-hexagonWidth,0,-hexagonHeight); //bottom middle of right Hexagon
+                        drawView(set,hexagonBottom,missingIntersections++,-hexagonWidth,hexagonWidth,-hexagonHeight,0); //top middle of left Hexagon
+                        drawView(set,hexagonBottom,missingIntersections++,0,hexagonWidth,-hexagonHalfHeight,0); // top left
+                        drawView(set,hexagonBottom,missingIntersections++,0,0,-hexagonHeight,0);// top middle
+                        drawView(set,hexagonBottom,missingIntersections++,hexagonWidth,0,-hexagonHalfHeight,0); //top right
+                        drawView(set,hexagonTop,missingIntersections++,0,hexagonWidth,0,-hexagonHalfHeight); //bottom left
+                        drawView(set,hexagonTop,missingIntersections++,0,0,0,-hexagonHeight); //bottom middle
+                        drawView(set,hexagonTop,missingIntersections++,hexagonWidth,0,0,-hexagonHalfHeight); //bottom right
+                        drawView(set,hexagonTop,missingIntersections,hexagonWidth,-hexagonWidth,0,-hexagonHeight); //bottom middle of right Hexagon
 
                         //draw missing connections in the middle row
                         drawConnection(set,hexagonTop,connectionTop++,hexagonQuarterWidth,hexagonQuarterWidth*3,0,-hexagonQuarterHeight*3,30); //bottom left
@@ -380,9 +310,9 @@ public class demoboard extends AppCompatActivity{
                 }
 
                 // draw intersections & connections on outside borders
-                drawIntersection(set,hexagonTop,intersectionTop++,0,hexagonWidth,-hexagonHalfHeight,0); //left top border
+                drawView(set,hexagonTop,intersectionTop++,0,hexagonWidth,-hexagonHalfHeight,0); //left top border
                 drawConnection(set,hexagonTop,connectionTop++,-hexagonWidth,0,0,0,90); //left top border
-                drawIntersection(set,hexagonBottom,intersectionBottom--,hexagonWidth,0,0,-hexagonHalfHeight); // right bottom border
+                drawView(set,hexagonBottom,intersectionBottom--,hexagonWidth,0,0,-hexagonHalfHeight); // right bottom border
                 drawConnection(set,hexagonBottom,connectionBottom--,0,-hexagonWidth,0,0,90); //right bottom border
 
             } else {
@@ -396,10 +326,10 @@ public class demoboard extends AppCompatActivity{
             }
 
             //draw intersections to Hexagon
-            drawIntersection(set,hexagonTop,intersectionTop++,0,0,-hexagonHeight,0);// top middle
-            drawIntersection(set,hexagonTop,intersectionTop++,hexagonWidth,0,-hexagonHalfHeight,0); //top right
-            drawIntersection(set,hexagonBottom,intersectionBottom--,0,0,0,-hexagonHeight); //bottom middle
-            drawIntersection(set,hexagonBottom,intersectionBottom--,0,hexagonWidth,0,-hexagonHalfHeight); //bottom left
+            drawView(set,hexagonTop,intersectionTop++,0,0,-hexagonHeight,0);// top middle
+            drawView(set,hexagonTop,intersectionTop++,hexagonWidth,0,-hexagonHalfHeight,0); //top right
+            drawView(set,hexagonBottom,intersectionBottom--,0,0,0,-hexagonHeight); //bottom middle
+            drawView(set,hexagonBottom,intersectionBottom--,0,hexagonWidth,0,-hexagonHalfHeight); //bottom left
 
             //draw connections to Hexagon
             drawConnection(set,hexagonTop,connectionTop++,hexagonQuarterWidth*3,hexagonQuarterWidth,-hexagonQuarterHeight*3,0,30); //top right
@@ -414,8 +344,8 @@ public class demoboard extends AppCompatActivity{
             }
 
             //drawRollValues
-            drawIntersection(set,hexagonTop,rollValue++,0,0,0,hexagonQuarterHeight);
-            drawIntersection(set,hexagonBottom,rollValue++,0,0,0,hexagonQuarterHeight);
+            drawView(set,hexagonTop,rollValue++,0,0,0,hexagonQuarterHeight);
+            drawView(set,hexagonBottom,rollValue++,0,0,0,hexagonQuarterHeight);
 
             prevHexagonTop = hexagon - 1;
             prevHexagonBottom = hexagon++;
@@ -426,19 +356,38 @@ public class demoboard extends AppCompatActivity{
 
 
      */
-    public void drawIntersection(ConstraintSet set, int hexagon, int intersection, int startMargin, int endMargin, int topMargin, int bottomMargin){
+    public void drawView(ConstraintSet set, int hexagon, int intersection, int startMargin, int endMargin, int topMargin, int bottomMargin){
         set.connect(intersection, ConstraintSet.START, hexagon, ConstraintSet.START, startMargin);
         set.connect(intersection, ConstraintSet.END, hexagon, ConstraintSet.END, endMargin);
         set.connect(intersection, ConstraintSet.TOP, hexagon, ConstraintSet.TOP, topMargin);
         set.connect(intersection, ConstraintSet.BOTTOM, hexagon, ConstraintSet.BOTTOM, bottomMargin);
     }
 
-    public void drawConnection(ConstraintSet set, int hexagon, int connection, int startMargin, int endMargin, int topMargin, int bottomMargin,int rotation){
-        set.setRotation(connection,rotation);
-        drawIntersection(set,hexagon,connection,startMargin,endMargin,topMargin,bottomMargin);
+    public int drawIntersections(ConstraintSet set, int intersectionsInRow, int hexagon, int intersection, int startMargin, int endMargin, int topMargin, int bottomMargin, int offset){
+        for(int i = 0; i < intersectionsInRow; i++){
+            drawView(set,hexagon,intersection++,startMargin,endMargin,topMargin,bottomMargin);
+
+            //move every intersection a half hexagon to the right
+            startMargin += hexagonWidth/2;
+            endMargin -= hexagonWidth/2;
+
+            //add height offset to every second intersection
+            if (i % 2 == 0){
+                topMargin -= offset;
+            } else{
+                topMargin += offset;
+            }
+
+        }
+        return intersection;
     }
 
-    public int drawConnectionRow(ConstraintSet set, int hexagonsInRow, int hexagon, int connection, int startMargin, int endMargin, int topMargin, int bottomMargin){
+    public void drawConnection(ConstraintSet set, int hexagon, int connection, int startMargin, int endMargin, int topMargin, int bottomMargin,int rotation){
+        set.setRotation(connection,rotation);
+        drawView(set,hexagon,connection,startMargin,endMargin,topMargin,bottomMargin);
+    }
+
+    public int drawHorizontalConnections(ConstraintSet set, int hexagonsInRow, int hexagon, int connection, int startMargin, int endMargin, int topMargin, int bottomMargin){
         for(int i = 0; i < hexagonsInRow; i++){
             drawConnection(set,hexagon,connection++,startMargin+hexagonWidth*i,endMargin-hexagonWidth*i,-topMargin,-bottomMargin,-30); //top left
             drawConnection(set,hexagon,connection++,endMargin+hexagonWidth*i,startMargin-hexagonWidth*i,-topMargin,-bottomMargin,30); //top right
@@ -446,9 +395,26 @@ public class demoboard extends AppCompatActivity{
         return connection;
     }
 
+    public int drawVerticalConnections(ConstraintSet set, int hexagonsInRow, int hexagon, int connection){
+        for(int i = 0; i < hexagonsInRow+1; i++){
+            drawConnection(set,hexagon,connection++,-hexagonWidth+hexagonWidth*i,-hexagonWidth*i,0,0,90); //right down
+        }
+        return connection;
+    }
+
     public void drawHexagon(ConstraintSet set, int hexagon, int prevHexagon, int startMargin, int topMargin){
         set.connect(hexagon, ConstraintSet.START, prevHexagon, ConstraintSet.START, startMargin);
         set.connect(hexagon, ConstraintSet.TOP, prevHexagon, ConstraintSet.TOP, topMargin);
+    }
+
+    public int[] switchMargins(int[] margins) {
+        int temp = margins[0];
+        margins[0] = margins[1];
+        margins[1] = temp;
+        temp = margins[2];
+        margins[2] = margins[3];
+        margins[3] = temp;
+        return margins;
     }
 
     //TODO: find alternative Method to get StatusBarHeight
