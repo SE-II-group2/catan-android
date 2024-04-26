@@ -74,6 +74,7 @@ public class lobbyActivity extends AppCompatActivity {
                 playerName = playerNameEditText.getText().toString();
                 joinGame(false);
                 Log.d("LobbyActivity", "Connect button pressed with playername: " + playerName + "and gameID: " + selectedGameID);
+                requestActiveGames();
             }
         });
 
@@ -82,6 +83,8 @@ public class lobbyActivity extends AppCompatActivity {
             public void onClick(View v) {
                 playerName = playerNameEditText.getText().toString();
                 joinGame(true);
+                requestActiveGames();
+                Log.d("LobbyActivity", "Create button pressed with playername: " + playerName);
             }
         });
 

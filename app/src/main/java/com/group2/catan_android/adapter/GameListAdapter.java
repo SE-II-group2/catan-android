@@ -1,10 +1,12 @@
 package com.group2.catan_android.adapter;
 
 import android.content.ClipData;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.catan_android.databinding.GameItemBinding;
@@ -16,6 +18,8 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
 
     private List<Game> games;
     private final ItemClickListener listener;
+
+    private int selectedPos = RecyclerView.NO_POSITION;
 
     public GameListAdapter(List<Game> games, ItemClickListener listener){
         this.games = games;
@@ -29,6 +33,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
 
     public void setGames(List<Game> games){
         this.games = games;
+        selectedPos = RecyclerView.NO_POSITION;
         notifyDataSetChanged();
     }
 
@@ -49,6 +54,12 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
     public void onBindViewHolder(@NonNull GameListViewHolder holder, int position) {
         holder.setGameData(games.get(position));
         holder.bindListener(games.get(position), listener);
+
+        if (selectedPos == position){
+            holder.binding.getRoot().setBackgroundColor(Color.GREEN);
+        } else {
+            holder.binding.getRoot().setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     @Override
@@ -56,7 +67,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         return games.size();
     }
 
-    public static class GameListViewHolder extends RecyclerView.ViewHolder{
+    public class GameListViewHolder extends RecyclerView.ViewHolder{
 
         GameItemBinding binding;
         GameListViewHolder(GameItemBinding gameItemBinding){
@@ -65,9 +76,13 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         }
 
         void bindListener(Game game, ItemClickListener listener){
-            binding.getRoot().setOnClickListener(v ->
-                    listener.onItemClicked(game)
-            );
+            binding.getRoot().setOnClickListener(v -> {
+                int previousSelectedPos = selectedPos;
+                selectedPos = getAdapterPosition();
+                notifyItemChanged(previousSelectedPos);
+                notifyItemChanged(selectedPos);
+                listener.onItemClicked(game);
+            });
         }
 
         void setGameData(Game game){
