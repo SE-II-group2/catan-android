@@ -27,12 +27,13 @@ public class demoboard extends AppCompatActivity {
     // hexagon icon measurements
     final static int hexagonHeight = 198;
     final static int hexagonWidth = hexagonHeight / 99 * 86; // 99:86 is the aspect ratio of a hexagon with equal sites
-    final static int hexagonHalfHeight = hexagonHeight / 2; // also equals size of one site of the hexagon
+    final static int hexagonHalfHeight = hexagonHeight / 2;
     final static int hexagonQuarterWidth = hexagonWidth / 4;
     final static int hexagonQuarterHeight = hexagonHeight / 4;
 
     // intersection Size
     static int intersectionSize = 40;
+    static int connectionSize = hexagonHalfHeight;
 
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
@@ -105,7 +106,7 @@ public class demoboard extends AppCompatActivity {
             connectionView.setId(ViewCompat.generateViewId());
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonHalfHeight, hexagonHalfHeight);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
@@ -144,7 +145,7 @@ public class demoboard extends AppCompatActivity {
             rollValueView.setTextColor(Color.BLACK);
             rollValueView.setGravity(Gravity.CENTER);
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonHalfHeight, hexagonHalfHeight); //view size should be square
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
             constraintLayout.addView(rollValueView, params);
             rollValueViews[i] = rollValueView;
         }
