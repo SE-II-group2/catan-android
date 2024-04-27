@@ -1,7 +1,5 @@
 package com.group2.catan_android.gamelogic;
 
-import android.os.Build;
-
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
@@ -15,8 +13,8 @@ import java.util.List;
 public class Board {
 
     private List<Hexagon> hexagonList;
-    private Connection [][] adjacencyMatrix;
-    private Intersection [][] intersections;
+    private Connection[][] adjacencyMatrix;
+    private Intersection[][] intersections;
     private int[][] surroundingHexagons;
     private static final int NON_EXISTING_HEXAGON = 19;
 

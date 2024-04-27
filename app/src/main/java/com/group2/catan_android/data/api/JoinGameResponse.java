@@ -1,4 +1,4 @@
-package com.group2.catan_android.networking.dto;
+package com.group2.catan_android.data.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,6 +11,9 @@ public class JoinGameResponse {
     public String gameID;
     @JsonProperty("token")
     public String token;
+
+    @JsonProperty("inGameID")
+    private int inGameID;
 
     public String getToken() {
         return token;
@@ -34,5 +37,13 @@ public class JoinGameResponse {
 
     public void setGameID(String gameID) {
         this.gameID = gameID;
+    }
+
+    public int getInGameID() {
+        return inGameID;
+    }
+
+    public void setInGameID(int inGameID) {
+        this.inGameID = inGameID;
     }
 }

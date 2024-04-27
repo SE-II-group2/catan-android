@@ -51,6 +51,10 @@ public class SocketManager {
         liveCycleSubscriptions = client.lifecycle().subscribe(consumer);
     }
 
+    public void unsubscribeAll(){
+        messageSubscriptions.dispose();
+    }
+
     public void disconnect(){
         if(client != null)
             client.disconnect();

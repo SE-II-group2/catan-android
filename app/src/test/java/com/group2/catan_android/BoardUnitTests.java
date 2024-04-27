@@ -3,14 +3,14 @@ package com.group2.catan_android;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.group2.catan_android.gamelogic.*;
-import com.group2.catan_android.gamelogic.objects.*;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.objects.Building;
+import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.Before;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
