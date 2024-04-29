@@ -161,6 +161,8 @@ public class demoboard extends AppCompatActivity {
         });
       
         getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.resources, new resources()).addToBackStack(null).commit();
+
     }
 
 
