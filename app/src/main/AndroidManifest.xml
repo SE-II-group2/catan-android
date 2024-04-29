@@ -29,7 +29,8 @@
         </activity>
         <activity
             android:name=".demoboard"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="sensorLandscape">
         </activity>
         <activity
             android:name=".DemoActivity"
