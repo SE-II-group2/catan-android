@@ -2,6 +2,7 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.FrameLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -15,6 +16,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
@@ -156,6 +159,8 @@ public class demoboard extends AppCompatActivity {
             int layoutHeight = constraintLayout.getHeight();
             applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
         });
+      
+        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
     }
 
 
@@ -308,5 +313,4 @@ public class demoboard extends AppCompatActivity {
         }
         return result;
     }
-
 }
