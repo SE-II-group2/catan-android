@@ -6,4 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".demoboard"
-    android:background="#009dc4"/>
+    android:background="#009dc4">
+
+    <FrameLayout
+        android:id="@+id/leftButtons"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/endturn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/end_turn_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+    <!--android:name="com.group2.catan_android.leftButtons_2"-->

@@ -1,6 +1,7 @@
 package com.group2.catan_android;
 
 import android.os.Bundle;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,12 +11,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class demoboard extends AppCompatActivity {
 
     // hexagon icon measurements
     static int height = 200;
     static int width = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +58,7 @@ public class demoboard extends AppCompatActivity {
 
         ImageView[] imageViews = new ImageView[ids.length];
 
-        for (int i = 0; i < ids.length; i++){
+        for (int i = 0; i < ids.length; i++) {
             ImageView imageView = new ImageView(this);
             imageView.setId(ViewCompat.generateViewId());
             imageView.setImageDrawable(ContextCompat.getDrawable(this, ids[i]));
@@ -63,13 +67,22 @@ public class demoboard extends AppCompatActivity {
             imageViews[i] = imageView;
         }
 
+
+        //getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_2()).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
+
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
             applyConstraints(constraintLayout, imageViews, layoutWidth, layoutHeight);
-            addbuttons(constraintLayout);
-        });
+            });
+
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+
+
+
     }
+
     private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] imageViews, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
@@ -77,10 +90,10 @@ public class demoboard extends AppCompatActivity {
         //TODO: Maybe revise the margins sometime
         int topMargin = -20;
         int sideMargin = 0;
-        int thirdRow = (int) Math.round((layoutWidth/2)-(2.5*width));
+        int thirdRow = (int) Math.round((layoutWidth / 2) - (2.5 * width));
         int secondRow = (int) Math.round(thirdRow + (width / 2));
         int firstRow = (int) Math.round(thirdRow + width);
-        int firstTop = (int) Math.round((layoutHeight/2)-(2.5*height)+(topMargin));
+        int firstTop = (int) Math.round((layoutHeight / 2) - (2.5 * height) + (topMargin));
 
         int prevDrawable = ConstraintSet.PARENT_ID;
         int firstDrawableInRow = imageViews[0].getId();
@@ -90,7 +103,7 @@ public class demoboard extends AppCompatActivity {
 
             // first hexagons in each line
             if (i == 0 || i == 3 || i == 7 || i == 12 || i == 16) { // start of new line 3-4-5-4-3
-                switch(i) {
+                switch (i) {
                     case 0:
                     case 16:
                         set.connect(imageView.getId(), ConstraintSet.START, constraintLayout.getId(), ConstraintSet.START, firstRow);
@@ -125,92 +138,4 @@ public class demoboard extends AppCompatActivity {
 
         set.applyTo(constraintLayout);
     }
-    private void addbuttons(ConstraintLayout main){
-
-        int size = main.getHeight()/3;
-        ConstraintSet set = new ConstraintSet();
-        set.clone(main);
-
-        ImageView buildbutton = new ImageView(this);
-        buildbutton.setId(ViewCompat.generateViewId());
-        buildbutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.build_button_svg));
-        main.addView(buildbutton);
-
-        set.constrainWidth(buildbutton.getId(), size);
-        set.constrainHeight(buildbutton.getId(), size);
-        set.connect(buildbutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
-        set.connect(buildbutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.connect(buildbutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
-        set.connect(buildbutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, -main.getHeight()+size);
-        set.applyTo(main);
-
-
-        ImageView tradebutton = new ImageView(this);
-        tradebutton.setId(ViewCompat.generateViewId());
-        tradebutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.trade_button_svg));
-        main.addView(tradebutton);
-        set.constrainWidth(tradebutton.getId(), size);
-        set.constrainHeight(tradebutton.getId(), size);
-        set.connect(tradebutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
-        set.connect(tradebutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.connect(tradebutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
-        set.connect(tradebutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
-        set.applyTo(main);
-
-
-        ImageView usebutton = new ImageView(this);
-        usebutton.setId(ViewCompat.generateViewId());
-        usebutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.question1_svgrepo_com));
-        main.addView(usebutton);
-        set.constrainWidth(usebutton.getId(), size);
-        set.constrainHeight(usebutton.getId(), size);
-        set.connect(usebutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, -main.getWidth()+size);
-        set.connect(usebutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.connect(usebutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
-        set.connect(usebutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, main.getHeight()-size);
-        set.applyTo(main);
-
-
-        ImageView endturnbutton = new ImageView(this);
-        endturnbutton.setId(ViewCompat.generateViewId());
-        endturnbutton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.end_turn_button));
-        main.addView(endturnbutton);
-        set.constrainWidth(endturnbutton.getId(), size);
-        set.constrainHeight(endturnbutton.getId(), size);
-        set.connect(endturnbutton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
-        set.connect(endturnbutton.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.connect(endturnbutton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+size);
-        set.connect(endturnbutton.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, -main.getHeight()+size);
-        set.applyTo(main);
-
-        int[] resources= {
-                R.drawable.count_brick_svg,
-                R.drawable.count_wood_svg,
-                R.drawable.count_sheep_svg,
-                R.drawable.count_wheat_svg,
-                R.drawable.count_stone_svg
-        };
-        int resource_size = main.getHeight()/4;
-        for(int i=0;i<5;i++){
-            ImageView resource = new ImageView(this);
-            resource.setId(ViewCompat.generateViewId());
-            resource.setImageDrawable(ContextCompat.getDrawable(this, resources[i]));
-            main.addView(resource);
-            set.constrainWidth(resource.getId(), resource_size);
-            set.constrainHeight(resource.getId(), resource_size);
-            set.connect(resource.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
-            set.connect(resource.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, -main.getHeight()+resource_size/2);
-            if(i==0){
-                set.connect(resource.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+resource_size/2);
-            }else{
-                set.connect(resource.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, -main.getWidth()+resource_size/2+i*resource_size);
-            }
-            set.connect(resource.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
-            set.applyTo(main);
-        }
-
-    }
-
-
 }
-
