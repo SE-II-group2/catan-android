@@ -2,6 +2,8 @@ package com.group2.catan_android;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.fragment.app.FragmentTransition;
@@ -65,6 +67,22 @@ public class leftButtons_2 extends Fragment {
         // Inflate the layout for this fragment
 
         return inflater.inflate(R.layout.fragment_left_buttons_2, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ImageView build = getActivity().findViewById(R.id.exit);
+        build.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Fragment newFragment = new leftButtons_1();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.leftButtons, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
     }
 
 }
