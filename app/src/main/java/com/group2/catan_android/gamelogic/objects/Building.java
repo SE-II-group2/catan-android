@@ -1,8 +1,9 @@
 package com.group2.catan_android.gamelogic.objects;
 
+import com.group2.catan_android.gamelogic.enums.BuildingType;
+
 public class Building extends Intersection {
 
-    public enum BuildingType { CITY, VILLAGE }
     BuildingType type;
 
     public Building(int playerID, BuildingType type) {
