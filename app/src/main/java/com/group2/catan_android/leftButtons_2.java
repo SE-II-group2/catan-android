@@ -83,6 +83,41 @@ public class leftButtons_2 extends Fragment {
                 transaction.commit();
             }
         });
+        ImageView street = getActivity().findViewById(R.id.street);
+        street.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                /* build street button */
+                // TODO: Make the player be able to place the street in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+            }
+        });
+        ImageView settlement = getActivity().findViewById(R.id.settlement);
+        settlement.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                /* build settlement button */
+                // TODO: Make the player be able to place the settlement in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+            }
+        });
+        ImageView city = getActivity().findViewById(R.id.city);
+        city.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                /* build city button */
+                // TODO: Make the player be able to place the city in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+            }
+        });
+        ImageView developmentcard = getActivity().findViewById(R.id.developmentcard);
+        developmentcard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Give the player a random development card and afterwards return the fragment "leftButtons" to "leftButtons_1".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+            }
+        });
     }
 
 }
