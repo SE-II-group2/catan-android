@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".demoboard"
+    tools:context=".GameActivity"
     android:background="#009dc4">
 
     <FrameLayout
@@ -48,4 +48,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <!--android:name="com.group2.catan_android.leftButtons_2"-->
+    <!--android:name="com.group2.catan_android.buttonsOpenFragmentagment"-->

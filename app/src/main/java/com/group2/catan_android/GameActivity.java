@@ -1,6 +1,7 @@
 package com.group2.catan_android;
 
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,14 +17,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.group2.catan_android.fragments.PlayerResourcesFragment;
+import com.group2.catan_android.fragments.PlayerScoresFragment;
+import com.group2.catan_android.fragments.buttonsClosedFragment;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
-import com.group2.catan_android.gamelogic.enums.Location;
 
 import java.util.List;
 import java.util.Locale;
 
-public class demoboard extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
 
     // hexagon icon measurements
     final static int hexagonHeight = 198;
@@ -132,6 +135,7 @@ public class demoboard extends AppCompatActivity {
             intersectionView.setOnClickListener(v -> {
                 Toast.makeText(getApplicationContext(), "index " + (intersectionView.getId()), Toast.LENGTH_SHORT).show();
                 intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
+                intersectionView.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
             });
         }
 
@@ -158,10 +162,10 @@ public class demoboard extends AppCompatActivity {
             applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
         });
 
-        // initialisation of the frame
-        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.resources, new resources()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.score, new score()).addToBackStack(null).commit();
+        // initialisation of the button fragments
+        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.resources, new PlayerResourcesFragment()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.score, new PlayerScoresFragment()).addToBackStack(null).commit();
         // TODO: Write OnClickListener for the end turn button
         /*
         findViewById(R.id.endturn).setOnClickListener(new View.OnClickListener() {

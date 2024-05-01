@@ -1,4 +1,4 @@
-package com.group2.catan_android;
+package com.group2.catan_android.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,12 +11,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.group2.catan_android.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link leftButtons_2#newInstance} factory method to
+ * Use the {@link buttonsOpenFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class leftButtons_2 extends Fragment {
+public class buttonsOpenFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,7 +29,7 @@ public class leftButtons_2 extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public leftButtons_2() {
+    public buttonsOpenFragment() {
         // Required empty public constructor
     }
 
@@ -37,11 +39,11 @@ public class leftButtons_2 extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment leftButtons_2.
+     * @return A new instance of fragment buttonsOpenFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static leftButtons_2 newInstance(String param1, String param2) {
-        leftButtons_2 fragment = new leftButtons_2();
+    public static buttonsOpenFragment newInstance(String param1, String param2) {
+        buttonsOpenFragment fragment = new buttonsOpenFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,7 +75,7 @@ public class leftButtons_2 extends Fragment {
         build.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Fragment newFragment = new leftButtons_1();
+                Fragment newFragment = new buttonsClosedFragment();
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.replace(R.id.leftButtons, newFragment);
                 transaction.addToBackStack(null);
@@ -85,8 +87,8 @@ public class leftButtons_2 extends Fragment {
             @Override
             public void onClick(View v){
                 /* build street button */
-                // TODO: Make the player be able to place the street in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
-                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+                // TODO: Make the player be able to place the street in possible locations and afterwards return the fragment "leftButtons" to "buttonsClosedFragment".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
             }
         });
         ImageView settlement = getActivity().findViewById(R.id.settlement);
@@ -94,8 +96,8 @@ public class leftButtons_2 extends Fragment {
             @Override
             public void onClick(View v){
                 /* build settlement button */
-                // TODO: Make the player be able to place the settlement in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
-                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+                // TODO: Make the player be able to place the settlement in possible locations and afterwards return the fragment "leftButtons" to "buttonsClosedFragment".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
             }
         });
         ImageView city = getActivity().findViewById(R.id.city);
@@ -103,16 +105,16 @@ public class leftButtons_2 extends Fragment {
             @Override
             public void onClick(View v){
                 /* build city button */
-                // TODO: Make the player be able to place the city in possible locations and afterwards return the fragment "leftButtons" to "leftButtons_1".
-                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+                // TODO: Make the player be able to place the city in possible locations and afterwards return the fragment "leftButtons" to "buttonsClosedFragment".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
             }
         });
         ImageView developmentcard = getActivity().findViewById(R.id.developmentcard);
         developmentcard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: Give the player a random development card and afterwards return the fragment "leftButtons" to "leftButtons_1".
-                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
+                // TODO: Give the player a random development card and afterwards return the fragment "leftButtons" to "buttonsClosedFragment".
+                //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
             }
         });
     }

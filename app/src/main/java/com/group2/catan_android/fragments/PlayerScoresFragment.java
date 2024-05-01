@@ -1,4 +1,4 @@
-package com.group2.catan_android;
+package com.group2.catan_android.fragments;
 
 import android.os.Bundle;
 
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.group2.catan_android.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link score#newInstance} factory method to
+ * Use the {@link PlayerScoresFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class score extends Fragment {
+public class PlayerScoresFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +26,7 @@ public class score extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public score() {
+    public PlayerScoresFragment() {
         // Required empty public constructor
     }
 
@@ -37,8 +39,8 @@ public class score extends Fragment {
      * @return A new instance of fragment score.
      */
     // TODO: Rename and change types and number of parameters
-    public static score newInstance(String param1, String param2) {
-        score fragment = new score();
+    public static PlayerScoresFragment newInstance(String param1, String param2) {
+        PlayerScoresFragment fragment = new PlayerScoresFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
