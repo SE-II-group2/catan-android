@@ -83,5 +83,34 @@ public class leftButtons_1 extends Fragment {
                 transaction.commit();
             }
         });
+        ImageView trade = getActivity().findViewById(R.id.trade);
+        trade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Write what shall happen when pressing the trade button
+
+            }
+        });
+
+        ImageView card_usage = getActivity().findViewById(R.id.card_usage);
+        card_usage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Write what shall happen when pressing the development card usage button
+
+            }
+        });
+
+        // TODO: Decide weather to have a fourth button on top
+        /*
+        ImageView extra_button = getActivity().findViewById(R.id.help);
+        extra_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Write what shall happen when pressing the extra button
+
+            }
+        });
+         */
     }
 }

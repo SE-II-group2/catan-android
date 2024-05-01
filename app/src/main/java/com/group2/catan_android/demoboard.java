@@ -157,9 +157,20 @@ public class demoboard extends AppCompatActivity {
             int layoutHeight = constraintLayout.getHeight();
             applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
         });
-      
+
+        // initialisation of the frame
         getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new leftButtons_1()).addToBackStack(null).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.resources, new resources()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.score, new score()).addToBackStack(null).commit();
+        // TODO: Write OnClickListener for the end turn button
+        /*
+        findViewById(R.id.endturn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            // Code...
+            }
+        });
+         */
 
     }
 

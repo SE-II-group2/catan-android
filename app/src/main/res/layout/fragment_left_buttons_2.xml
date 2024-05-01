@@ -88,7 +88,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/mysterycard"
+            android:id="@+id/developmentcard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:src="@drawable/question1_svgrepo_com"
