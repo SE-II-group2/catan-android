@@ -97,11 +97,6 @@ public class Board {
         return connectedIntersections;
     }
 
-    public void generateConnectedIntersections(){
-        connectedIntersectionsToRoad = new int[2][72];
-        connectedIntersectionsToRoad[0] = new int[] {0 ,0 ,0 ,1 ,1 ,2 ,2 ,3 ,3 ,3,0 ,1 ,1 ,2 ,2 ,6 ,7 ,7 ,7 ,3 ,4 ,5 ,5 ,5 ,6 ,6 ,11,7 ,7 ,7 ,8 ,8 ,9 ,9 ,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,16,17,17,18,18};
-        connectedIntersectionsToRoad[1] = new int[] {19,19,1 ,19,2 ,19,19,19,0 ,4,1 ,4 ,2 ,5 ,6 ,19,19,3 ,8 ,4 ,8 ,9 ,9 ,6 ,10,11,19,19,12,8 ,12,9 ,13,10,14,11,15,19,19,16,13,16,14,17,15,18,19,19,19,17,19,18,19,19};
-    }
 
     public void addVillage(Player player, int row, int col){
         // player has enough Resources
@@ -184,6 +179,12 @@ public class Board {
             case 5: intersection = 45 + col; break;
         }
         return intersection;
+    }
+
+    public void generateConnectedIntersections(){ // shows which connection is connected to which 2 intersections
+        connectedIntersectionsToRoad = new int[2][72];
+        connectedIntersectionsToRoad[0] = new int[] {0,1,2,3,4,5,0,2 ,4 ,6 ,7,8,9 ,10,11,12,13,14,7 ,9 ,11,13,15,16,17,18,19,20,21,22,23,24,25,28,27,30,29,32,31,34,33,36,35,16,18,20,22,24,26,39,38,41,40,43,42,45,44,28,30,32,34,36,48,47,50,49,52,51,39,41,43,45};
+        connectedIntersectionsToRoad[1] = new int[] {1,2,3,4,5,6,8,10,12,14,8,9,10,11,12,13,14,15,17,19,21,23,25,17,18,19,20,21,22,23,24,25,26,29,28,31,30,33,32,35,34,37,36,27,29,31,33,35,37,40,39,42,41,44,43,46,45,38,40,42,44,46,49,48,51,50,53,52,47,49,51,53};
     }
 
     private void generateHexagons() {
