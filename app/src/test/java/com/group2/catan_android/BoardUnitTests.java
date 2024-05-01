@@ -2,6 +2,7 @@ package com.group2.catan_android;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -37,7 +38,7 @@ public class BoardUnitTests {
 
     @Test
     public void testGenerateHexagonsSize() {
-        Assertions.assertNotNull(board.getHexagonList());
+        assertNotNull(board.getHexagonList());
         assertEquals(19, board.getHexagonList().size()); // Check if 19 hexagons are generated
     }
 

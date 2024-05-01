@@ -41,4 +41,11 @@ public class Player {
         return color;
     }
 
+    public int[] getResources() {
+        return resources;
+    }
+
+    public int getVictoryPoints() {
+        return victoryPoints;
+    }
 }
