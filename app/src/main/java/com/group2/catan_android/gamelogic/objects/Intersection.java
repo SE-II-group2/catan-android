@@ -1,9 +1,15 @@
 package com.group2.catan_android.gamelogic.objects;
 
-public class Intersection {
-    int playerID;
+import com.group2.catan_android.gamelogic.Player;
 
-    public int getPlayerID(){
-        return playerID;
+public class Intersection {
+    Player player;
+
+    public Player getPlayerID(){
+        return player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

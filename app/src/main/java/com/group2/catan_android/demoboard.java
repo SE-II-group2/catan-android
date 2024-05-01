@@ -2,7 +2,6 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.FrameLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -16,11 +15,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.enums.Location;
 
 import java.util.List;
 import java.util.Locale;
@@ -68,20 +66,20 @@ public class demoboard extends AppCompatActivity {
 
             hexagonRollValues[i] = hexagon.getRollValue(); // save roll Value
 
-            switch (hexagon.getType()) { // save SVG
-                case "HILLS":
+            switch (hexagon.getLocation()) { // save SVG
+                case HILLS:
                     hexagonPictures[i] = R.drawable.hexagon_brick_svg;
                     break;
-                case "FOREST":
+                case FOREST:
                     hexagonPictures[i] = R.drawable.hexagon_wood_svg;
                     break;
-                case "MOUNTAINS":
+                case MOUNTAINS:
                     hexagonPictures[i] = R.drawable.hexagon_stone_svg;
                     break;
-                case "PASTURE":
+                case PASTURE:
                     hexagonPictures[i] = R.drawable.hexagon_sheep_svg;
                     break;
-                case "FIELDS":
+                case FIELDS:
                     hexagonPictures[i] = R.drawable.hexagon_wheat_svg;
                     break;
                 default:

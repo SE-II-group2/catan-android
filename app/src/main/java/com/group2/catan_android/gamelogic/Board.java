@@ -1,12 +1,13 @@
 package com.group2.catan_android.gamelogic;
 
-import android.os.Build;
-
+import com.group2.catan_android.gamelogic.enums.Location;
+import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,89 +19,15 @@ public class Board {
     private Connection [][] adjacencyMatrix;
     private Intersection [][] intersections;
     private int[][] surroundingHexagons;
+    private int[][] connectedIntersectionsToRoad;
     private static final int NON_EXISTING_HEXAGON = 19;
 
-
-    // Define enum for locations
-    enum Location {
-        HILLS, FOREST, MOUNTAINS, FIELDS, PASTURE, DESERT
-    }
-
-    // Define enum for resource distributions
-    enum ResourceDistribution {
-        FIELDS(new int[]{1, 0, 0, 0, 0}),
-        PASTURE(new int[]{0, 1, 0, 0, 0}),
-        FOREST(new int[]{0, 0, 1, 0, 0}),
-        HILLS(new int[]{0, 0, 0, 1, 0}),
-        MOUNTAINS(new int[]{0, 0, 0, 0, 1}),
-        DESERT(new int[]{0, 0, 0, 0, 0});
-
-        private final int[] distribution;
-
-        ResourceDistribution(int[] distribution) {
-            this.distribution = distribution;
-        }
-
-        public int[] getDistribution() {
-            return distribution;
-        }
-    }
-    public static List<Hexagon> generateHexagons() {
-        List<Location> locations = new ArrayList<>();
-        List<Integer> values = new ArrayList<>();
-
-        // Copy locations and values lists to ensure original lists remain unchanged
-        Collections.addAll(locations, Location.HILLS, Location.HILLS, Location.HILLS, Location.FOREST,
-                Location.FOREST, Location.FOREST, Location.FOREST, Location.MOUNTAINS, Location.MOUNTAINS,
-                Location.MOUNTAINS, Location.FIELDS, Location.FIELDS, Location.FIELDS, Location.FIELDS,
-                Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.DESERT);
-        Collections.addAll(values, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
-
-        List<Hexagon> hexagons = new ArrayList<>();
-
-        Collections.shuffle(locations);
-        Collections.shuffle(values);
-
-        for (Location location : locations) {
-            int value;
-            if (location == Location.DESERT) {
-                value = 0; // Desert location should have value 0
-            } else {
-                value = values.remove(0);
-            }
-
-            ResourceDistribution resourceDistribution;
-            switch (location) {
-                case FIELDS:
-                    resourceDistribution = ResourceDistribution.FIELDS;
-                    break;
-                case PASTURE:
-                    resourceDistribution = ResourceDistribution.PASTURE;
-                    break;
-                case FOREST:
-                    resourceDistribution = ResourceDistribution.FOREST;
-                    break;
-                case HILLS:
-                    resourceDistribution = ResourceDistribution.HILLS;
-                    break;
-                case MOUNTAINS:
-                    resourceDistribution = ResourceDistribution.MOUNTAINS;
-                    break;
-                default:
-                    resourceDistribution = ResourceDistribution.DESERT;
-            }
-
-            hexagons.add(new Hexagon(location.name(), resourceDistribution.getDistribution(), value));
-        }
-
-        return hexagons;
-    }
-
     public Board(){
-        hexagonList = generateHexagons();
-        adjacencyMatrix = getAdjacencyMatrix();
-        intersections = getIntersections();
-        surroundingHexagons = getSurroundingHexagons();
+        generateHexagons();
+        generateAdjacencyMatrix();
+        generateIntersectionsStartingArray();
+        generateSurroundingHexagonArray();
+        generateConnectedIntersections();
     }
 
     public void distributeResourcesByDiceRoll(int diceRoll) {
@@ -115,7 +42,7 @@ public class Board {
         return hexagonList;
     }
 
-    public Connection[][] getAdjacencyMatrix() {
+    public void generateAdjacencyMatrix() {
         Connection emptyConnection = new Connection();
         adjacencyMatrix = new Connection[54][54];
 
@@ -125,11 +52,9 @@ public class Board {
         for (int i = 0; i < rows.length; i++) {
             adjacencyMatrix[rows[i]][cols[i]] = emptyConnection;
         }
-
-        return adjacencyMatrix;
     }
 
-    public Intersection[][] getIntersections() {
+    public void generateIntersectionsStartingArray() {
         Intersection intersection = new Intersection();
         intersections = new Intersection[6][11];
 
@@ -140,35 +65,50 @@ public class Board {
                 intersections[intersections.length - 1 - i][j] = intersection;
             }
         }
-
-        return intersections;
     }
 
-    private int[][] getSurroundingHexagons() {
-        surroundingHexagons = new int[4][54];
-        surroundingHexagons[0] = new int[] {0 ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53};
-        surroundingHexagons[1] = new int[] {0 ,0 ,0 ,1 ,1 ,2 ,2 ,3 ,3 ,3,0 ,1 ,1 ,2 ,2 ,6 ,7 ,7 ,7 ,3 ,4 ,5 ,5 ,5 ,6 ,6 ,11,7 ,7 ,7 ,8 ,8 ,9 ,9 ,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,16,17,17,18,18};
-        surroundingHexagons[2] = new int[] {19,19,1 ,19,2 ,19,19,19,0 ,4,1 ,4 ,2 ,5 ,6 ,19,19,3 ,8 ,4 ,8 ,9 ,9 ,6 ,10,11,19,19,12,8 ,12,9 ,13,10,14,11,15,19,19,16,13,16,14,17,15,18,19,19,19,17,19,18,19,19};
-        surroundingHexagons[3] = new int[] {19,19,19,19,19,19,19,19,19,0,4 ,5 ,5 ,6 ,19,19,19,19,3 ,8 ,9 ,9 ,10,10,11,19,19,19,19,12,13,13,14,14,15,15,19,19,19,19,16,17,17,18,18,19,19,19,19,19,19,19,19,19};
-        return surroundingHexagons;
+    private void generateSurroundingHexagonArray() {
+        surroundingHexagons = new int[3][54];
+        surroundingHexagons[0] = new int[] {0 ,0 ,0 ,1 ,1 ,2 ,2 ,3 ,3 ,3,0 ,1 ,1 ,2 ,2 ,6 ,7 ,7 ,7 ,3 ,4 ,5 ,5 ,5 ,6 ,6 ,11,7 ,7 ,7 ,8 ,8 ,9 ,9 ,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,16,17,17,18,18};
+        surroundingHexagons[1] = new int[] {19,19,1 ,19,2 ,19,19,19,0 ,4,1 ,4 ,2 ,5 ,6 ,19,19,3 ,8 ,4 ,8 ,9 ,9 ,6 ,10,11,19,19,12,8 ,12,9 ,13,10,14,11,15,19,19,16,13,16,14,17,15,18,19,19,19,17,19,18,19,19};
+        surroundingHexagons[2] = new int[] {19,19,19,19,19,19,19,19,19,0,4 ,5 ,5 ,6 ,19,19,19,19,3 ,8 ,9 ,9 ,10,10,11,19,19,19,19,12,13,13,14,14,15,15,19,19,19,19,16,17,17,18,18,19,19,19,19,19,19,19,19,19};
     }
 
-    public void addRoad(int playerID, int row, int col){
+    public void addRoad(Player player, int connectionID){
         // player has enough Resources
 
-        if((adjacencyMatrix[row][col] != null && !(adjacencyMatrix[row][col] instanceof Road)) /*&& isNextToOwnRoad(col,playerID)*/){
-            Road road = new Road(playerID);
-            adjacencyMatrix[row][col] = road;
-            adjacencyMatrix[col][row] = road;
+        // translate connection to two Intersections
+        int[] connectedIntersections = getConnectedIntersections(connectionID);
+
+        // add road by adding it to adjacencyMatrix
+        if((adjacencyMatrix[connectedIntersections[0]][connectedIntersections[1]] != null && !(adjacencyMatrix[connectedIntersections[0]][connectedIntersections[1]] instanceof Road)) /*&& isNextToOwnRoad(col,playerID)*/){
+            Road road = new Road(player);
+            adjacencyMatrix[connectedIntersections[0]][connectedIntersections[1]] = road;
+            adjacencyMatrix[connectedIntersections[1]][connectedIntersections[0]] = road;
         }
     }
 
-    public void addVillage(int playerID, int row, int col){
+    private int[] getConnectedIntersections(int connectionID) {
+        int[] connectedIntersections = new int[2];
+
+        connectedIntersections[0] = connectedIntersectionsToRoad[0][connectionID];
+        connectedIntersections[1] = connectedIntersectionsToRoad[1][connectionID];
+
+        return connectedIntersections;
+    }
+
+    public void generateConnectedIntersections(){
+        connectedIntersectionsToRoad = new int[2][72];
+        connectedIntersectionsToRoad[0] = new int[] {0 ,0 ,0 ,1 ,1 ,2 ,2 ,3 ,3 ,3,0 ,1 ,1 ,2 ,2 ,6 ,7 ,7 ,7 ,3 ,4 ,5 ,5 ,5 ,6 ,6 ,11,7 ,7 ,7 ,8 ,8 ,9 ,9 ,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,16,17,17,18,18};
+        connectedIntersectionsToRoad[1] = new int[] {19,19,1 ,19,2 ,19,19,19,0 ,4,1 ,4 ,2 ,5 ,6 ,19,19,3 ,8 ,4 ,8 ,9 ,9 ,6 ,10,11,19,19,12,8 ,12,9 ,13,10,14,11,15,19,19,16,13,16,14,17,15,18,19,19,19,17,19,18,19,19};
+    }
+
+    public void addVillage(Player player, int row, int col){
         // player has enough Resources
 
         int intersection = translateIntersectionToAdjacencyMatrix(row,col);
         if((intersections[row][col] != null) && !isNextToBuilding(row,col) /*&& isNextToOwnRoad(intersection,playerID)*/ && !(intersections[row][col] instanceof Building)){
-            intersections[row][col] = new Building(playerID,Building.BuildingType.VILLAGE);
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
             Building village = (Building)intersections[row][col];
 
             addToHexagons(intersection,village);
@@ -222,10 +162,10 @@ public class Board {
         return nextToBuilding;
     }
 
-    public boolean isNextToOwnRoad(int intersection, int playerID){
+    public boolean isNextToOwnRoad(int intersection, Player player){
         //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
-            if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayerID() == playerID)){
+            if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayer() == player)){
                 return true;
             }
         }
@@ -245,6 +185,56 @@ public class Board {
         }
         return intersection;
     }
+
+    private void generateHexagons() {
+        List<Location> locations = new ArrayList<>();
+        List<Integer> values = new ArrayList<>();
+
+        // Copy locations and values lists to ensure original lists remain unchanged (19 locations total)
+        Collections.addAll(locations, Location.HILLS, Location.HILLS, Location.HILLS, Location.FOREST,
+                Location.FOREST, Location.FOREST, Location.FOREST, Location.MOUNTAINS, Location.MOUNTAINS,
+                Location.MOUNTAINS, Location.FIELDS, Location.FIELDS, Location.FIELDS, Location.FIELDS,
+                Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.DESERT);
+        Collections.addAll(values, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
+
+        hexagonList = new ArrayList<>();
+
+        Collections.shuffle(locations);
+        Collections.shuffle(values);
+
+        for (int i = 0; i<locations.size(); i++) {
+            Location location = locations.get(i);
+            int value;
+            if (location == Location.DESERT) {
+                value = 0; // Desert location should have value 0
+            } else {
+                value = values.remove(0);
+            }
+
+            ResourceDistribution resourceDistribution;
+            switch (location) {
+                case FIELDS:
+                    resourceDistribution = ResourceDistribution.FIELDS;
+                    break;
+                case PASTURE:
+                    resourceDistribution = ResourceDistribution.PASTURE;
+                    break;
+                case FOREST:
+                    resourceDistribution = ResourceDistribution.FOREST;
+                    break;
+                case HILLS:
+                    resourceDistribution = ResourceDistribution.HILLS;
+                    break;
+                case MOUNTAINS:
+                    resourceDistribution = ResourceDistribution.MOUNTAINS;
+                    break;
+                default:
+                    resourceDistribution = ResourceDistribution.DESERT;
+            }
+            hexagonList.add(new Hexagon(location, resourceDistribution, value, i));
+        }
+    }
+
 
 }
 
