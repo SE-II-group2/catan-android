@@ -5,9 +5,9 @@ public class Player {
     private final String displayName;
     private int victoryPoints = 0;
     private final int[] resources = new int[]{0,0,0,0,0};
-    private final String color;
+    private final int color;
 
-    public Player(String displayName, String color) {
+    public Player(String displayName, int color) {
         this.displayName = displayName;
         this.color = color;
     }
@@ -37,7 +37,7 @@ public class Player {
         return displayName;
     }
 
-    public String getColor() {
+    public int getColor() {
         return color;
     }
 

@@ -62,7 +62,7 @@
             android:id="@+id/street"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/exit_button_svg"
+            android:src="@drawable/road_button"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -91,11 +91,11 @@
             android:id="@+id/developmentcard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/question1_svgrepo_com"
-            app:layout_constraintDimensionRatio="1:1"
+            android:src="@drawable/development_card_button"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/exit"/>
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@+id/exit"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

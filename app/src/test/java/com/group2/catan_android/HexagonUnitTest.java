@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import android.graphics.Color;
+
 import com.group2.catan_android.gamelogic.*;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
@@ -18,7 +20,7 @@ public class HexagonUnitTest {
     private Player player1;
     @BeforeEach
     public void setUp() {
-        player1 = new Player("player1", "color");
+        player1 = new Player("player1", Color.RED);
     }
 
     @Test

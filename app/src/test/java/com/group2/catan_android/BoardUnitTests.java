@@ -11,6 +11,8 @@ import com.group2.catan_android.gamelogic.enums.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import android.graphics.Color;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,7 @@ public class BoardUnitTests {
     public void setUp() {
         board = new Board();
         buildingMock = mock(Building.class); // Create a mock object for Building
-        player1 = new Player("player1", "color");
+        player1 = new Player("player1", Color.RED);
     }
 
     @Test
