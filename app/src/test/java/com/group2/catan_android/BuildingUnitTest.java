@@ -5,21 +5,26 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
-import com.group2.catan_android.gamelogic.*;
+import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.*;
+import com.group2.catan_android.gamelogic.enums.*;
 public class BuildingUnitTest {
+
+    private Player player1;
+    private Player player2;
+    @BeforeEach
+    public void setUp() {
+        player1 = new Player("player1", "color");
+        player2 = new Player("player2", "color");
+    }
 
     @Test
     public void testBuildingPlayerID() {
-        Building building1 = new Building(1, Building.BuildingType.VILLAGE);
-        Building building2 = new Building(1, Building.BuildingType.CITY);
+        Building building1 = new Building(player1, BuildingType.VILLAGE);
+        Building building2 = new Building(player2, BuildingType.CITY);
 
-        assertEquals(1, building1.getPlayerID());
-        assertEquals(1, building2.getPlayerID());
+        assertEquals(player1, building1.getPlayer());
+        assertEquals(player2, building2.getPlayer());
     }
 }

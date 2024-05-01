@@ -36,6 +36,7 @@ public class Hexagon {
             if (buildings[i] == null) {
                 buildings[i] = building;
                 numOfAdjacentBuildings++;
+                System.out.println("added to HexagonID: " + id);
                 break;
             }
         }
@@ -59,6 +60,10 @@ public class Hexagon {
 
     public int getNumOfAdjacentBuildings(){
         return numOfAdjacentBuildings;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @NonNull

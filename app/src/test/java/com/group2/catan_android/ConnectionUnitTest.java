@@ -16,9 +16,15 @@ import com.group2.catan_android.gamelogic.objects.*;
 
 public class ConnectionUnitTest {
 
+    private Player player1;
+    @BeforeEach
+    public void setUp() {
+        player1 = new Player("player1", "color");
+    }
+
     @Test
     public void testRoadOwner() {
-        Connection connection = new Road(1);
-        assertEquals(1, connection.getPlayerID());
+        Connection connection = new Road(player1);
+        assertEquals(player1, connection.getPlayer());
     }
 }

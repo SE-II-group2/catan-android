@@ -64,29 +64,38 @@ public class Board {
             adjacencyMatrix[toIntersection][fromIntersection] = road;
             return true;
         }
-
         return false;
     }
 
-    public void addNewVillage(Player player, int intersectionID){
+    public boolean addNewVillage(Player player, int intersectionID){
         //TODO: check if player has enough Resources
 
         int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
         int row = intersectionCoordinates[0];
         int col = intersectionCoordinates[1];
+        System.out.println("row: " + row + " col: " + col);
+
+        if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
+            Building village = (Building)intersections[row][col];
+            addBuildingToSurroundingHexagons(intersectionID,village);
+            return true;
+        }
 
         if((intersections[row][col] != null) && !(intersections[row][col] instanceof Building) && noBuildingAdjacent(row,col) && isNextToOwnRoad(intersectionID,player)){
             intersections[row][col] = new Building(player,BuildingType.VILLAGE);
             Building village = (Building)intersections[row][col];
 
-            addToHexagons(intersectionID,village);
+            addBuildingToSurroundingHexagons(intersectionID,village);
+            return true;
         }
+        return false;
     }
 
-    private void addToHexagons(int intersection, Building building){
-        int firstHexagon = surroundingHexagons[1][intersection];
-        int secondHexagon = surroundingHexagons[2][intersection];
-        int thirdHexagon = surroundingHexagons[3][intersection];
+    private void addBuildingToSurroundingHexagons(int intersection, Building building){
+        int firstHexagon = surroundingHexagons[0][intersection];
+        int secondHexagon = surroundingHexagons[1][intersection];
+        int thirdHexagon = surroundingHexagons[2][intersection];
 
         if(firstHexagon != NON_EXISTING_HEXAGON){
             hexagonList.get(firstHexagon).addBuilding(building);
@@ -268,6 +277,8 @@ public class Board {
         }
     }
 
-
+    public void endSetupPhase(){
+        isSetupPhase = false;
+    }
 }
 

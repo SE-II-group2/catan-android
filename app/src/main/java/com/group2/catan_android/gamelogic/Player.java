@@ -2,17 +2,14 @@ package com.group2.catan_android.gamelogic;
 
 public class Player {
 
-    private final String token;
     private final String displayName;
     private int victoryPoints = 0;
     private final int[] resources = new int[]{0,0,0,0,0};
     private final String color;
 
-    public Player(String token, String displayName, String color, int victoryPoints) {
-        this.token = token;
+    public Player(String displayName, String color) {
         this.displayName = displayName;
         this.color = color;
-        this.victoryPoints = victoryPoints;
     }
 
     public void adjustResources(int[] resources){
@@ -44,7 +41,4 @@ public class Player {
         return color;
     }
 
-    public String getToken() {
-        return token;
-    }
 }
