@@ -9,7 +9,7 @@
     android:background="#009dc4">
 
     <FrameLayout
-        android:id="@+id/leftButtons"
+        android:id="@+id/leftButtonsFragment"
         android:layout_width="200dp"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/resources"
+        android:id="@+id/playerResourcesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.25"
@@ -26,13 +26,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/score"
+        android:id="@+id/playerScoresFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.25"
         app:layout_constraintDimensionRatio="2:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resources" />
+        app:layout_constraintTop_toBottomOf="@+id/playerResourcesFragment" />
 
     <ImageView
         android:id="@+id/endturn"

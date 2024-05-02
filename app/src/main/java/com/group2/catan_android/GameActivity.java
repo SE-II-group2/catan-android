@@ -1,7 +1,6 @@
 package com.group2.catan_android;
 
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -17,16 +16,22 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.group2.catan_android.fragments.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.fragments.buttonsClosedFragment;
+import com.group2.catan_android.fragments.buttonsOpenFragment;
+import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import java.util.List;
 import java.util.Locale;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
+
+    private ButtonType mLastButtonClicked;
 
     // hexagon icon measurements
     final static int hexagonHeight = 198;
@@ -39,6 +44,11 @@ public class GameActivity extends AppCompatActivity {
     static int intersectionSize = 40;
     static int connectionSize = hexagonHalfHeight;
 
+    // view IDs offsets
+    final static int CONNECTIONS_OFFSET = 20; // 19 Hexagons + 1 (0 index)
+    final static int INTERSECTIONS_OFFSET = 92; // 19 Hexagons + 72 Connections + 1
+
+    Player player = new Player("token","displayName","gameID",Color.GREEN);
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
 
@@ -46,7 +56,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_demoboard);
+        setContentView(R.layout.activity_game);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -62,6 +72,7 @@ public class GameActivity extends AppCompatActivity {
         ImageView[] intersectionViews = new ImageView[54];
         ImageView[] connectionViews = new ImageView[72];
         TextView[] rollValueViews = new TextView[19];
+
 
         //get Roll Values and set images of Hexagons
         for (int i = 0; i < hexagonPictures.length; i++) {
@@ -100,8 +111,6 @@ public class GameActivity extends AppCompatActivity {
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonWidth, hexagonHeight);
             constraintLayout.addView(hexagonView, params);
             hexagonViews[i] = hexagonView;
-
-            hexagonView.setOnClickListener(v -> Toast.makeText(getApplicationContext(), "index " + (hexagonView.getId()), Toast.LENGTH_SHORT).show());
         }
 
         //draw Connections
@@ -114,10 +123,12 @@ public class GameActivity extends AppCompatActivity {
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
-            // toast for testing
             connectionView.setOnClickListener(v -> {
-                Toast.makeText(getApplicationContext(), "index " + (connectionView.getId()), Toast.LENGTH_SHORT).show();
-                connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
+                if(mLastButtonClicked == ButtonType.ROAD){
+                    Toast.makeText(getApplicationContext(), "Connection id: " + (connectionView.getId()-CONNECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
+                    connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
+                    connectionView.setColorFilter(player.getColor());
+                }
             });
         }
 
@@ -131,11 +142,16 @@ public class GameActivity extends AppCompatActivity {
             constraintLayout.addView(intersectionView, params);
             intersectionViews[i] = intersectionView;
 
-            // toast for testing
             intersectionView.setOnClickListener(v -> {
-                Toast.makeText(getApplicationContext(), "index " + (intersectionView.getId()), Toast.LENGTH_SHORT).show();
-                intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                intersectionView.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_IN);
+                if(mLastButtonClicked == ButtonType.VILLAGE){
+                    Toast.makeText(getApplicationContext(), "Intersection ID: " + (intersectionView.getId()-INTERSECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
+                    intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
+                    intersectionView.setColorFilter(player.getColor());
+                } else if(mLastButtonClicked == ButtonType.CITY){
+                    Toast.makeText(getApplicationContext(), "Intersection ID: " + (intersectionView.getId()-INTERSECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
+                    intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
+                    intersectionView.setColorFilter(player.getColor());
+                }
             });
         }
 
@@ -163,10 +179,12 @@ public class GameActivity extends AppCompatActivity {
         });
 
         // initialisation of the button fragments
-        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtons, new buttonsClosedFragment()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.resources, new PlayerResourcesFragment()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.score, new PlayerScoresFragment()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtonsFragment, new buttonsClosedFragment()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.playerResourcesFragment, new PlayerResourcesFragment()).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.playerScoresFragment, new PlayerScoresFragment()).addToBackStack(null).commit();
+
         // TODO: Write OnClickListener for the end turn button
+
         /*
         findViewById(R.id.endturn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,7 +196,14 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onButtonClicked(ButtonType button) {
+        Toast.makeText(getApplicationContext(), button.toString() + " clicked", Toast.LENGTH_SHORT).show();
+        mLastButtonClicked = button;
+    }
 
+
+    //drawing of board
     private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
