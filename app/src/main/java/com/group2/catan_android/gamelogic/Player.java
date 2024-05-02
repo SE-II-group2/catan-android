@@ -1,5 +1,9 @@
 package com.group2.catan_android.gamelogic;
 
+import android.util.Log;
+
+import java.util.Arrays;
+
 public class Player {
 
     private final String token;
@@ -25,9 +29,12 @@ public class Player {
     }
 
     public boolean resourcesSufficient(int[] resourceCost){
-        if(resourceCost!=null&&resourceCost.length == 5){
+
+        if(resourceCost != null && resourceCost.length == 5){
             for (int i = 0; i < resourceCost.length; i++) {
-                if(this.resources[i]+resourceCost[i]<0)return false;
+                if(this.resources[i] + resourceCost[i] < 0){
+                    return false;
+                }
             }
         }
         return true;

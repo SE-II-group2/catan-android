@@ -20,6 +20,8 @@ public class BuildingUnitTest {
     public void setUp() {
         player1 = new Player("player1","player1","player1", Color.RED);
         player2 = new Player("player1","player1","player1", Color.RED);
+        player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
+        player2.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
 
     @Test

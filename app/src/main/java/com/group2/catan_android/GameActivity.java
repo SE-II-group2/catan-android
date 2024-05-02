@@ -52,6 +52,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +65,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
+
+        player.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
+        board.addNewRoad(player,0);
+        board.setSetupPhase(false);
 
         //init of arrays to store displayable views and values
         int[] hexagonPictures = new int[19];
@@ -123,11 +128,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
+            int connectionID = connectionView.getId() - CONNECTIONS_OFFSET;
+
             connectionView.setOnClickListener(v -> {
                 if(mLastButtonClicked == ButtonType.ROAD){
-                    Toast.makeText(getApplicationContext(), "Connection id: " + (connectionView.getId()-CONNECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
-                    connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
-                    connectionView.setColorFilter(player.getColor());
+                    if(board.addNewRoad(player,connectionID)){
+                        connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
+                        connectionView.setColorFilter(player.getColor());
+                    } else{
+                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -141,16 +151,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(intersectionSize, intersectionSize);
             constraintLayout.addView(intersectionView, params);
             intersectionViews[i] = intersectionView;
+            int intersectionID = intersectionView.getId() - INTERSECTIONS_OFFSET;
 
             intersectionView.setOnClickListener(v -> {
-                if(mLastButtonClicked == ButtonType.VILLAGE){
-                    Toast.makeText(getApplicationContext(), "Intersection ID: " + (intersectionView.getId()-INTERSECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
-                    intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
-                    intersectionView.setColorFilter(player.getColor());
+                if(mLastButtonClicked == ButtonType.VILLAGE) {
+                    if (board.addNewVillage(player, intersectionID)) {
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
+                        intersectionView.setColorFilter(player.getColor());
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
+                    }
                 } else if(mLastButtonClicked == ButtonType.CITY){
-                    Toast.makeText(getApplicationContext(), "Intersection ID: " + (intersectionView.getId()-INTERSECTIONS_OFFSET), Toast.LENGTH_SHORT).show();
-                    intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                    intersectionView.setColorFilter(player.getColor());
+                    if (board.addNewCity(player,intersectionID)){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
+                        intersectionView.setColorFilter(player.getColor());
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -198,7 +215,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     @Override
     public void onButtonClicked(ButtonType button) {
-        Toast.makeText(getApplicationContext(), button.toString() + " clicked", Toast.LENGTH_SHORT).show();
         mLastButtonClicked = button;
     }
 

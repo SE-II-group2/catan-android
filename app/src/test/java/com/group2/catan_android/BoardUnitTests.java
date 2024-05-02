@@ -36,6 +36,7 @@ public class BoardUnitTests {
         board = new Board();
         buildingMock = mock(Building.class); // Create a mock object for Building
         player1 = new Player("player1","player1","player1", Color.RED);
+        player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
 
     @Test
@@ -75,6 +76,7 @@ public class BoardUnitTests {
 
         board.addNewVillage(player1, 21);
         board.addNewVillage(player1, 23);
+        assertFalse(board.addNewVillage(player1, 22));
         board.addNewVillage(player1, 12);
 
         List<Hexagon> hexList = board.getHexagonList();
