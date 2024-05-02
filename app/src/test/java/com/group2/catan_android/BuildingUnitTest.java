@@ -18,8 +18,8 @@ public class BuildingUnitTest {
 
     @BeforeEach
     public void setUp() {
-        player1 = new Player("player1", Color.RED);
-        player2 = new Player("player2", Color.BLUE);
+        player1 = new Player("player1","player1","player1", Color.RED);
+        player2 = new Player("player1","player1","player1", Color.RED);
     }
 
     @Test

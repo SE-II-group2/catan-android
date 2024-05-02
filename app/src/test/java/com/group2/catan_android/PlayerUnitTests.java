@@ -20,7 +20,7 @@ public class PlayerUnitTests {
 
     @BeforeEach
     public void setUp() {
-        player1 = new Player("player1", Color.RED);
+        player1 = new Player("player1","player1","player1", Color.RED);
     }
 
     @Test
@@ -42,7 +42,10 @@ public class PlayerUnitTests {
     @Test
     public void testResourceSufficient() {
         player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
-        assertTrue(player1.resourcesSufficient(ResourceDistribution.FOREST.getDistribution()));
-        assertFalse(player1.resourcesSufficient(ResourceDistribution.HILLS.getDistribution()));
+
+        int[] costs1 = new int[]{0, 0, -1, 0, 0}; // -FOREST
+        int[] costs2 = new int[]{0, -1, -1, 0, 0};
+        assertTrue(player1.resourcesSufficient(costs1));
+        assertFalse(player1.resourcesSufficient(costs2));
     }
 }

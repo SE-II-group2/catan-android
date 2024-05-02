@@ -2,13 +2,17 @@ package com.group2.catan_android.gamelogic;
 
 public class Player {
 
+    private final String token;
+    private final String gameID;
     private final String displayName;
     private int victoryPoints = 0;
     private final int[] resources = new int[]{0,0,0,0,0};
     private final int color;
 
-    public Player(String displayName, int color) {
+    public Player(String token, String displayName, String gameID, int color) {
+        this.token = token;
         this.displayName = displayName;
+        this.gameID = gameID;
         this.color = color;
     }
 

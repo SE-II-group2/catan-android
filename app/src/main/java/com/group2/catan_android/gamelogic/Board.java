@@ -73,7 +73,6 @@ public class Board {
         int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
         int row = intersectionCoordinates[0];
         int col = intersectionCoordinates[1];
-        System.out.println("row: " + row + " col: " + col);
 
         if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
             intersections[row][col] = new Building(player,BuildingType.VILLAGE);
@@ -88,6 +87,26 @@ public class Board {
 
             addBuildingToSurroundingHexagons(intersectionID,village);
             return true;
+        }
+        return false;
+    }
+
+    public boolean addNewCity(Player player, int intersectionID){
+        //TODO: check if player has enough Resources
+
+        if(isSetupPhase){
+            return false;
+        } else {
+            int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
+            int row = intersectionCoordinates[0];
+            int col = intersectionCoordinates[1];
+
+            if (intersections[row][col].getType() == BuildingType.VILLAGE && intersections[row][col].getPlayer() == player) {
+                intersections[row][col] = new Building(player, BuildingType.CITY);
+                Building city = (Building) intersections[row][col];
+                addBuildingToSurroundingHexagons(intersectionID, city);
+                return true;
+            }
         }
         return false;
     }
@@ -198,7 +217,6 @@ public class Board {
         for (int i = 0; i < rows.length; i++) {
             adjacencyMatrix[rows[i]][cols[i]] = emptyConnection;
         }
-
     }
 
     public void generateIntersectionsStartingArray() {
@@ -277,8 +295,16 @@ public class Board {
         }
     }
 
-    public void endSetupPhase(){
-        isSetupPhase = false;
+    public void setSetupPhase(boolean setupPhase) {
+        isSetupPhase = setupPhase;
+    }
+
+    public Connection[][] getAdjacencyMatrix() {
+        return adjacencyMatrix;
+    }
+
+    public Intersection[][] getIntersections() {
+        return intersections;
     }
 }
 
