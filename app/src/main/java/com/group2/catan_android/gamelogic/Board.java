@@ -1,7 +1,5 @@
 package com.group2.catan_android.gamelogic;
 
-import android.util.Log;
-
 import com.group2.catan_android.gamelogic.enums.Location;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -76,7 +74,7 @@ public class Board {
     public boolean addNewVillage(Player player, int intersectionID){
         if(!player.resourcesSufficient(ResourceCost.VILLAGE.getCost())){
             return false;
-        };
+        }
 
         int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
         int row = intersectionCoordinates[0];
@@ -102,7 +100,7 @@ public class Board {
     public boolean addNewCity(Player player, int intersectionID){
         if(!player.resourcesSufficient(ResourceCost.CITY.getCost())){
             return false;
-        };
+        }
 
         if(isSetupPhase){
             return false;
@@ -153,8 +151,8 @@ public class Board {
             return false;
         }
 
-        //if even even check or uneven uneven check below, else above if there is a building next to the position where it should be built
-        if((evenRow && evenCol) || (!evenRow && !evenCol)){
+        //if even uneven or uneven even check below, else above if there is a building
+        if((evenRow && !evenCol) || (!evenRow && evenCol)){
             if(row != 0 && intersections[row-1][col] instanceof Building){
                 nextToBuilding = true;
             }

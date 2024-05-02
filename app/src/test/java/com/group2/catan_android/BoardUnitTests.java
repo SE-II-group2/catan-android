@@ -174,6 +174,21 @@ public class BoardUnitTests {
         assertTrue(board.addNewRoad(player1,1));
         assertFalse(board.addNewRoad(player1,3));
     }
+
+    @Test
+    public void testAddVillageNextToVillage(){
+        board.addNewRoad(player1,0);
+        board.addNewRoad(player1,6);
+        board.addNewRoad(player1,1);
+        board.addNewRoad(player1,2);
+        board.addNewRoad(player1,7);
+        board.addNewRoad(player1,13);
+
+        assertTrue(board.addNewVillage(player1, 0));
+        assertFalse(board.addNewVillage(player1, 8));
+        assertTrue(board.addNewVillage(player1, 3));
+        assertTrue(board.addNewVillage(player1, 11));
+    }
 }
 
 
