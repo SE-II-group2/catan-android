@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".demoboard"
+            android:name=".GameActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape">
         </activity>

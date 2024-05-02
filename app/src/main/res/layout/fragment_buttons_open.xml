@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".leftButtons_1"
+    tools:context=".fragments.buttonsOpenFragment"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,10 +18,10 @@
         app:layout_constraintTop_toTopOf="parent" >
 
         <ImageView
-            android:id="@+id/help"
+            android:id="@+id/city"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/exit_button_svg"
+            android:src="@drawable/city_button"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -39,10 +39,10 @@
         app:layout_constraintTop_toBottomOf="@id/one" >
 
         <ImageView
-            android:id="@+id/card_usage"
+            android:id="@+id/village"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/question1_svgrepo_com"
+            android:src="@drawable/settlement_button"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -59,10 +59,10 @@
         app:layout_constraintTop_toBottomOf="@id/two" >
 
         <ImageView
-            android:id="@+id/trade"
+            android:id="@+id/road"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/trade_button_svg"
+            android:src="@drawable/road_button"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -79,12 +79,22 @@
         app:layout_constraintTop_toBottomOf="@id/three" >
 
         <ImageView
-            android:id="@+id/build"
+            android:id="@+id/exit"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:src="@drawable/build_button_svg"
+            android:src="@drawable/exit_button_svg"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/developmentCard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/development_card_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@+id/exit"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
