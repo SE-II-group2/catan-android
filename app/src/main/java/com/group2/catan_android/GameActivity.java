@@ -136,7 +136,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                         connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
                         connectionView.setColorFilter(player.getColor());
                     } else{
-                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
