@@ -48,12 +48,12 @@
             android:id="@+id/demoBoard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DemoBoardActivity" />
 
         <Button
             android:id="@+id/lobbyscreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lobby Screen" />
+            android:text="GameActivity" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

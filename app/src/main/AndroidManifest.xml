@@ -33,8 +33,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".demoboard"
-            android:exported="true" />
+            android:name=".GameActivity"
+            android:exported="true"
+            android:screenOrientation="sensorLandscape">
+        </activity>
         <activity
             android:name=".DemoActivity"
             android:exported="false" />

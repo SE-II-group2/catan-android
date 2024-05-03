@@ -1,9 +1,17 @@
 package com.group2.catan_android.gamelogic.objects;
 
-public class Intersection {
-    int playerID;
+import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
 
-    public int getPlayerID(){
-        return playerID;
+public class Intersection {
+    Player player;
+    BuildingType type = BuildingType.EMPTY;
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public BuildingType getType() {
+        return type;
     }
 }

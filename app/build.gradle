@@ -67,11 +67,12 @@ sonar {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        property("sonar.coverage.exclusions", "com/group2/catan_android/fragments")
     }
 }
 
 dependencies {
-
+    implementation "androidx.fragment:fragment:1.6.2"
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
