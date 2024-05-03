@@ -49,5 +49,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="GameActivity" />
+
+        <Button
+            android:id="@+id/lobbyActivityButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Lobby" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
