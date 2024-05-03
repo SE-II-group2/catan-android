@@ -1,9 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Catan_android" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Catan_android" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="buttonStyle">@style/MyButton</item>
     </style>
 
     <style name="Theme.Catan_android" parent="Base.Theme.Catan_android" />
+    <style name="MyButton" parent="Widget.AppCompat.Button">
+        <item name="android:textAllCaps">false</item>
+    </style>
 </resources>
