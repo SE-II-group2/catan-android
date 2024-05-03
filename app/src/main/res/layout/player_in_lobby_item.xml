@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    android:layout_margin="5dp"
+    android:background="@drawable/player_card_shape">
+    <TextView
+        android:id="@+id/playerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:hint="Player Name"
+        android:textSize="20sp"
+        android:layout_marginStart="10dp"/>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        android:layout_marginEnd="10dp"
+        android:tint="#a0a0a0"
+        android:src="@drawable/baseline_network_check_24"/>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/admin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/connection"
+        app:layout_constraintTop_toTopOf="@id/connection"
+        android:src="@drawable/baseline_grade_24" />
+</androidx.constraintlayout.widget.ConstraintLayout>

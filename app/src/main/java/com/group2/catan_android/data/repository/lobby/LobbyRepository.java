@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,7 +23,7 @@ import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-public class LobbyRepository {
+public class LobbyRepository implements LobbyLoader, LobbyJoiner{
     private static LobbyRepository instance;
     private final GameApi api;
     private LobbyRepository(GameApi gameApi){
@@ -42,27 +43,31 @@ public class LobbyRepository {
     public Single<List<AvailableGame>> getLobbies(){
         return api.getLobbies()
                 .map(ListGamesResponse::getGameList)
-                .onErrorResumeNext(this::convertAPIError);
+                .onErrorResumeNext(throwable -> Single.error(convertAPIError(throwable)));
     }
 
     public Single<JoinGameResponse> joinGame(JoinGameRequest joinRequest){
         return api.connectGame(joinRequest)
-                .onErrorResumeNext(this::convertAPIError);
+                .onErrorResumeNext(throwable -> Single.error(convertAPIError(throwable)));
     }
 
     public Single<JoinGameResponse> createGame(JoinGameRequest joinGameRequest){
         Log.d("Test", "Create Game Called");
         return api.createGame(joinGameRequest)
-                .onErrorResumeNext(this::convertAPIError);
+                .onErrorResumeNext(throwable -> Single.error(convertAPIError(throwable)));
+    }
+
+    public Completable leaveGame(String token){
+        return api.leaveGame(token)
+                .onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
     }
 
 
-    private <T> Single<T> convertAPIError(Throwable throwable) {
+    private Throwable convertAPIError(Throwable throwable) {
         if (throwable instanceof HttpException) {
-            Throwable t = parseHttpException((HttpException) throwable);
-            return Single.error(t);
+            return parseHttpException((HttpException) throwable);
         } else {
-            return Single.error(throwable);
+            return throwable;
         }
     }
 
@@ -70,7 +75,7 @@ public class LobbyRepository {
         Response<?> response = httpException.response();
         if(response != null){
             try (ResponseBody errorBody = response.errorBody()){
-                ApiErrorResponse apiErrorResponse = ObjectMapperProvider.getMapper().readValue(errorBody.toString(), ApiErrorResponse.class);
+                ApiErrorResponse apiErrorResponse = ObjectMapperProvider.getMapper().readValue(errorBody.string(), ApiErrorResponse.class);
                 return new Throwable(apiErrorResponse.getMessage());
             } catch (Exception e) {
                 return new Throwable("API ERROR but cannot read message");
