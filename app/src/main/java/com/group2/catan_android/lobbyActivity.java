@@ -157,9 +157,11 @@ public class lobbyActivity extends AppCompatActivity {
         if(selectedGameID != null){
             connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
             createButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
+            createButton.setEnabled(false);
         } else {
             connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
             createButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+            createButton.setEnabled((true));
         }
     }
 
