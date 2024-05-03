@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="GrassGreen">#FF7EC850</color>
     <color name="GrassGreenHighlighted">#FF659f41</color>
+    <color name="button_available">@color/GrassGreen</color>
+    <color name="button_not_available">#FFAAAFB4</color>
 </resources>

@@ -59,6 +59,7 @@ public class lobbyActivity extends AppCompatActivity {
         GameListAdapter.ItemClickListener listener = game -> {
             selectedGameID = game.getGameID();
             Toast.makeText(lobbyActivity.this, "Game selected: " + game.getGameID(), Toast.LENGTH_SHORT).show();
+            updateButtonColors();
         };
 
         gameListAdapter = new GameListAdapter(listener);
@@ -94,10 +95,12 @@ public class lobbyActivity extends AppCompatActivity {
                 requestActiveGames();
             }
         });
-        }
+    }
 
     private void requestActiveGames() {
         GameRepository repository = GameRepository.getInstance();
+        selectedGameID = null;
+        updateButtonColors();
         repository.listGames(new GameRepository.listCallback() {
             @Override
             public void onListReceived(ListGameResponse response) {
@@ -145,6 +148,19 @@ public class lobbyActivity extends AppCompatActivity {
                 Toast.makeText(lobbyActivity.this, "Error connecting to game", Toast.LENGTH_LONG).show();
             }
         }, create);
+    }
+
+    private void updateButtonColors(){
+        Button connectButton = findViewById(R.id.LobbyJoinButton);
+        Button createButton = findViewById(R.id.LobbyCreateButton);
+
+        if(selectedGameID != null){
+            connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+            createButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
+        } else {
+            connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+            createButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+        }
     }
 
 }
