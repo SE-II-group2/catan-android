@@ -21,6 +21,10 @@
             android:exported="false"
             android:theme="@style/Theme.Catan_android" />
         <activity
+            android:name=".lobbyActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
             android:name=".ConnectToGameActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
@@ -29,13 +33,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".demoboard"
-            android:exported="true"></activity>
+            android:name=".GameActivity"
+            android:exported="true"
+            android:screenOrientation="sensorLandscape">
+        </activity>
         <activity
             android:name=".DemoActivity"
             android:exported="false" />

@@ -60,6 +60,10 @@ public class InLobby extends AppCompatActivity {
 
     private void setAdmin(boolean isAdmin){
         binding.start.setEnabled(isAdmin);
+        if(isAdmin)
+            binding.start.setBackgroundColor(getColor(R.color.button_not_available));
+        else
+            binding.start.setBackgroundColor(getColor(R.color.button_available));
     }
 
     private void doLeave(){
