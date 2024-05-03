@@ -2,13 +2,16 @@ package com.group2.catan_android.adapter;
 
 import android.content.ClipData;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.group2.catan_android.R;
 import com.group2.catan_android.databinding.GameItemBinding;
 import com.group2.catan_android.networking.dto.Game;
 
@@ -55,10 +58,15 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         holder.setGameData(games.get(position));
         holder.bindListener(games.get(position), listener);
 
+        // TODO: maybe refactor sometime
         if (selectedPos == position){
-            holder.binding.getRoot().setBackgroundColor(Color.GREEN);
+            holder.binding.getRoot().setBackgroundColor(Color.BLACK);
+            //holder.gameCardView.setCardBackgroundColor(ContextCompat.getColor(holder.gameCardView.getContext(), R.color.GrassGreenHighlighted));
+            //holder.gameCardView.setCardBackgroundColor(Color.BLUE);
         } else {
             holder.binding.getRoot().setBackgroundColor(Color.TRANSPARENT);
+            //holder.gameCardView.setCardBackgroundColor(ContextCompat.getColor(holder.gameCardView.getContext(), R.color.GrassGreen));
+            //holder.gameCardView.setCardBackgroundColor(Color.GREEN);
         }
     }
 
@@ -70,15 +78,18 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
     public class GameListViewHolder extends RecyclerView.ViewHolder{
 
         GameItemBinding binding;
+        CardView gameCardView;
         GameListViewHolder(GameItemBinding gameItemBinding){
             super(gameItemBinding.getRoot());
             binding = gameItemBinding;
+            gameCardView = binding.getRoot().findViewById(R.id.gameCardView);
         }
 
         void bindListener(Game game, ItemClickListener listener){
             binding.getRoot().setOnClickListener(v -> {
                 int previousSelectedPos = selectedPos;
                 selectedPos = getAdapterPosition();
+                Log.d("GameListAdapter", "Clicked position: " + selectedPos + ", Previous position: " + previousSelectedPos);
                 notifyItemChanged(previousSelectedPos);
                 notifyItemChanged(selectedPos);
                 listener.onItemClicked(game);
