@@ -95,4 +95,5 @@ dependencies {
     implementation libs.retrofit
     implementation libs.retrofit.jackson
     implementation libs.retrofit.rxandroid
+    implementation libs.lifecycle
 }

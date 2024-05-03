@@ -5,7 +5,6 @@ import java.util.List;
 public class PlayersInLobbyDto extends MessageDto {
     List<PlayerDto> players;
     PlayerDto admin;
-    PlayerEventDto event;
 
     public PlayersInLobbyDto(){
         super();
@@ -26,13 +25,5 @@ public class PlayersInLobbyDto extends MessageDto {
 
     public void setAdmin(PlayerDto admin) {
         this.admin = admin;
-    }
-
-    public PlayerEventDto getEvent() {
-        return event;
-    }
-
-    public void setEvent(PlayerEventDto event) {
-        this.event = event;
     }
 }

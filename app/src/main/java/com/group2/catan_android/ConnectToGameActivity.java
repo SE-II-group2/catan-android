@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,9 +18,11 @@ import com.group2.catan_android.adapter.GameListAdapter;
 import com.group2.catan_android.data.api.ApiErrorResponse;
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.api.JoinGameResponse;
+import com.group2.catan_android.data.live.PlayersInLobbyDto;
 import com.group2.catan_android.data.model.AvailableGame;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.service.ApiService;
+import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.data.service.StompManager;
 import com.group2.catan_android.databinding.ActivityConnectToGameBinding;
 import com.group2.catan_android.networking.dto.Game;
@@ -27,11 +30,13 @@ import com.group2.catan_android.networking.socket.SocketManager;
 
 import java.util.List;
 
+import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import ua.naiksoftware.stomp.dto.LifecycleEvent;
 
 public class ConnectToGameActivity extends AppCompatActivity {
 
@@ -70,10 +75,10 @@ public class ConnectToGameActivity extends AppCompatActivity {
             getAvailableGames();
         });
         binding.createNew.setOnClickListener(v -> {
-            joinGame();
+            createGame();
         });
         binding.connect.setOnClickListener(v -> {
-
+            joinGame();
         });
 
         adapter = new GameListAdapter(this.listener);
@@ -109,26 +114,53 @@ public class ConnectToGameActivity extends AppCompatActivity {
                 });
     }
 
-    private void joinGame(){
+    private void createGame(){
+        GameController gc = GameController.getInstance();
         JoinGameRequest request = new JoinGameRequest();
-        request.setPlayerName("Test");
-        LobbyRepository.getInstance().createGame(request)
-                .subscribeOn(Schedulers.io())
+        request.setPlayerName(binding.playerName.getText().toString());
+        gc.createGame(request)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<>() {
+                .subscribe(new CompletableObserver() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         compositeDisposable.add(d);
                     }
 
                     @Override
-                    public void onSuccess(JoinGameResponse joinGameResponse) {
-                        connectSocket(joinGameResponse);
+                    public void onComplete() {
+                        Intent i = new Intent(getApplicationContext(), InLobby.class);
+                        startActivity(i);
+                        Log.d("Testing", "Completed");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        showMessage(e.getMessage());
+                        Log.d("Testing", e.getMessage() != null ? e.getMessage() : "error");
+                    }
+                });
+    }
+    private void joinGame(){
+        GameController gc = GameController.getInstance();
+        JoinGameRequest request = new JoinGameRequest();
+        request.setPlayerName(binding.playerName.getText().toString());
+        request.setGameID(this.selectedGame.getGameID());
+        gc.joinGame(request)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        compositeDisposable.add(d);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Intent i = new Intent(getApplicationContext(), InLobby.class);
+                        startActivity(i);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("Testing", e.getMessage() != null ? e.getMessage() : "error");
                     }
                 });
     }
@@ -148,22 +180,6 @@ public class ConnectToGameActivity extends AppCompatActivity {
         }
     }
 
-    private void connectSocket(JoinGameResponse response){
-        StompManager manager = StompManager.getInstance();
-        manager.connect(response.token);
-        compositeDisposable.add(manager.getMessageTopic("/topic/game/" + response.gameID + "/lobby")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                messageDto -> Toast.makeText(this.getApplicationContext(), messageDto.getEventType(), Toast.LENGTH_SHORT).show()
-        ));
-        manager.getRawTopic("/topic/game/" + response.gameID + "/lobby")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(message ->
-                Log.d("Test", message.getPayload())
-        );
-    }
 
     private boolean checkInput(){
         return !binding.playerName.getText().toString().isBlank();
@@ -172,7 +188,7 @@ public class ConnectToGameActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        compositeDisposable.dispose();
+        compositeDisposable.clear();
     }
 
 }
