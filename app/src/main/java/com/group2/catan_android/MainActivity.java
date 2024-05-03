@@ -32,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button demoBoard = findViewById(R.id.demoBoard);
         demoBoard.setOnClickListener(v -> navigate(GameActivity.class));
+
+        Button lobby = findViewById(R.id.lobbyActivityButton);
+        lobby.setOnClickListener(v -> navigate(lobbyActivity.class));
+
     }
 
     private void navigate(Class<?> cl){
