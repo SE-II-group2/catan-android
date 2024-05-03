@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.ButtonsClosedFragment">
+
+    <TextView
+        android:id="@+id/costsDescription"
+        android:layout_width="136dp"
+        android:layout_height="28dp"
+        android:autoSizeTextType="uniform"
+        android:text="Costs to build"
+        android:textColor="@color/black"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/roadCosts"
+        android:layout_width="115dp"
+        android:layout_height="16dp"
+        android:autoSizeTextType="uniform"
+        android:text="City:"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cityCosts" />
+
+    <TextView
+        android:id="@+id/villageCosts"
+        android:layout_width="115dp"
+        android:layout_height="20dp"
+        android:autoSizeTextType="uniform"
+        android:text="Road:"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/costsDescription" />
+
+    <TextView
+        android:id="@+id/cityCosts"
+        android:layout_width="115dp"
+        android:layout_height="20dp"
+        android:autoSizeTextType="uniform"
+        android:text="Village:"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/villageCosts" />
+
+    <TextView
+        android:id="@+id/developmentCard"
+        android:layout_width="116dp"
+        android:layout_height="19dp"
+        android:autoSizeTextType="uniform"
+        android:text="Development Card:"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/roadCosts" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

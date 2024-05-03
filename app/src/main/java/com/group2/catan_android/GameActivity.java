@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,12 +16,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
-import com.group2.catan_android.fragments.buttonsClosedFragment;
-import com.group2.catan_android.fragments.buttonsOpenFragment;
+import com.group2.catan_android.fragments.ButtonsClosedFragment;
+import com.group2.catan_android.fragments.PopUpFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
@@ -195,27 +199,39 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
         });
 
-        // initialisation of the button fragments
-        getSupportFragmentManager().beginTransaction().replace(R.id.leftButtonsFragment, new buttonsClosedFragment()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.playerResourcesFragment, new PlayerResourcesFragment()).addToBackStack(null).commit();
-        getSupportFragmentManager().beginTransaction().replace(R.id.playerScoresFragment, new PlayerScoresFragment()).addToBackStack(null).commit();
+        // initialisation of button fragments
+        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, new PlayerResourcesFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
 
-        // TODO: Write OnClickListener for the end turn button
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
 
-        /*
-        findViewById(R.id.endturn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            // Code...
-            }
+
+        // endTurn Button
+        findViewById(R.id.endTurnButton).setOnClickListener(v -> {
+            Toast.makeText(getApplicationContext(), "End Turn Button", Toast.LENGTH_SHORT).show();
         });
-         */
-
     }
 
     @Override
     public void onButtonClicked(ButtonType button) {
         mLastButtonClicked = button;
+
+        if(button == ButtonType.HELP){
+            HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
+            if(helpFragment == null){
+                getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
+            } else{
+                getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
+            }
+        }
+
+        if(button == ButtonType.BUILD){
+            HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
+            if(helpFragment != null){
+                getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
+            }
+        }
     }
 
 

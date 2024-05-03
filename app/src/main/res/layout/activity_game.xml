@@ -5,46 +5,54 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GameActivity"
-    android:background="#009dc4">
+    android:background="#009dc4"
+    tools:context=".GameActivity">
+
 
     <FrameLayout
         android:id="@+id/leftButtonsFragment"
-        android:layout_width="200dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/helpFragment"
+            android:layout_width="227dp"
+            android:layout_height="149dp"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="5dp"></FrameLayout>
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/playerResourcesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintDimensionRatio="2.5:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
         android:id="@+id/playerScoresFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintDimensionRatio="2:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintTop_toBottomOf="@+id/playerResourcesFragment" />
 
     <ImageView
-        android:id="@+id/endturn"
+        android:id="@+id/endTurnButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.25"
-        app:layout_constraintDimensionRatio="1:1"
         android:src="@drawable/end_turn_button"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.25" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
