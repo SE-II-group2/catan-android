@@ -31,14 +31,7 @@ public class MainActivity extends AppCompatActivity {
         connection.setOnClickListener(v -> navigate(ConnectToGameActivity.class));
 
         Button demoBoard = findViewById(R.id.demoBoard);
-<<<<<<< HEAD
-        demoBoard.setOnClickListener(v -> navigate(demoboard.class));
-
-        Button lobbyscreen = findViewById(R.id.lobbyscreen);
-        lobbyscreen.setOnClickListener(v -> navigate(lobbyActivity.class));
-=======
         demoBoard.setOnClickListener(v -> navigate(GameActivity.class));
->>>>>>> main
     }
 
     private void navigate(Class<?> cl){
