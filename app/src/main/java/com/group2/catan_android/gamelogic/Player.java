@@ -1,8 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
-import android.util.Log;
-
-import java.util.Arrays;
+import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 
 public class Player {
 
@@ -13,6 +11,12 @@ public class Player {
     private final int[] resources = new int[]{0,0,0,0,0};
     private final int color;
 
+    private ResourceUpdateListener listener;
+
+    public void setResourceUpdateListener(ResourceUpdateListener listener) {
+        this.listener = listener;
+    }
+
     public Player(String token, String displayName, String gameID, int color) {
         this.token = token;
         this.displayName = displayName;
@@ -20,12 +24,17 @@ public class Player {
         this.color = color;
     }
 
-    public void adjustResources(int[] resources){
-        if(resources!=null&&resources.length == 5){
+    public void adjustResources(int[] resources) {
+        if (resources != null && resources.length == 5) {
             for (int i = 0; i < resources.length; i++) {
-                this.resources[i]+= resources[i];
+                this.resources[i] += resources[i];
+            }
+
+            if (listener != null) {
+                listener.onResourcesUpdated(this.resources);
             }
         }
+
     }
 
     public boolean resourcesSufficient(int[] resourceCost){
@@ -37,7 +46,6 @@ public class Player {
                 }
             }
         }
-
         return true;
     }
 

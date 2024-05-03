@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 
 public class ButtonsClosedFragment extends Fragment  {
 

@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 
 public class ButtonsOpenFragment extends Fragment {
 

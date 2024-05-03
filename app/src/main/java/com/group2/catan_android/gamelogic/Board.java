@@ -45,7 +45,7 @@ public class Board {
     }
 
     public boolean addNewRoad(Player player, int connectionID){
-        if(!player.resourcesSufficient(ResourceCost.ROAD.getCost())){
+        if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.ROAD.getCost())){
             return false;
         }
 
@@ -72,7 +72,7 @@ public class Board {
     }
 
     public boolean addNewVillage(Player player, int intersectionID){
-        if(!player.resourcesSufficient(ResourceCost.VILLAGE.getCost())){
+        if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.VILLAGE.getCost())){
             return false;
         }
 
@@ -98,7 +98,7 @@ public class Board {
     }
 
     public boolean addNewCity(Player player, int intersectionID){
-        if(!player.resourcesSufficient(ResourceCost.CITY.getCost())){
+        if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.CITY.getCost())){
             return false;
         }
 

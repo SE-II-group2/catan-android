@@ -29,6 +29,8 @@
         android:id="@+id/playerResourcesFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
         app:layout_constraintDimensionRatio="2.5:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.25"

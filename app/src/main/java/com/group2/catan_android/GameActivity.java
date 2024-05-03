@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,18 +15,16 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.fragments.HelpFragment;
-import com.group2.catan_android.fragments.OnButtonClickListener;
+import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.fragments.ButtonsClosedFragment;
-import com.group2.catan_android.fragments.PopUpFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import java.util.List;
@@ -53,6 +50,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int INTERSECTIONS_OFFSET = 92; // 19 Hexagons + 72 Connections + 1
 
     Player player = new Player("token","displayName","gameID",Color.GREEN);
+
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
 
@@ -70,7 +68,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
-        player.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
+        player.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
         board.addNewRoad(player,0);
         board.setSetupPhase(false);
 
@@ -137,6 +135,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             connectionView.setOnClickListener(v -> {
                 if(mLastButtonClicked == ButtonType.ROAD){
                     if(board.addNewRoad(player,connectionID)){
+                        player.adjustResources(ResourceCost.ROAD.getCost());
                         connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
                         connectionView.setColorFilter(player.getColor());
                     } else{
@@ -160,6 +159,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             intersectionView.setOnClickListener(v -> {
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
                     if (board.addNewVillage(player, intersectionID)) {
+                        player.adjustResources(ResourceCost.VILLAGE.getCost());
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
                         intersectionView.setColorFilter(player.getColor());
                     } else {
@@ -167,6 +167,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     }
                 } else if(mLastButtonClicked == ButtonType.CITY){
                     if (board.addNewCity(player,intersectionID)){
+                        player.adjustResources(ResourceCost.CITY.getCost());
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
                         intersectionView.setColorFilter(player.getColor());
                     } else {
@@ -200,12 +201,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         // initialisation of button fragments
+        PlayerResourcesFragment playerResourcesFragment = new PlayerResourcesFragment();
+        player.setResourceUpdateListener(playerResourcesFragment);
+
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, new PlayerResourcesFragment()).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
-
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
-
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
