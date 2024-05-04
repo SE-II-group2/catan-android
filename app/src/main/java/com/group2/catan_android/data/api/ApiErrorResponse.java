@@ -1,4 +1,4 @@
-package com.group2.catan_android.networking.dto;
+package com.group2.catan_android.data.api;
 
 public class ApiErrorResponse {
     private int statusCode;

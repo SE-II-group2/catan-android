@@ -39,12 +39,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button
-            android:id="@+id/btnConnection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="connectionActivity" />
-
-        <Button
             android:id="@+id/demoBoard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

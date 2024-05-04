@@ -1,5 +1,7 @@
 package com.group2.catan_android;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,7 +38,6 @@ public class DemoActivity extends AppCompatActivity {
         buttonSendMsg.setOnClickListener(v -> sendMessage());
 
         textViewServerResponse = findViewById(R.id.textViewResponse);
-
         networkHandler = new WebSocketClient();
     }
 

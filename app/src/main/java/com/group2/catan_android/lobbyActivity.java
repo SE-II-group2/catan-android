@@ -1,37 +1,41 @@
 package com.group2.catan_android;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
+
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.adapter.GameListAdapter;
-import com.group2.catan_android.networking.dto.ApiErrorResponse;
-import com.group2.catan_android.networking.dto.Game;
-import com.group2.catan_android.networking.dto.JoinGameRequest;
-import com.group2.catan_android.networking.dto.JoinGameResponse;
-import com.group2.catan_android.networking.dto.ListGameResponse;
-import com.group2.catan_android.networking.repository.GameRepository;
+import com.group2.catan_android.data.api.JoinGameRequest;
+import com.group2.catan_android.data.model.AvailableGame;
+import com.group2.catan_android.data.repository.lobby.LobbyRepository;
+import com.group2.catan_android.data.service.GameController;
+
 
 import java.util.List;
+
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class lobbyActivity extends AppCompatActivity {
@@ -39,6 +43,7 @@ public class lobbyActivity extends AppCompatActivity {
     private String playerName = "";
     private EditText playerNameEditText;
     private GameListAdapter gameListAdapter;
+    private CompositeDisposable compositeDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +56,15 @@ public class lobbyActivity extends AppCompatActivity {
             return insets;
         });
 
+        compositeDisposable = new CompositeDisposable();
+
         playerNameEditText = findViewById(R.id.LobbyPlayerNameEditText);
         Button connectButton = findViewById(R.id.LobbyJoinButton);
         Button createButton = findViewById(R.id.LobbyCreateButton);
         ImageButton refreshButton = findViewById(R.id.LobbyRefreshButton);
 
         GameListAdapter.ItemClickListener listener = game -> {
-            selectedGameID = game.getGameID();
-            Toast.makeText(lobbyActivity.this, "Game selected: " + game.getGameID(), Toast.LENGTH_SHORT).show();
+            selectedGameID = game.getGameID().equals(selectedGameID) ? null : game.getGameID();
             updateButtonColors();
         };
 
@@ -95,59 +101,68 @@ public class lobbyActivity extends AppCompatActivity {
                 requestActiveGames();
             }
         });
+
     }
 
     private void requestActiveGames() {
-        GameRepository repository = GameRepository.getInstance();
+        LobbyRepository repository = LobbyRepository.getInstance();
         selectedGameID = null;
         updateButtonColors();
-        repository.listGames(new GameRepository.listCallback() {
-            @Override
-            public void onListReceived(ListGameResponse response) {
-                List<Game> games = response.getGameList();
-                gameListAdapter.setGames(games);
-            }
 
-            @Override
-            public void onFailure(Throwable throwable) {
-                Toast.makeText(lobbyActivity.this, "Failed to fetch games", Toast.LENGTH_SHORT).show();
-            }
-        });
+        repository.getLobbies()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new SingleObserver<List<AvailableGame>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                compositeDisposable.add(d);
+                            }
+
+                            @Override
+                            public void onSuccess(List<AvailableGame> availableGames) {
+                                gameListAdapter.setGames(availableGames);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Toast.makeText(lobbyActivity.this, "Faild to fetch games", Toast.LENGTH_SHORT).show();
+                            }
+                        });
     }
 
     private void joinGame(boolean create) {
+        GameController gc = GameController.getInstance();
         String playerName = playerNameEditText.getText().toString().trim();
-        Log.d("LobbyActivity", "Player Name: " + playerName + ", Create: " + create);
-
         if (playerName.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Player name is required", Toast.LENGTH_LONG).show();
             return;
         }
-
         JoinGameRequest request = new JoinGameRequest();
         request.setPlayerName(playerName);
         if (!create && selectedGameID != null) {
             request.setGameID(selectedGameID);
         }
 
-        GameRepository repository = GameRepository.getInstance();
-        repository.join(request, new GameRepository.JoinCallback() {
-            @Override
-            public void onJoin(JoinGameResponse joinGameResponse) {
-                Toast.makeText(lobbyActivity.this, "Connected to game: " + joinGameResponse.getGameID(), Toast.LENGTH_SHORT).show();
-            }
+        Completable completable = create ? gc.createGame(request) : gc.joinGame(request);
 
-            @Override
-            public void onJoinUnsuccessful(ApiErrorResponse errorResponse) {
-                Toast.makeText(lobbyActivity.this, "Failed to join game: " + errorResponse.getMessage(), Toast.LENGTH_LONG).show();
-            }
+        completable.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new CompletableObserver() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            compositeDisposable.add(d);
+                        }
 
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("LobbyActivity", "Error joining game", throwable);
-                Toast.makeText(lobbyActivity.this, "Error connecting to game", Toast.LENGTH_LONG).show();
-            }
-        }, create);
+                        @Override
+                        public void onComplete() {
+                            Intent i = new Intent(getApplicationContext(), InLobby.class);
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(lobbyActivity.this, "Failed to join game: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
     }
 
     private void updateButtonColors(){
@@ -158,10 +173,12 @@ public class lobbyActivity extends AppCompatActivity {
             connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
             createButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
             createButton.setEnabled(false);
+            connectButton.setEnabled(true);
         } else {
-            connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+            connectButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
             createButton.setBackgroundColor(getResources().getColor(R.color.button_available));
-            createButton.setEnabled((true));
+            createButton.setEnabled(true);
+            connectButton.setEnabled(false);
         }
     }
 

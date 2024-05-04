@@ -20,12 +20,18 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        buildTypes.each {
+            it.buildConfigField('String', 'BASE_URL', '"https://10.0.2.2:8080/catan"')
+            it.buildConfigField('String', 'SOCKET_URL', '"ws://10.0.2.2:8080/catan"')
         }
     }
     compileOptions {
@@ -89,4 +95,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.12.4'
     implementation libs.retrofit
     implementation libs.retrofit.jackson
+    implementation libs.retrofit.rxandroid
+    implementation libs.lifecycle
 }

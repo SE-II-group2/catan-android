@@ -1,4 +1,4 @@
-package com.group2.catan_android.networking.dto;
+package com.group2.catan_android.data.api;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

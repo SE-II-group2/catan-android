@@ -6,4 +6,7 @@
     <color name="GrassGreenHighlighted">#FF659f41</color>
     <color name="button_available">@color/GrassGreen</color>
     <color name="button_not_available">#FFAAAFB4</color>
+    <color name="red">#de2121</color>
+    <color name="green">#00FF00</color>
+    <color name="grey">#a0a0a0</color>
 </resources>

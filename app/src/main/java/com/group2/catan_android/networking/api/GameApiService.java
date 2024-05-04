@@ -1,8 +1,8 @@
 package com.group2.catan_android.networking.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.group2.catan_android.networking.dto.JoinGameRequest;
-import com.group2.catan_android.networking.dto.JoinGameResponse;
+import com.group2.catan_android.data.api.JoinGameRequest;
+import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.networking.dto.ListGameResponse;
 
 import retrofit2.Call;

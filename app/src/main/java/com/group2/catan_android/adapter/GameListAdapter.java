@@ -1,6 +1,5 @@
 package com.group2.catan_android.adapter;
 
-import android.content.ClipData;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,23 +7,21 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.group2.catan_android.data.model.AvailableGame;
 import com.group2.catan_android.R;
 import com.group2.catan_android.databinding.GameItemBinding;
-import com.group2.catan_android.networking.dto.Game;
 
 import java.util.List;
 
 public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameListViewHolder> {
 
-    private List<Game> games;
+    private List<AvailableGame> games;
     private final ItemClickListener listener;
-
     private int selectedPos = RecyclerView.NO_POSITION;
 
-    public GameListAdapter(List<Game> games, ItemClickListener listener){
+    public GameListAdapter(List<AvailableGame> games, ItemClickListener listener){
         this.games = games;
         this.listener = listener;
     }
@@ -34,7 +31,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         this.listener = listener;
     }
 
-    public void setGames(List<Game> games){
+    public void setGames(List<AvailableGame> games){
         this.games = games;
         selectedPos = RecyclerView.NO_POSITION;
         notifyDataSetChanged();
@@ -85,10 +82,12 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
             gameCardView = binding.getRoot().findViewById(R.id.gameCardView);
         }
 
-        void bindListener(Game game, ItemClickListener listener){
+        void bindListener(AvailableGame game, ItemClickListener listener){
             binding.getRoot().setOnClickListener(v -> {
                 int previousSelectedPos = selectedPos;
                 selectedPos = getAdapterPosition();
+                if(selectedPos == previousSelectedPos)
+                    selectedPos = RecyclerView.NO_POSITION;
                 Log.d("GameListAdapter", "Clicked position: " + selectedPos + ", Previous position: " + previousSelectedPos);
                 notifyItemChanged(previousSelectedPos);
                 notifyItemChanged(selectedPos);
@@ -96,13 +95,13 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
             });
         }
 
-        void setGameData(Game game){
+        void setGameData(AvailableGame game){
             binding.gameID.setText(game.getGameID());
             binding.playersConnected.setText(Integer.toString(game.getPlayerCount()));
         }
     }
 
     public interface ItemClickListener{
-        void onItemClicked(Game game);
+        void onItemClicked(AvailableGame game);
     }
 }
