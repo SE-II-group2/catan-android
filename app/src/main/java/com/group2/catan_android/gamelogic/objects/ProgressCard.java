@@ -16,6 +16,8 @@ public class ProgressCard {
         this.cost = cost;
     }
 
+    //TODO: progress cards cannot be played in the same turn as received, except victory card if player has 9 VPS
+
     public void use(){
         switch (type){
             case KNIGHT:

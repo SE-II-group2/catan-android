@@ -273,8 +273,11 @@ public class Board {
         for (int i = 0; i<locations.size(); i++) {
             Location location = locations.get(i);
             int value;
+            boolean hasRobber = false;
+
             if (location == Location.DESERT) {
                 value = 0; // Desert location should have value 0
+                hasRobber = true;
             } else {
                 value = values.remove(0);
             }
@@ -299,7 +302,7 @@ public class Board {
                 default:
                     resourceDistribution = ResourceDistribution.DESERT;
             }
-            hexagonList.add(new Hexagon(location, resourceDistribution, value, i));
+            hexagonList.add(new Hexagon(location, resourceDistribution, value, hasRobber, i));
         }
     }
 

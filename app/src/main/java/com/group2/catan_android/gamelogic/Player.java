@@ -1,6 +1,9 @@
 package com.group2.catan_android.gamelogic;
 
 import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
+import com.group2.catan_android.gamelogic.objects.ProgressCard;
+
+import java.util.List;
 
 public class Player {
 
@@ -12,6 +15,8 @@ public class Player {
     private final int color;
 
     private ResourceUpdateListener listener;
+
+    private List<ProgressCard> progressCards;
 
     public void setResourceUpdateListener(ResourceUpdateListener listener) {
         this.listener = listener;
