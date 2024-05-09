@@ -41,6 +41,16 @@ public class Hexagon {
         }
     }
 
+    public void removeBuilding(Building building) {
+        for (int i = 0; i < buildings.length; i++) {
+            if (buildings[i] == building) {
+                buildings[i] = null;
+                numOfAdjacentBuildings--;
+                break;
+            }
+        }
+    }
+
     public Location getLocation() {
         return location;
     }
