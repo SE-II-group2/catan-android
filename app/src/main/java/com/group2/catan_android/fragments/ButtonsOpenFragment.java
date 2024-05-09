@@ -21,7 +21,7 @@ public class ButtonsOpenFragment extends Fragment {
     ImageView road;
     ImageView village;
     ImageView city;
-    ImageView developmentCard;
+    ImageView progressCard;
 
     private OnButtonClickListener mListener;
 
@@ -46,7 +46,7 @@ public class ButtonsOpenFragment extends Fragment {
         road = getActivity().findViewById(R.id.road);
         village = getActivity().findViewById(R.id.village);
         city = getActivity().findViewById(R.id.city);
-        developmentCard = getActivity().findViewById(R.id.developmentCard);
+        progressCard = getActivity().findViewById(R.id.progressCard);
 
         build.setOnClickListener(v -> {
             Fragment newFragment = new ButtonsClosedFragment();
@@ -80,11 +80,11 @@ public class ButtonsOpenFragment extends Fragment {
             //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
-        developmentCard.setOnClickListener(v -> {
-            mListener.onButtonClicked(ButtonType.DEVELOPMENT_CARD);
+        progressCard.setOnClickListener(v -> {
+            mListener.onButtonClicked(ButtonType.PROGRESS_CARD);
             setButtonBorders(v);
 
-            // TODO: Give the player a random development card and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
+            // TODO: Give the player a random progress card and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
             //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
@@ -94,7 +94,7 @@ public class ButtonsOpenFragment extends Fragment {
         village.setBackgroundResource(0);
         city.setBackgroundResource(0);
         road.setBackgroundResource(0);
-        developmentCard.setBackgroundResource(0);
+        progressCard.setBackgroundResource(0);
         v.setBackgroundResource(R.drawable.button_clicked_border);
     }
 
