@@ -112,7 +112,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Hexagons
         for (int i = 0; i < hexagonPictures.length; i++) {
             ImageView hexagonView = new ImageView(this);
-            hexagonView.setId(ViewCompat.generateViewId());
+            hexagonView.setId(i+1);
             hexagonView.setImageDrawable(ContextCompat.getDrawable(this, hexagonPictures[i]));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonWidth, hexagonHeight);
@@ -123,7 +123,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Connections
         for (int i = 0; i < connectionViews.length; i++) {
             ImageView connectionView = new ImageView(this);
-            connectionView.setId(ViewCompat.generateViewId());
+            connectionView.setId(i+CONNECTIONS_OFFSET);
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
@@ -148,7 +148,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Intersections
         for (int i = 0; i < 54; i++) {
             ImageView intersectionView = new ImageView(this);
-            intersectionView.setId(ViewCompat.generateViewId());
+            intersectionView.setId(i+INTERSECTIONS_OFFSET);
             intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(intersectionSize, intersectionSize);
@@ -180,7 +180,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Roll Values
         for (int i = 0; i < hexagonRollValues.length; i++) {
             TextView rollValueView = new TextView(this);
-            rollValueView.setId(ViewCompat.generateViewId());
+            rollValueView.setId(i+INTERSECTIONS_OFFSET+54);
             String rollValue = String.format(Locale.getDefault(), "%d", hexagonRollValues[i]);
             rollValueView.setText(rollValue);
 
