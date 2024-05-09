@@ -1,6 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.gamelogic.enums.Location;
+import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 import com.group2.catan_android.gamelogic.objects.Building;
@@ -127,14 +127,13 @@ public class Board {
      * @param player
      * @param connectionID
      */
-    public void insertRoadFromOtherPlayer(Player player, int connectionID) {
+    public void insertRoadFromServerMessage(Player player, int connectionID) {
         int[] connectionIntersections = getConnectedIntersections(connectionID);
         int fromIntersection = connectionIntersections[0];
         int toIntersection = connectionIntersections[1];
         Road road = new Road(player);
         adjacencyMatrix[fromIntersection][toIntersection] = road;
         adjacencyMatrix[toIntersection][fromIntersection] = road;
-
     }
 
     /**
@@ -144,7 +143,7 @@ public class Board {
      * @param intersectionID
      * @param buildingType
      */
-    public void insertBuildingFromOtherPlayer(Player player, int intersectionID, BuildingType buildingType){
+    public void insertBuildingFromServerMessage(Player player, int intersectionID, BuildingType buildingType){
 
         int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
         int row = intersectionCoordinates[0];
@@ -314,7 +313,7 @@ public class Board {
     private void generateWaitingHexagonList() {
         hexagonList = new ArrayList<>();
         for (int i = 0; i < 19; i++) {
-            hexagonList.add(new Hexagon(Location.DESERT, ResourceDistribution.DESERT, 0, i));
+            hexagonList.add(new Hexagon(Hexagontype.DESERT, ResourceDistribution.DESERT, 0, i));
         }
 
 

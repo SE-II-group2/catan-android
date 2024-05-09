@@ -26,7 +26,7 @@ public class HexagonUnitTest {
 
     @Test
     public void testAddBuilding() {
-        Hexagon hexagon = new Hexagon(Location.FOREST,ResourceDistribution.FOREST, 6,0);
+        Hexagon hexagon = new Hexagon(Hexagontype.FOREST,ResourceDistribution.FOREST, 6,0);
         Building building1 = new Building(player1, BuildingType.VILLAGE);
         hexagon.addBuilding(building1);
 
@@ -41,7 +41,7 @@ public class HexagonUnitTest {
     public void testDistributeResources() {
         buildingMock = mock(Building.class); // Create a mock object for Building}
 
-        Hexagon hexagon = new Hexagon(Location.HILLS, ResourceDistribution.HILLS, 4,1);
+        Hexagon hexagon = new Hexagon(Hexagontype.HILLS, ResourceDistribution.HILLS, 4,1);
         hexagon.addBuilding(buildingMock);
 
         // Assume giveResources method properly modifies resources for Buildings

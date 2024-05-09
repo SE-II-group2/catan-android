@@ -1,18 +1,18 @@
 package com.group2.catan_android.data.live.game;
 
 
-import com.group2.catan_android.gamelogic.enums.Location;
+import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
 
 public class HexagonDto{
-    private Location location;
+    private Hexagontype hexagontype;
     private ResourceDistribution resourceDistribution;
     private int value;
     private int id;
 
-    public HexagonDto(Location location, ResourceDistribution resourceDistribution, int value, int id) {
-        this.location = location;
+    public HexagonDto(Hexagontype hexagontype, ResourceDistribution resourceDistribution, int value, int id) {
+        this.hexagontype = hexagontype;
         this.resourceDistribution = resourceDistribution;
         this.value = value;
         this.id = id;
@@ -21,12 +21,12 @@ public class HexagonDto{
     public HexagonDto() {
     }
 
-    public Location getLocation() {
-        return location;
+    public Hexagontype getLocation() {
+        return hexagontype;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocation(Hexagontype hexagontype) {
+        this.hexagontype = hexagontype;
     }
 
     public ResourceDistribution getResourceDistribution() {

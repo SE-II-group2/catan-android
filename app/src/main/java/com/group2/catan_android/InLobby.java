@@ -50,7 +50,6 @@ public class InLobby extends AppCompatActivity {
             return insets;
         });
         setGameID();
-
     }
 
     private void setGameID(){

@@ -46,10 +46,10 @@ public class PlayerResourcesFragment extends Fragment implements ResourceUpdateL
     }
 
     public void updateResources(int[] resources) {
-        woodCount.setText(String.valueOf(resources[0]));
-        brickCount.setText(String.valueOf(resources[1]));
-        sheepCount.setText(String.valueOf(resources[2]));
-        wheatCount.setText(String.valueOf(resources[3]));
+        woodCount.setText(String.valueOf(resources[2]));
+        brickCount.setText(String.valueOf(resources[3]));
+        sheepCount.setText(String.valueOf(resources[1]));
+        wheatCount.setText(String.valueOf(resources[0]));
         stoneCount.setText(String.valueOf(resources[4]));
     }
 

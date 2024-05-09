@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import android.graphics.Color;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -49,7 +48,7 @@ public class BoardUnitTests {
     public void testGenerateHexagonsDesertTileCorrectness() {
         boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.getLocation().equals(Location.DESERT)) {
+            if (hexagon.getLocation().equals(Hexagontype.DESERT)) {
                 assertEquals(0, hexagon.getRollValue());
                 assertArrayEquals(new int[]{0, 0, 0, 0, 0}, hexagon.getDistribution().getDistribution());
                 hasDesertTile = true;
