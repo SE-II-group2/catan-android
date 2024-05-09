@@ -336,5 +336,16 @@ public class Board {
         this.hexagonList = hexagonList;
         return true;
     }
+
+    public boolean setAdjacencyMatrix(Connection[][] connections){
+        if(connections.length!=54 || connections[0].length!=54)return false;
+        this.adjacencyMatrix=connections;
+        return true;
+    }
+
+    public void setIntersections(Intersection[][] intersections1){
+        if(intersections1.length!=6 || intersections1[0].length!=11)return;
+        this.intersections=intersections1;
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
+import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 
 public class Player {
