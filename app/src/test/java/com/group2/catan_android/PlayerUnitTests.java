@@ -20,11 +20,11 @@ import java.util.Arrays;
 
 public class PlayerUnitTests {
 
-    Player player1;
-    ResourceUpdateListener mockListener;
-    String playerToken = "player1";
-    String displayName = "player1";
-    String gameID = "player1";
+    private Player player1;
+    private ResourceUpdateListener mockListener;
+    private final String playerToken = "player1";
+    private final String displayName = "player1";
+    private final String gameID = "player1";
     static int playerColor = Color.RED;
 
     @BeforeEach
