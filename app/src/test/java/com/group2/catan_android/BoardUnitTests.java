@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.*;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class BoardUnitTests {
@@ -30,12 +32,20 @@ public class BoardUnitTests {
     @Mock
     private Building buildingMock;
     private Player player1;
+    private ResourceUpdateListener mockListener;
 
     @BeforeEach
     public void setUp() {
         board = new Board();
         buildingMock = mock(Building.class); // Create a mock object for Building
+        mockListener = new ResourceUpdateListener() {
+            @Override
+            public void onResourcesUpdated(int[] resources) {
+                System.out.println("Resources updated: " + Arrays.toString(resources));
+            }
+        };
         player1 = new Player("player1","player1","player1", Color.RED);
+        player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
 
@@ -122,6 +132,12 @@ public class BoardUnitTests {
     }
 
     @Test
+    public void testAddCityInsufficientResources(){
+        board.setSetupPhase(false);
+        player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
+        assertFalse(board.addNewCity(player1, 0));
+    }
+    @Test
     public void testAddVillageEdgeOfBoard() {
         board.addNewRoad(player1,18);
         board.addNewRoad(player1,23);
@@ -174,6 +190,12 @@ public class BoardUnitTests {
         assertTrue(board.addNewRoad(player1,1));
         assertFalse(board.addNewRoad(player1,3));
     }
+    @Test
+    public void testAddRoadInsufficientResources(){
+        board.setSetupPhase(false);
+        player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
+        assertFalse(board.addNewRoad(player1, 0));
+    }
 
     @Test
     public void testAddVillageNextToVillage(){
@@ -189,6 +211,52 @@ public class BoardUnitTests {
         assertTrue(board.addNewVillage(player1, 3));
         assertTrue(board.addNewVillage(player1, 11));
     }
+
+    @Test
+    public void testAddVillageInsufficientResources(){
+        board.setSetupPhase(false);
+        player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
+        assertFalse(board.addNewVillage(player1, 0));
+    }
+
+    @Test
+    public void testGetAdjacencyMatrixCorrectRetrieval() {
+        Board board = new Board();
+        Connection[][] matrix = board.getAdjacencyMatrix();
+
+        assertNotNull(matrix);
+        assertEquals(54, matrix.length);
+        assertTrue(matrix[0][1] instanceof Connection || matrix[0][1] == null);
+    }
+
+    @Test
+    public void testTranslateIntersectionToMatrixCoordinates() {
+        int[] coords;
+
+        // First Row
+        coords = board.translateIntersectionToMatrixCoordinates(1);
+        assertArrayEquals(new int[]{0, 3}, coords);
+
+        // Second Row
+        coords = board.translateIntersectionToMatrixCoordinates(19);
+
+        assertArrayEquals(new int[]{2, 3}, coords);
+
+        // Third Row
+        coords = board.translateIntersectionToMatrixCoordinates(30);
+
+        assertArrayEquals(new int[]{3, 3}, coords);
+
+        // Fourth Row
+        coords = board.translateIntersectionToMatrixCoordinates(41);
+
+        assertArrayEquals(new int[]{4, 4}, coords);
+
+        // Fifth Row
+        coords = board.translateIntersectionToMatrixCoordinates(50);
+        System.out.println("x-Koordinate: " + coords[0]);
+        System.out.println("y-Koordinate: " + coords[1]);
+        assertArrayEquals(new int[]{5, 5}, coords);
+    }
+
 }
-
-
