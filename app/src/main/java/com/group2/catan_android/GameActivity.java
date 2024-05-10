@@ -2,6 +2,7 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -24,8 +25,13 @@ import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
+import com.group2.catan_android.gamelogic.objects.Building;
+import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.objects.Intersection;
+import com.group2.catan_android.gamelogic.objects.Road;
 
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +55,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int CONNECTIONS_OFFSET = 20; // 19 Hexagons + 1 (0 index)
     final static int INTERSECTIONS_OFFSET = 92; // 19 Hexagons + 72 Connections + 1
 
-    Player player = new Player("token","displayName","gameID",Color.GREEN);
+    Player player1 = new Player("token","displayName","gameID",Color.GREEN);
 
     Board board = new Board();
     List<Hexagon> hexagonList = board.getHexagonList();
@@ -68,9 +74,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
-        player.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
-        board.addNewRoad(player,0);
-        board.setSetupPhase(false);
+        player1.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
+        board.addNewRoad(player1,0); // add one road at first top Hexagon to "simulate" fake starting phase
+        board.setSetupPhase(false); // end fake starting phase
+
+
 
         //init of arrays to store displayable views and values
         int[] hexagonPictures = new int[19];
@@ -134,10 +142,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             connectionView.setOnClickListener(v -> {
                 if(mLastButtonClicked == ButtonType.ROAD){
-                    if(board.addNewRoad(player,connectionID)){
-                        player.adjustResources(ResourceCost.ROAD.getCost());
-                        connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
-                        connectionView.setColorFilter(player.getColor());
+                    Toast.makeText(getApplicationContext(), " " + connectionView.getId(), Toast.LENGTH_SHORT).show();
+                    if(board.addNewRoad(player1,connectionID)){
+                        player1.adjustResources(ResourceCost.ROAD.getCost());
+                        updateUiBoard(board);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
@@ -158,18 +166,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             intersectionView.setOnClickListener(v -> {
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
-                    if (board.addNewVillage(player, intersectionID)) {
-                        player.adjustResources(ResourceCost.VILLAGE.getCost());
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
-                        intersectionView.setColorFilter(player.getColor());
+                    if (board.addNewVillage(player1, intersectionID)) {
+                        player1.adjustResources(ResourceCost.VILLAGE.getCost());
+                        updateUiBoard(board);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
                 } else if(mLastButtonClicked == ButtonType.CITY){
-                    if (board.addNewCity(player,intersectionID)){
-                        player.adjustResources(ResourceCost.CITY.getCost());
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                        intersectionView.setColorFilter(player.getColor());
+                    if (board.addNewCity(player1,intersectionID)){
+                        player1.adjustResources(ResourceCost.CITY.getCost());
+                        updateUiBoard(board);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -202,7 +208,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // initialisation of button fragments
         PlayerResourcesFragment playerResourcesFragment = new PlayerResourcesFragment();
-        player.setResourceUpdateListener(playerResourcesFragment);
+        player1.setResourceUpdateListener(playerResourcesFragment);
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
@@ -210,8 +216,44 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "End Turn Button", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
+            updateUiBoard(board);
         });
+
+    }
+
+    public void updateUiBoard(Board board){
+        Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
+        Intersection[][] intersections = board.getIntersections();
+
+        // update connections
+        for(int row = 0; row < adjacencyMatrix.length; row++) {
+            for (int col = 0; col < adjacencyMatrix[row].length; col++) {
+                if(adjacencyMatrix[row][col] instanceof Road){
+                    int id = (((Road) adjacencyMatrix[row][col]).getId() + CONNECTIONS_OFFSET);
+                    ImageView connectionView = findViewById(id);
+                    connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
+                    connectionView.setColorFilter(((Road) adjacencyMatrix[row][col]).getPlayer().getColor());
+                }
+            }
+        }
+
+        // update intersections
+        for(int row = 0; row < intersections.length; row++) {
+            for (int col = 0; col < intersections[row].length; col++) {
+                if(intersections[row][col] instanceof Building){
+                    int id = (((Building) intersections[row][col]).getId() + INTERSECTIONS_OFFSET);
+                    ImageView intersectionView = findViewById(id);
+
+                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
+                    } else if(intersections[row][col].getType() == BuildingType.CITY){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
+                    }
+                    intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
+                }
+            }
+        }
     }
 
     @Override
