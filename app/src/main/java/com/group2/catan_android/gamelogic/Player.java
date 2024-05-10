@@ -37,7 +37,11 @@ public class Player {
 
             if (listener != null) {
                 listener.onResourcesUpdated(this.resources);
+            } else {
+                throw new IllegalArgumentException("No listener found");
             }
+        } else {
+            throw new IllegalArgumentException("Resources array must be not-null and have exactly 5 elements.");
         }
 
     }
@@ -50,8 +54,11 @@ public class Player {
                     return false;
                 }
             }
+            return true;
+        } else {
+            throw new IllegalArgumentException("Resources Cost array must be not-null and have exactly 5 elements.");
         }
-        return true;
+
     }
 
     public void increaseVictoryPoints(int amount){
