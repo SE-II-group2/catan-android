@@ -1,5 +1,7 @@
 package com.group2.catan_android.gamelogic;
 
+import android.util.Log;
+
 import com.group2.catan_android.gamelogic.enums.Location;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -170,6 +172,7 @@ public class Board {
         //check the specific intersection in the adjacencyMatrix if there are any roads, and if it belongs to the playerID who wants to build
         for(int i = 0; i < 54; i++){
             if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayer() == player)){
+                Log.d("debug","is next to Own Road " + intersection + " of player " + player.getDisplayName());
                 return true;
             }
         }
@@ -316,6 +319,10 @@ public class Board {
 
     public Intersection[][] getIntersections() {
         return intersections;
+    }
+
+    public boolean isSetupPhase() {
+        return isSetupPhase;
     }
 }
 

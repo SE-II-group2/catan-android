@@ -71,6 +71,10 @@ public class Hexagon {
         return id;
     }
 
+    public boolean isHavingRobber(){
+        return hasRobber;
+    }
+
     @NonNull
     @Override
     public String toString() {
