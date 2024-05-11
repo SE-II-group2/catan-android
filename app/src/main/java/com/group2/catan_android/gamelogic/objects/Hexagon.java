@@ -15,15 +15,21 @@ public class Hexagon {
     private Building[] buildings;
     private int numOfAdjacentBuildings = 0;
 
-    public Hexagon(Location location, ResourceDistribution distribution, int rollValue, int id) {
+    private boolean hasKnight;
+
+    public Hexagon(Location location, ResourceDistribution distribution, int rollValue, boolean hasKnight, int id) {
         this.location = location;
         this.distribution = distribution;
         this.rollValue = rollValue;
         this.buildings = new Building[3];
+        this.hasKnight = hasKnight;
         this.id = id;
     }
 
     public void distributeResources() {
+        if(hasKnight){
+            return;
+        }
         for (Building building : buildings) {
             if (building != null) {
                 building.giveResources(distribution);

@@ -88,7 +88,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/developmentCard"
+            android:id="@+id/progressCard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:src="@drawable/development_card_button"
