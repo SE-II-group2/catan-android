@@ -28,7 +28,7 @@ public class PlayerUnitTests {
     static int playerColor = Color.RED;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         player1 = new Player(playerToken,displayName,gameID, playerColor);
         mockListener = new ResourceUpdateListener() {
             @Override
@@ -39,28 +39,28 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testAdjustResources() {
+    void testAdjustResources() {
         player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
         assertArrayEquals(ResourceDistribution.FOREST.getDistribution(), player1.getResources());
     }
 
     @Test
-    public void testAdjustResourcesNull(){
+    void testAdjustResourcesNull(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             player1.adjustResources(null);
         });
     }
 
     @Test
-    public void testAdjustResourcesWrongLength(){
+    void testAdjustResourcesWrongLength(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             player1.adjustResources((new int[]{1}));
         });
     }
 
     @Test
-    public void testAdjustResourcesWithoutListener(){
+    void testAdjustResourcesWithoutListener(){
         player1.setResourceUpdateListener(null);
         int[] distribution = new int[]{1, 1, 1, 1, 1};
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -69,7 +69,7 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testVictoryPoints() {
+    void testVictoryPoints() {
         player1.increaseVictoryPoints(2);
         assertEquals(2,player1.getVictoryPoints());
 
@@ -78,7 +78,7 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testResourceSufficient() {
+    void testResourceSufficient() {
         player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
 
@@ -89,14 +89,14 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testResourceSufficientWithoutCost() {
+    void testResourceSufficientWithoutCost() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
                 player1.resourcesSufficient(null);
         });
     }
 
     @Test
-    public void testResourceWrongLength(){
+    void testResourceWrongLength(){
         int[] resourceCost = new int[]{1};
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             player1.resourcesSufficient(resourceCost);
@@ -104,7 +104,7 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testPlayerGetter() {
+    void testPlayerGetter() {
         Assertions.assertEquals(displayName, player1.getDisplayName());
         Assertions.assertEquals(playerColor, player1.getColor());
     }

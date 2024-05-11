@@ -21,40 +21,40 @@ public class ProgressCardUnitTest {
     private ProgressCard progressCard;
 
     @BeforeEach
-    public void setUp(){
+    void setUp(){
         MockitoAnnotations.openMocks(this);
     }
     //TODO: Assert/Verify the cases after implementation
     @Test
-    public void testKnightCardUse(){
+    void testKnightCardUse(){
         progressCard = new ProgressCard(ProgressCardType.KNIGHT, ResourceCost.PROGRESS_CARD);
         progressCard.player = player1;
         progressCard.use();
     }
 
     @Test
-    public void testYOPCardUse(){
+    void testYOPCardUse(){
         progressCard = new ProgressCard(ProgressCardType.YEAR_OF_PLENTY, ResourceCost.PROGRESS_CARD);
         progressCard.player = player1;
         progressCard.use();
     }
 
     @Test
-    public void testRoadBuildingCardUse(){
+    void testRoadBuildingCardUse(){
         progressCard = new ProgressCard(ProgressCardType.ROAD_BUILDING, ResourceCost.PROGRESS_CARD);
         progressCard.player = player1;
         progressCard.use();
     }
 
     @Test
-    public void testMonopolyCardUse(){
+    void testMonopolyCardUse(){
         progressCard = new ProgressCard(ProgressCardType.MONOPOLY, ResourceCost.PROGRESS_CARD);
         progressCard.player = player1;
         progressCard.use();
     }
 
     @Test
-    public void testVictoryPointCardUse(){
+    void testVictoryPointCardUse(){
         progressCard = new ProgressCard(ProgressCardType.VICTORY_POINT, ResourceCost.PROGRESS_CARD);
         progressCard.player = player1;
         progressCard.use();

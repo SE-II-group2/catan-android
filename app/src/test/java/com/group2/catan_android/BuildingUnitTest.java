@@ -21,7 +21,7 @@ public class BuildingUnitTest {
     private ResourceUpdateListener mockListener;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         player1 = new Player("player1","player1","player1", Color.RED);
         player2 = new Player("player1","player1","player1", Color.RED);
         mockListener = new ResourceUpdateListener() {
@@ -37,7 +37,7 @@ public class BuildingUnitTest {
     }
 
     @Test
-    public void testBuildingPlayerID() {
+    void testBuildingPlayerID() {
         Building building1 = new Building(player1, BuildingType.VILLAGE);
         Building building2 = new Building(player2, BuildingType.CITY);
 
@@ -46,7 +46,7 @@ public class BuildingUnitTest {
     }
 
     @Test
-    public void testGiveResourcesNormal(){
+    void testGiveResourcesNormal(){
         Building village = new Building(player1, BuildingType.VILLAGE);
         ResourceDistribution distribution = ResourceDistribution.FIELDS;
         village.giveResources(distribution);
@@ -55,7 +55,7 @@ public class BuildingUnitTest {
     }
 
     @Test
-    public void testGiveResourcesCity(){
+    void testGiveResourcesCity(){
         Building city = new Building(player1, BuildingType.CITY);
         ResourceDistribution distribution = ResourceDistribution.FIELDS;
         city.giveResources(distribution);
@@ -64,7 +64,7 @@ public class BuildingUnitTest {
     }
 
     @Test
-    public void testBuildingGetter(){
+    void testBuildingGetter(){
         Building building1 = new Building(player1, BuildingType.VILLAGE);
         Building building2 = new Building(player1, BuildingType.CITY);
         assertEquals(player1, building1.getPlayer());

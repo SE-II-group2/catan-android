@@ -19,7 +19,7 @@ public class ConnectionUnitTest {
     private Player player1;
     private ResourceUpdateListener mockListener;
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockListener = new ResourceUpdateListener() {
             @Override
             public void onResourcesUpdated(int[] resources) {
@@ -33,13 +33,13 @@ public class ConnectionUnitTest {
     }
 
     @Test
-    public void testRoadOwner() {
+    void testRoadOwner() {
         Connection connection = new Road(player1);
         assertEquals(player1, connection.getPlayer());
     }
 
     @Test
-    public void testConnectionGetter() {
+    void testConnectionGetter() {
         Connection connection1 = new Connection();
         assertNull(connection1.getPlayer());
     }

@@ -25,7 +25,7 @@ public class HexagonUnitTest {
     private Player player1;
     private ResourceUpdateListener mockListener;
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockListener = new ResourceUpdateListener() {
             @Override
             public void onResourcesUpdated(int[] resources) {
@@ -38,7 +38,7 @@ public class HexagonUnitTest {
     }
 
     @Test
-    public void testAddBuilding() {
+    void testAddBuilding() {
         Hexagon hexagon = new Hexagon(Location.FOREST,ResourceDistribution.FOREST, 6,false,0);
         Building building1 = new Building(player1, BuildingType.VILLAGE);
         hexagon.addBuilding(building1);
@@ -51,7 +51,7 @@ public class HexagonUnitTest {
     private Building buildingMock;
 
     @Test
-    public void testDistributeResources() {
+    void testDistributeResources() {
         buildingMock = mock(Building.class); // Create a mock object for Building}
 
         Hexagon hexagon = new Hexagon(Location.HILLS, ResourceDistribution.HILLS, 4,false,1);
@@ -64,7 +64,7 @@ public class HexagonUnitTest {
     }
 
     @Test
-    public void testDistributeResourcesWithKnight(){
+    void testDistributeResourcesWithKnight(){
         buildingMock = mock(Building.class);
         Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, true, 9);
         hexagon.addBuilding(buildingMock);
@@ -73,7 +73,7 @@ public class HexagonUnitTest {
     }
 
     @Test
-    public void testHexagonGetter(){
+    void testHexagonGetter(){
         Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, false, 9);
         Assertions.assertEquals(Location.FOREST, hexagon.getLocation());
         Assertions.assertEquals(5, hexagon.getRollValue());
@@ -81,7 +81,7 @@ public class HexagonUnitTest {
     }
 
     @Test
-    public void testHexagonToString(){
+    void testHexagonToString(){
         Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, false, 9);
         String expectedString = "Hexagon Type: FOREST; Rollvalue: 5; Number of Buildings adjecent: 0\n";
         Assertions.assertEquals(expectedString, hexagon.toString());

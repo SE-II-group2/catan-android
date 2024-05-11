@@ -35,7 +35,7 @@ public class BoardUnitTests {
     private ResourceUpdateListener mockListener;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         board = new Board();
         buildingMock = mock(Building.class); // Create a mock object for Building
         mockListener = new ResourceUpdateListener() {
@@ -50,13 +50,13 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testGenerateHexagonsSize() {
+    void testGenerateHexagonsSize() {
         assertNotNull(board.getHexagonList());
         assertEquals(19, board.getHexagonList().size()); // Check if 19 hexagons are generated
     }
 
     @Test
-    public void testGenerateHexagonsDesertTileCorrectness() {
+    void testGenerateHexagonsDesertTileCorrectness() {
         boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
             if (hexagon.getLocation().equals(Location.DESERT)) {
@@ -69,7 +69,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testDistributeResourcesByDiceRoll() {
+    void testDistributeResourcesByDiceRoll() {
         for (Hexagon hexagon : board.getHexagonList()) {
             hexagon.addBuilding(buildingMock);
         }
@@ -79,7 +79,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddVillageNormalCase() {
+    void testAddVillageNormalCase() {
         board.addNewRoad(player1,14);
         board.addNewRoad(player1,28);
         board.addNewRoad(player1,29);
@@ -97,7 +97,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddCityToVillage() {
+    void testAddCityToVillage() {
         board.addNewRoad(player1,27);
         assertSame(BuildingType.EMPTY,board.getIntersections()[2][5].getType());
         board.setSetupPhase(false);
@@ -113,7 +113,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddCityNormalCase() {
+    void testAddCityNormalCase() {
         board.addNewRoad(player1,14);
         board.addNewRoad(player1,28);
         board.addNewRoad(player1,29);
@@ -132,13 +132,13 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddCityInsufficientResources(){
+    void testAddCityInsufficientResources(){
         board.setSetupPhase(false);
         player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
         assertFalse(board.addNewCity(player1, 0));
     }
     @Test
-    public void testAddVillageEdgeOfBoard() {
+    void testAddVillageEdgeOfBoard() {
         board.addNewRoad(player1,18);
         board.addNewRoad(player1,23);
 
@@ -151,7 +151,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddVillageSetupUpPhase(){
+    void testAddVillageSetupUpPhase(){
         assertTrue(board.addNewVillage(player1, 16));
         assertTrue(board.addNewRoad(player1,23));
 
@@ -163,7 +163,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddCitySetupUpPhase(){
+    void testAddCitySetupUpPhase(){
         assertTrue(board.addNewVillage(player1, 16));
         assertFalse(board.addNewCity(player1,16));
 
@@ -173,7 +173,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddRoad() {
+    void testAddRoad() {
         board.addNewRoad(player1, 0);
         assertTrue(board.isNextToOwnRoad(1, player1));
         assertTrue(board.isNextToOwnRoad(0, player1));
@@ -181,7 +181,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddRoadInvalidPlacement(){
+    void testAddRoadInvalidPlacement(){
         assertTrue(board.addNewRoad(player1, 0));
         assertFalse(board.addNewRoad(player1, 0));
 
@@ -191,14 +191,14 @@ public class BoardUnitTests {
         assertFalse(board.addNewRoad(player1,3));
     }
     @Test
-    public void testAddRoadInsufficientResources(){
+    void testAddRoadInsufficientResources(){
         board.setSetupPhase(false);
         player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
         assertFalse(board.addNewRoad(player1, 0));
     }
 
     @Test
-    public void testAddVillageNextToVillage(){
+    void testAddVillageNextToVillage(){
         board.addNewRoad(player1,0);
         board.addNewRoad(player1,6);
         board.addNewRoad(player1,1);
@@ -213,14 +213,14 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testAddVillageInsufficientResources(){
+    void testAddVillageInsufficientResources(){
         board.setSetupPhase(false);
         player1.adjustResources(new int[]{-100, -100, -100, -100, -100});
         assertFalse(board.addNewVillage(player1, 0));
     }
 
     @Test
-    public void testGetAdjacencyMatrixCorrectRetrieval() {
+    void testGetAdjacencyMatrixCorrectRetrieval() {
         Board board = new Board();
         Connection[][] matrix = board.getAdjacencyMatrix();
 
@@ -230,7 +230,7 @@ public class BoardUnitTests {
     }
 
     @Test
-    public void testTranslateIntersectionToMatrixCoordinates() {
+    void testTranslateIntersectionToMatrixCoordinates() {
         int[] coords;
 
         // First Row

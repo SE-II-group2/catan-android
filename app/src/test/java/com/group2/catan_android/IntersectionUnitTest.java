@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 public class IntersectionUnitTest {
     private Intersection intersection;
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         intersection = new Intersection();
     }
 
     @Test
-    public void testInterSectionGetter(){
+    void testInterSectionGetter(){
         Assertions.assertNull(intersection.getPlayer());
         Assertions.assertEquals(BuildingType.EMPTY, intersection.getType());
     }
