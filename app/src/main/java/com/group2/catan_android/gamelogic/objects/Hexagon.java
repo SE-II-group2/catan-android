@@ -17,12 +17,12 @@ public class Hexagon {
 
     private boolean hasRobber;
 
-    public Hexagon(Location location, ResourceDistribution distribution, int rollValue, boolean hasRobber, int id) {
+    public Hexagon(Location location, ResourceDistribution distribution, int rollValue, boolean hasKnight, int id) {
         this.location = location;
         this.distribution = distribution;
         this.rollValue = rollValue;
         this.buildings = new Building[3];
-        this.hasRobber = hasRobber;
+        this.hasRobber = hasKnight;
         this.id = id;
     }
 
