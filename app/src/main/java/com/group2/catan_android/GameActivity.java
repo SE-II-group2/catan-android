@@ -68,9 +68,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
-        player.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
-        board.addNewRoad(player,0);
-        board.setSetupPhase(false);
 
         //init of arrays to store displayable views and values
         int[] hexagonPictures = new int[19];
@@ -385,5 +382,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public void demoBoardMoves(){
+        player.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
+        board.addNewRoad(player,0);
+        board.setSetupPhase(false);
     }
 }
