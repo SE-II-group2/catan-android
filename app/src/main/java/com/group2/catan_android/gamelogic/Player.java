@@ -1,6 +1,5 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
 import java.util.List;
@@ -14,13 +13,7 @@ public class Player {
     private final int[] resources = new int[]{0,0,0,0,0};
     private final int color;
 
-    private ResourceUpdateListener listener;
-
     private List<ProgressCard> progressCards;
-
-    public void setResourceUpdateListener(ResourceUpdateListener listener) {
-        this.listener = listener;
-    }
 
     public Player(String token, String displayName, String gameID, int color) {
         this.token = token;
@@ -33,12 +26,6 @@ public class Player {
         if (resources != null && resources.length == 5) {
             for (int i = 0; i < resources.length; i++) {
                 this.resources[i] += resources[i];
-            }
-
-            if (listener != null) {
-                listener.onResourcesUpdated(this.resources);
-            } else {
-                throw new IllegalArgumentException("No listener found");
             }
         } else {
             throw new IllegalArgumentException("Resources array must be not-null and have exactly 5 elements.");

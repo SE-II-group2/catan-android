@@ -1,12 +1,9 @@
 package com.group2.catan_android;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
@@ -64,6 +58,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     Player player3 = new Player("token","p3","gameID",Color.BLUE);
     Player player4 = new Player("token","p4","gameID",Color.YELLOW);
     Board board = new Board();
+
+    PlayerResourcesFragment playerResourcesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +127,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
                     if(board.addNewRoad(player1,connectionID)){
                         player1.adjustResources(ResourceCost.ROAD.getCost());
-                        updateUiBoard(board);
+                        updateUiBoard(board,player1);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
@@ -155,14 +151,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
                     if (board.addNewVillage(player1, intersectionID)) {
                         player1.adjustResources(ResourceCost.VILLAGE.getCost());
-                        updateUiBoard(board);
+                        updateUiBoard(board,player1);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
                 } else if(mLastButtonClicked == ButtonType.CITY){
                     if (board.addNewCity(player1,intersectionID)){
                         player1.adjustResources(ResourceCost.CITY.getCost());
-                        updateUiBoard(board);
+                        updateUiBoard(board,player1);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -178,8 +174,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         // initialisation of button fragments
-        PlayerResourcesFragment playerResourcesFragment = new PlayerResourcesFragment();
-        player1.setResourceUpdateListener(playerResourcesFragment);
+        playerResourcesFragment = new PlayerResourcesFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
@@ -188,14 +183,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
-            updateUiBoard(board);
             demoBoardMoves();
+            updateUiBoard(board,player1);
         });
 
     }
 
 
-    public void updateUiBoard(Board board){
+    public void updateUiBoard(Board board, Player player){
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
@@ -233,6 +228,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
                 }
             }
+
+
         }
 
         // update hexagons with robber
@@ -279,6 +276,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 robberView.setVisibility(View.INVISIBLE);
                 rollValueView.setVisibility(View.VISIBLE);
             }
+
+            // update resource Fragment
+            playerResourcesFragment.updateResources(player);
         }
 
 
@@ -453,5 +453,25 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         // demo board moves
         player1.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
 
+        board.addNewRoad(player1,0); // add one road at first top Hexagon to "simulate" fake starting phase
+        board.addNewRoad(player2,9);
+        board.addNewRoad(player3,68);
+        board.addNewRoad(player4,66);
+        board.addNewRoad(player1,1);
+        board.addNewRoad(player1,2);
+        board.addNewRoad(player1,7);
+        board.addNewRoad(player1,12);
+        board.addNewRoad(player2,16);
+        board.addNewRoad(player2,5);
+        board.addNewRoad(player2,21);
+        board.addNewRoad(player2,21);
+        board.addNewRoad(player3,49);
+        board.addNewRoad(player3,52);
+        board.addNewRoad(player4,71);
+        board.addNewRoad(player4,56);
+        board.addNewVillage(player4,44);
+        board.addNewVillage(player3,40);
+        board.addNewCity(player3,40);
+        board.setSetupPhase(false); // end fake starting phase
     }
 }

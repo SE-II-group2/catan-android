@@ -12,28 +12,17 @@ import static org.mockito.Mockito.verify;
 
 import android.graphics.Color;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.*;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
 
-import java.util.Arrays;
-
 public class HexagonUnitTest {
 
     private Player player1;
-    private ResourceUpdateListener mockListener;
+
     @BeforeEach
     void setUp() {
-        mockListener = new ResourceUpdateListener() {
-            @Override
-            public void onResourcesUpdated(int[] resources) {
-                System.out.println("Resources updated: " + Arrays.toString(resources));
-            }
-        };
         player1 = new Player("player1","player1","player1", Color.RED);
-        player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
 

@@ -7,31 +7,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import android.graphics.Color;
 
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
-
-import java.util.Arrays;
 
 public class BuildingUnitTest {
 
     private Player player1;
     private Player player2;
-    private ResourceUpdateListener mockListener;
 
     @BeforeEach
     void setUp() {
         player1 = new Player("player1","player1","player1", Color.RED);
         player2 = new Player("player1","player1","player1", Color.RED);
-        mockListener = new ResourceUpdateListener() {
-            @Override
-            public void onResourcesUpdated(int[] resources) {
-                System.out.println("Resources updated: " + Arrays.toString(resources));
-            }
-        };
-        player1.setResourceUpdateListener(mockListener);
-        player2.setResourceUpdateListener(mockListener);
+
         player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
         player2.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
