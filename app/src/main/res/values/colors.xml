@@ -9,4 +9,5 @@
     <color name="red">#de2121</color>
     <color name="green">#00FF00</color>
     <color name="grey">#a0a0a0</color>
+    <color name="devCardColor">#FFf4eee0</color>
 </resources>
