@@ -6,7 +6,7 @@ import com.group2.catan_android.gamelogic.enums.ResourceCost;
 
 public class ProgressCard {
 
-    Player player;
+    public Player player;
     ProgressCardType type;
 
     ResourceCost cost = ResourceCost.PROGRESS_CARD;
