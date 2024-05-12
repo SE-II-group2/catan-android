@@ -1,15 +1,15 @@
 package com.group2.catan_android.data.live.game;
 
 
-import com.group2.catan_android.data.live.PlayerDto;
+import com.group2.catan_android.data.live.game.IngamePlayerDto;
 
 
 public class IntersectionDto {
-    private PlayerDto owner;
+    private IngamePlayerDto owner;
     private String BuildingType;
     private int id;
 
-    public IntersectionDto(PlayerDto owner, String buildingType, int id) {
+    public IntersectionDto(IngamePlayerDto owner, String buildingType, int id) {
         this.owner = owner;
         BuildingType = buildingType;
         this.id = id;
@@ -18,11 +18,11 @@ public class IntersectionDto {
     public IntersectionDto() {
     }
 
-    public PlayerDto getOwner() {
+    public IngamePlayerDto getOwner() {
         return owner;
     }
 
-    public void setOwner(PlayerDto owner) {
+    public void setOwner(IngamePlayerDto owner) {
         this.owner = owner;
     }
 

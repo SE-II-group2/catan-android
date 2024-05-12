@@ -11,13 +11,31 @@ public class HexagonDto{
     private int value;
     private int id;
 
-    public HexagonDto(Hexagontype hexagontype, ResourceDistribution resourceDistribution, int value, int id) {
+    private boolean hasRobber;
+
+    public HexagonDto(Hexagontype hexagontype, ResourceDistribution resourceDistribution, int value, int id, boolean hasRobber) {
         this.hexagontype = hexagontype;
         this.resourceDistribution = resourceDistribution;
         this.value = value;
         this.id = id;
+        this.hasRobber=hasRobber;
     }
 
+    public Hexagontype getHexagontype() {
+        return hexagontype;
+    }
+
+    public void setHexagontype(Hexagontype hexagontype) {
+        this.hexagontype = hexagontype;
+    }
+
+    public boolean isHasRobber() {
+        return hasRobber;
+    }
+
+    public void setHasRobber(boolean hasRobber) {
+        this.hasRobber = hasRobber;
+    }
     public HexagonDto() {
     }
 
