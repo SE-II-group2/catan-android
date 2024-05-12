@@ -127,7 +127,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
                     if(board.addNewRoad(player1,connectionID)){
                         player1.adjustResources(ResourceCost.ROAD.getCost());
-                        updateUiBoard(board,player1);
+                        updateUiBoard(board);
+                        updateUiPlayer(player1);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
@@ -151,14 +152,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
                     if (board.addNewVillage(player1, intersectionID)) {
                         player1.adjustResources(ResourceCost.VILLAGE.getCost());
-                        updateUiBoard(board,player1);
+                        updateUiBoard(board);
+                        updateUiPlayer(player1);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
                 } else if(mLastButtonClicked == ButtonType.CITY){
                     if (board.addNewCity(player1,intersectionID)){
                         player1.adjustResources(ResourceCost.CITY.getCost());
-                        updateUiBoard(board,player1);
+                        updateUiBoard(board);
+                        updateUiPlayer(player1);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -184,13 +187,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
             demoBoardMoves();
-            updateUiBoard(board,player1);
+            updateUiBoard(board);
+            updateUiPlayer(player1);
         });
 
     }
 
 
-    public void updateUiBoard(Board board, Player player){
+    public void updateUiBoard(Board board){
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
@@ -276,12 +280,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 robberView.setVisibility(View.INVISIBLE);
                 rollValueView.setVisibility(View.VISIBLE);
             }
-
-            // update resource Fragment
-            playerResourcesFragment.updateResources(player);
         }
 
+    }
 
+    public void updateUiPlayer(Player player){
+        playerResourcesFragment.updateResources(player);
     }
 
     @Override
