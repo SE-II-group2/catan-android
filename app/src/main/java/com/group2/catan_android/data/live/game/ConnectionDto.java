@@ -1,14 +1,14 @@
 package com.group2.catan_android.data.live.game;
 
 
-import com.group2.catan_android.data.live.PlayerDto;
+import com.group2.catan_android.data.live.game.IngamePlayerDto;
 
 public class ConnectionDto {
-    public PlayerDto getOwner() {
+    public IngamePlayerDto getOwner() {
         return owner;
     }
 
-    public ConnectionDto(PlayerDto owner, int id) {
+    public ConnectionDto(IngamePlayerDto owner, int id) {
         this.owner = owner;
         this.id = id;
     }
@@ -16,7 +16,7 @@ public class ConnectionDto {
     public ConnectionDto() {
     }
 
-    public void setOwner(PlayerDto owner) {
+    public void setOwner(IngamePlayerDto owner) {
         this.owner = owner;
     }
 
@@ -28,6 +28,6 @@ public class ConnectionDto {
         this.id = id;
     }
 
-    private PlayerDto owner;
+    private IngamePlayerDto owner;
     private int id;
 }

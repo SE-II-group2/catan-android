@@ -55,7 +55,7 @@ public class HexagonUnitTest {
     @Test
     void testDistributeResourcesWithKnight(){
         buildingMock = mock(Building.class);
-        Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, true, 9);
+        Hexagon hexagon = new Hexagon(Hexagontype.FOREST, ResourceDistribution.FOREST, 5,  9, true);
         hexagon.addBuilding(buildingMock);
         hexagon.distributeResources();
         verify(buildingMock, times(0)).giveResources(hexagon.getDistribution());
@@ -63,16 +63,10 @@ public class HexagonUnitTest {
 
     @Test
     void testHexagonGetter(){
-        Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, false, 9);
-        Assertions.assertEquals(Location.FOREST, hexagon.getLocation());
+        Hexagon hexagon = new Hexagon(Hexagontype.FOREST, ResourceDistribution.FOREST, 5,  9, false);
+        Assertions.assertEquals(Hexagontype.FOREST, hexagon.getHexagontype());
         Assertions.assertEquals(5, hexagon.getRollValue());
         Assertions.assertEquals(9, hexagon.getId());
     }
 
-    @Test
-    void testHexagonToString(){
-        Hexagon hexagon = new Hexagon(Location.FOREST, ResourceDistribution.FOREST, 5, false, 9);
-        String expectedString = "Hexagon Type: FOREST; Rollvalue: 5; Number of Buildings adjecent: 0\n";
-        Assertions.assertEquals(expectedString, hexagon.toString());
-    }
 }

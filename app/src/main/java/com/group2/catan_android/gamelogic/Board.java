@@ -116,7 +116,7 @@ public class Board {
                 addBuildingToSurroundingHexagons(intersectionID, city);
                 return true;
             }
-        }
+
         return false;
     }
 
@@ -130,7 +130,7 @@ public class Board {
         int[] connectionIntersections = getConnectedIntersections(connectionID);
         int fromIntersection = connectionIntersections[0];
         int toIntersection = connectionIntersections[1];
-        Road road = new Road(player);
+        Road road = new Road(player, connectionID);
         adjacencyMatrix[fromIntersection][toIntersection] = road;
         adjacencyMatrix[toIntersection][fromIntersection] = road;
     }
@@ -151,7 +151,7 @@ public class Board {
         if(intersections[row][col] != null && intersections[row][col] instanceof Building){
             removeBuildingFromSurroundingHexagons(intersectionID, (Building) intersections[row][col]);
         }
-        intersections[row][col] = new Building(player, buildingType);
+        intersections[row][col] = new Building(player, buildingType, intersectionID);
         Building city = (Building) intersections[row][col];
         addBuildingToSurroundingHexagons(intersectionID, city);
         player.increaseVictoryPoints(1);
@@ -311,7 +311,7 @@ public class Board {
     private void generateWaitingHexagonList() {
         hexagonList = new ArrayList<>();
         for (int i = 0; i < 19; i++) {
-            hexagonList.add(new Hexagon(Hexagontype.DESERT, ResourceDistribution.DESERT, 0, i));
+            hexagonList.add(new Hexagon(Hexagontype.DESERT, ResourceDistribution.DESERT, 0, i, true));
         }
 
 

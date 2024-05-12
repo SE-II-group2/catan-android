@@ -30,6 +30,7 @@ public class CurrentGameState {
 
     }
 
+   // public void setValue()
     private Board board;
 
 }

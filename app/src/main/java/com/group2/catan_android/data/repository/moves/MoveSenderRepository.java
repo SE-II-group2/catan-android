@@ -1,4 +1,4 @@
-package com.group2.catan_android.data.repository.game;
+package com.group2.catan_android.data.repository.moves;
 
 import com.group2.catan_android.data.api.ApiErrorResponse;
 import com.group2.catan_android.data.live.game.GameMoveDto;

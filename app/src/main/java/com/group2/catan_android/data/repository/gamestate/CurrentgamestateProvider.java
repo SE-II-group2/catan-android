@@ -1,4 +1,4 @@
-package com.group2.catan_android.data.repository.board;
+package com.group2.catan_android.data.repository.gamestate;
 
 import io.reactivex.Observable;
 

@@ -1,4 +1,4 @@
-package com.group2.catan_android.data.repository.board;
+package com.group2.catan_android.data.repository.gamestate;
 
 import com.group2.catan_android.data.live.game.ConnectionDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
@@ -35,7 +35,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private Board board;
     private List<Player> players;
     CurrentGameState currentGameState;
-    HashMap<String, Player> playerHashMap;
+    HashMap<Integer, Player> playerHashMap;
     private Flowable<CurrentGameStateDto> liveDataIn;
 
     private static CurrentGamestateRepository instance;
@@ -104,7 +104,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         for (IngamePlayerDto playerDto : playerOrder) {
             Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
             playersList.add(player);
-            playerHashMap.put(playerDto.getDisplayName(), player);
+            playerHashMap.put(playerDto.getGameID(), player);
         }
         return playersList;
     }
@@ -125,8 +125,8 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                 connections[connectionIntersections[0]][connectionIntersections[1]] = con;
                 connections[connectionIntersections[1]][connectionIntersections[0]] = con;
             } else {
-                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(playerHashMap.get(connectionDto.getOwner().getDisplayName()));
-                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(playerHashMap.get(connectionDto.getOwner().getDisplayName()));
+                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(playerHashMap.get(connectionDto.getOwner().getGameID()), connectionDto.getId());
+                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(playerHashMap.get(connectionDto.getOwner().getGameID()), connectionDto.getId());
             }
         }
 
@@ -154,7 +154,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                         buildingType = BuildingType.EMPTY;
                         break;
                 }
-                intersection = new Building(new Player("", "", "", 1), buildingType);
+                intersection = new Building(players.get(0), buildingType,dto.getId());
             }
             idToIntersectionMap.put(dto.getId(), intersection);
         }
@@ -176,7 +176,8 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private ArrayList<Hexagon> getHexagonListFromDto(List<HexagonDto> hexagons) {
         ArrayList<Hexagon> hexagonsList = new ArrayList<>();
         for (HexagonDto hexagonDto : hexagons) {
-            hexagonsList.add(new Hexagon(hexagonDto.getLocation(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId()));
+            //TODO add robber to DTO
+            hexagonsList.add(new Hexagon(hexagonDto.getLocation(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), false));
         }
 
         // Custom comparator to sort by ID

@@ -2,21 +2,17 @@ package com.group2.catan_android.gamelogic;
 
 import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.model.DisplayablePlayer;
-import com.group2.catan_android.data.repository.board.CurrentGamestateRepository;
-import com.group2.catan_android.data.repository.game.MoveSenderRepository;
-import com.group2.catan_android.data.repository.gameprogress.GameprogressRepository;
+import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
+import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
 
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class MoveMaker {
     private Board board;
-    private String activePlayerDisplayName;
     private String currentDisplayName;
     private MoveSenderRepository moveSenderRepository = MoveSenderRepository.getInstance();
     private List<DisplayablePlayer> turnoder;
@@ -24,7 +20,7 @@ public class MoveMaker {
     private static final int VICTORYPOINTSFORVICTORY = 10;
     private boolean gameover = false;
     private String token;
-    private CurrentGamestateRepository boardRepository = CurrentGamestateRepository.getInstance();
+    private CurrentGamestateRepository currentGamestateRepository = CurrentGamestateRepository.getInstance();
     private CompositeDisposable disposable;
     private int[] resources;
     private boolean hasRolled=false;
@@ -62,7 +58,7 @@ public class MoveMaker {
     }
 
     void setupListeners() {
-        Disposable boardDisposable = boardRepository.getBoardObservable()
+       Disposable boardDisposable = currentGamestateRepository.getBoardObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(currentGameState::setValue);

@@ -9,6 +9,15 @@ import java.util.Locale;
 
 public class Hexagon {
     private final int id;
+
+    public Hexagontype getHexagontype() {
+        return hexagontype;
+    }
+
+    public boolean isHasRobber() {
+        return hasRobber;
+    }
+
     private final Hexagontype hexagontype;
     private final ResourceDistribution distribution;
     private final int rollValue;
@@ -84,9 +93,4 @@ public class Hexagon {
         return hasRobber;
     }
 
-    @NonNull
-    @Override
-    public String toString() {
-        return String.format(Locale.US,"Hexagon Type: %s; Rollvalue: %d; Number of Buildings adjecent: %d\n",location, rollValue, numOfAdjacentBuildings);
-    }
 }

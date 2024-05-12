@@ -2,7 +2,7 @@ package com.group2.catan_android;
 
 import android.app.Application;
 
-import com.group2.catan_android.data.repository.game.MoveSenderRepository;
+import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.PreferenceManager;

@@ -1,15 +1,14 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.data.live.PlayerDto;
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
 import java.util.List;
 
 public class Player {
 
-    private final String token;
-    private final String gameID;
+    private String token;
+    private String gameID;
+    private int inGameID;
     private final String displayName;
     private int victoryPoints = 0;
     private int[] resources = new int[]{0,0,0,0,0};
@@ -24,7 +23,7 @@ public class Player {
         this.color = color;
     }
 
-    public Player( String displayName,int victoryPoints, int[] resources,  int color) {
+    public Player( String displayName, int victoryPoints, int[] resources,  int color) {
         this.displayName = displayName;
         this.victoryPoints=victoryPoints;
         this.resources=resources;

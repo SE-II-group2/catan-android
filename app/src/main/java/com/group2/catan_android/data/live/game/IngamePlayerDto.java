@@ -32,15 +32,15 @@ public class IngamePlayerDto {
     public void setColor(int color) {
         this.color = color;
     }
-    public String getGameID() {
+    public int getGameID() {
         return gameID;
     }
 
-    public void setGameID(String gameID) {
+    public void setGameID(int gameID) {
         this.gameID = gameID;
     }
 
-    public IngamePlayerDto(String displayName, int[] resources, int victoryPoints, int color, String gameID) {
+    public IngamePlayerDto(String displayName, int[] resources, int victoryPoints, int color, int gameID) {
         this.displayName = displayName;
         this.resources = resources;
         this.victoryPoints = victoryPoints;
@@ -55,6 +55,6 @@ public class IngamePlayerDto {
     private int[] resources;
     private int victoryPoints;
     private int color;
-    private String gameID;
+    private int gameID;
 }
 

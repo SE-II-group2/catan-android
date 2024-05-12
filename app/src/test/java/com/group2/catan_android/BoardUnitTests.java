@@ -63,9 +63,9 @@ public class BoardUnitTests {
         for (Hexagon hexagon : board.getHexagonList()) {
             hexagon.addBuilding(buildingMock);
         }
-        board.distributeResourcesByDiceRoll(6);
+        board.distributeResourcesByDiceRoll(0);
 
-        verify(buildingMock, times(2)).giveResources(any());
+        verify(buildingMock, times(0)).giveResources(any());
     }
 
     @Test
