@@ -8,6 +8,9 @@ public class Player {
 
     private String token;
     private String gameID;
+
+
+
     private int inGameID;
     private String displayName;
     private int victoryPoints = 0;
@@ -75,5 +78,8 @@ public class Player {
 
     public int getVictoryPoints() {
         return victoryPoints;
+    }
+    public int getInGameID() {
+        return inGameID;
     }
 }

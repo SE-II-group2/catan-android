@@ -13,7 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
+import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
+import com.group2.catan_android.data.live.game.EndTurnMoveDto;
+import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
@@ -21,6 +26,7 @@ import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
@@ -29,9 +35,15 @@ import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
+import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
+import com.group2.catan_android.viewmodel.BoardViewModel;
+import com.group2.catan_android.viewmodel.InLobbyViewModel;
+import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
@@ -59,8 +71,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     Player player4 = new Player("token","p4","gameID",Color.YELLOW);
     Board board = new Board();
 
+    private BoardViewModel boardViewModel;
+    private ActivePlayerViewModel activePlayerViewModel;
+    private PlayerListViewModel playerListViewModel;
+    private MoveMaker movemaker;
     PlayerResourcesFragment playerResourcesFragment;
+    private List<Player> playerList;
+    private Player activePlayer;
 
+    private boolean hasRolled = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +93,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         decorView.setSystemUiVisibility(uiOptions);
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
-
+        movemaker = MoveMaker.getInstance();
         //init of arrays to store displayable views
         ImageView[] hexagonViews = new ImageView[TOTAL_HEXAGONS];
         TextView[] rollValueViews = new TextView[TOTAL_HEXAGONS];
@@ -124,14 +143,19 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             connectionView.setOnClickListener(v -> {
                 Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
                 if(mLastButtonClicked == ButtonType.ROAD){
-                    Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
+                    try{
+                        movemaker.makeMove(new BuildRoadMoveDto(connectionID));
+                    }catch (Exception e){
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    /*Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
                     if(board.addNewRoad(player1,connectionID)){
                         player1.adjustResources(ResourceCost.ROAD.getCost());
                         updateUiBoard(board);
                         updateUiPlayer(player1);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                 }
             });
         }
@@ -150,7 +174,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             intersectionView.setOnClickListener(v -> {
                 Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
-                    if (board.addNewVillage(player1, intersectionID)) {
+                    try{
+                        movemaker.makeMove(new BuildVillageMoveDto(intersectionID));
+                    }catch (Exception e){
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    /*if (board.addNewVillage(player1, intersectionID)) {
                         player1.adjustResources(ResourceCost.VILLAGE.getCost());
                         updateUiBoard(board);
                         updateUiPlayer(player1);
@@ -164,7 +193,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                         updateUiPlayer(player1);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                 }
             });
         }
@@ -183,14 +212,49 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
 
+        boardViewModel = new ViewModelProvider(this,
+                ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
+        activePlayerViewModel = new ViewModelProvider(this,
+                ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
+
+        playerListViewModel = new ViewModelProvider(this,
+                ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
+
+        boardViewModel.getBoardMutableLiveData().observe(this, this::updateUiBoard);
+        activePlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
+            this.activePlayer=player;
+            updateUiPlayer(activePlayer);
+            System.out.println("Got a update:§");
+        });
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
+            /*Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
             demoBoardMoves();
             updateUiBoard(board);
-            updateUiPlayer(player1);
+            updateUiPlayer(player1);*/
+            if(playerList.get(0).getInGameID()!=activePlayer.getInGameID())Toast.makeText(getApplicationContext(), "Not the active Player", Toast.LENGTH_SHORT).show();
+            if(hasRolled){
+                try{
+                    Random random = new Random();
+                    int diceRoll = random.nextInt(6)+1 + random.nextInt(6)+1;
+                    movemaker.makeMove(new RollDiceDto(diceRoll));
+                    hasRolled=true;
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }else {
+                try{
+                    movemaker.makeMove(new EndTurnMoveDto());
+                    hasRolled=false;
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
         });
-
+        activePlayer=new Player();
+        playerList = new ArrayList<Player>();
+        playerList.add(activePlayer);
+    updateUiBoard(new Board());
     }
 
 

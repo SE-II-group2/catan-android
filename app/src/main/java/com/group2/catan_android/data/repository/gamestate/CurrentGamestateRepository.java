@@ -1,12 +1,13 @@
 package com.group2.catan_android.data.repository.gamestate;
 
+import android.util.Log;
+
 import com.group2.catan_android.data.live.game.ConnectionDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
 import com.group2.catan_android.data.live.game.HexagonDto;
 import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.data.live.game.IntersectionDto;
 import com.group2.catan_android.data.repository.LiveDataReceiver;
-import com.group2.catan_android.data.repository.token.TokenRepository;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.CurrentGameState;
 import com.group2.catan_android.gamelogic.Player;
@@ -40,6 +41,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     HashMap<Integer, Player> playerHashMap;
     private Flowable<CurrentGameStateDto> liveDataIn;
     private static CurrentGamestateRepository instance;
+    private int activePlayerIngameID;
 
     Disposable d;
 
@@ -48,6 +50,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         this.activePlayerBehaviorSubject = BehaviorSubject.create();
         this.playerListBehaviorSubject = BehaviorSubject.create();
         board = new Board();
+        playerHashMap = new HashMap<>();
     }
 
     public static CurrentGamestateRepository getInstance() {
@@ -55,6 +58,10 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
             instance = new CurrentGamestateRepository();
         }
         return instance;
+    }
+
+    public void setActivePlayerIngameID(int inGameID) {
+        this.activePlayerIngameID=inGameID;
     }
 
     @Override
@@ -92,13 +99,15 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         d = liveDataIn
                 .doOnComplete(this::cleanup)
                 .subscribe(CurrentGameStateDto -> {
+                    Log.d("received something", "received something");
                     players = getPlayersFromDto(CurrentGameStateDto.getPlayerOrder());
                     board.setHexagonList(getHexagonListFromDto(CurrentGameStateDto.getHexagons()));
                     board.setIntersections(generateIntersectionsFromDto(CurrentGameStateDto.getIntersections()));
                     board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
                     board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
                     currentGameState = new CurrentGameState(players, board);
-                    activePlayer = playerHashMap.get(TokenRepository.getInstance().getInGameID());
+                    activePlayer = playerHashMap.get(activePlayerIngameID);
+
                     activePlayerBehaviorSubject.onNext(activePlayer);
                     playerListBehaviorSubject.onNext(players);
                     currentGameStateBehaviorSubject.onNext(currentGameState);
@@ -145,7 +154,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         Intersection intersection;
         // Create Intersection objects and map their IDs to the objects
         for (IntersectionDto dto : intersectionDtos) {
-            if (dto.getBuildingType().equals(BuildingType.EMPTY)) {
+            if (dto.getBuildingType().equals(BuildingType.EMPTY.toString())) {
                 intersection = new Intersection();
             } else {
                 BuildingType buildingType;
@@ -160,16 +169,19 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                         buildingType = BuildingType.EMPTY;
                         break;
                 }
-                intersection = new Building(playerHashMap.get(dto.getOwner().getInGameID()), buildingType,dto.getId());
+                if(dto.getOwner()==null)intersection = new Building(null, buildingType,dto.getId());
+                else intersection = new Building(playerHashMap.get(dto.getOwner().getInGameID()), buildingType,dto.getId());
             }
             idToIntersectionMap.put(dto.getId(), intersection);
         }
-
+        intersections = board.getIntersections();
+        int counter=0;
         // Fill the intersections array using the ID-to-Intersection map
         for (int i = 0; i < intersections.length; i++) {
             for (int j = 0; j < intersections[i].length; j++) {
-                if (idToIntersectionMap.containsKey(intersections[i][j])) {
-                    intersections[i][j] = idToIntersectionMap.get(intersections[i][j]);
+                if(intersections[i][j]!=null) {
+                    intersections[i][j] = idToIntersectionMap.get(counter);
+                    counter++;
                 }
             }
         }
@@ -183,7 +195,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         ArrayList<Hexagon> hexagonsList = new ArrayList<>();
         for (HexagonDto hexagonDto : hexagons) {
             //TODO add robber to DTO
-            hexagonsList.add(new Hexagon(hexagonDto.getLocation(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), hexagonDto.isHasRobber()));
+            hexagonsList.add(new Hexagon(hexagonDto.getHexagonType(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), hexagonDto.isHasRobber()));
         }
 
         // Custom comparator to sort by ID

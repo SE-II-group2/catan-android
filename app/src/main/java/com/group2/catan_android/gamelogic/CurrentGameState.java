@@ -27,7 +27,8 @@ public class CurrentGameState {
         this.board = board;
     }
     public CurrentGameState(){
-
+        this.board=new Board();
+        this.players = new ArrayList<>();
     }
 
    // public void setValue()

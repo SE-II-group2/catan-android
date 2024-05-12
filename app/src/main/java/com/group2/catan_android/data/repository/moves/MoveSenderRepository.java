@@ -37,6 +37,11 @@ public class MoveSenderRepository implements MoveSender{
                 .onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
     }
 
+    //HERE FOR THE MOMENT, NOT FINAL DESTINATION
+    public Completable startGame(String token){
+        return api.startGame(token).onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
+    }
+
     private Throwable convertAPIError(Throwable throwable) {
         if (throwable instanceof HttpException) {
             return parseHttpException((HttpException) throwable);

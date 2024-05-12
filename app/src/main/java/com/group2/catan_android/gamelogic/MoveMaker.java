@@ -1,5 +1,7 @@
 package com.group2.catan_android.gamelogic;
 
+import android.util.Log;
+
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
@@ -30,8 +32,9 @@ public class MoveMaker {
     private boolean hasPlacedVillageInSetupPhase = false;
     private int currentIngameID;
     private String token;
+    private static MoveMaker moveMakerInstance;
 
-    public MoveMaker() {
+    private MoveMaker() {
         board = new Board();
         token = TokenRepository.getInstance().getToken();
         currentIngameID = TokenRepository.getInstance().getInGameID();
@@ -39,8 +42,14 @@ public class MoveMaker {
         setupListeners();
     }
 
+    public static MoveMaker getInstance() {
+        if (moveMakerInstance == null) moveMakerInstance = new MoveMaker();
+        return moveMakerInstance;
+    }
+
     public void makeMove(GameMoveDto gameMove) throws Exception {
-        if (players.get(0) != activePlayer) throw new Exception("Not active player!");
+        if (players.get(0).getInGameID() != activePlayer.getInGameID())
+            throw new Exception("Not active player!");
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
                 if (hasRolled) throw new Exception("Has already Rolled the dice this turn");
@@ -48,23 +57,30 @@ public class MoveMaker {
                 hasRolled = true;
                 break;
             case "BuildRoadMoveDto":
-                if (isSetupPhase && hasPlacedVillageInSetupPhase)
+                if (isSetupPhase && hasPlacedVillageInSetupPhase) {
                     moveSenderRepository.sendMove(gameMove, token);
-                if (!activePlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
-                    throw new Exception("Not enough resources");
-                if (!board.addNewRoad(activePlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
-                    throw new Exception("invalid place to build a road!");
-                moveSenderRepository.sendMove(gameMove, token);
+                } else {
+                    if (!activePlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
+                        throw new Exception("Not enough resources");
+                    if (!board.addNewRoad(activePlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
+                        throw new Exception("invalid place to build a road!");
+                    moveSenderRepository.sendMove(gameMove, token);
+                }
                 break;
             case "BuildVillageMoveDto":
-                if (!isSetupPhase && activePlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))throw new Exception("Not enough Resources");
-                if (!board.addNewVillage(activePlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
-                    throw new Exception("Cant build a road here");
-                moveSenderRepository.sendMove(gameMove,token);
+                if (!isSetupPhase && activePlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
+                    throw new Exception("Not enough Resources");
+                if (!board.addNewVillage(activePlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID())) {
+                    Log.d("else", "getIntersectinID: " + ((BuildVillageMoveDto) gameMove).getIntersectionID());
+                    throw new Exception("Cant build a Village here");
+                }
+                Log.d("test", "added Village");
+                moveSenderRepository.sendMove(gameMove, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
                 break;
             case "EndTurnMoveDto":
-                if(isSetupPhase)throw new Exception("End your turn during setupphase by placing a village and a road");
-                moveSenderRepository.sendMove(gameMove,token);
+                if (isSetupPhase)
+                    throw new Exception("End your turn during setupphase by placing a village and a road");
+                moveSenderRepository.sendMove(gameMove, token);
                 hasRolled = false;
                 break;
             default:
