@@ -2,6 +2,7 @@ package com.group2.catan_android;
 
 import android.app.Application;
 
+import com.group2.catan_android.data.repository.game.MoveSenderRepository;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.PreferenceManager;
@@ -22,5 +23,6 @@ public class CatanAndroid extends Application {
         LobbyRepository.initialize(ApiService.getInstance().getGameApi());
         StompManager.initialize(StompDriver.getInstance(), ObjectMapperProvider.getMapper());
         GameController.initialize(StompManager.getInstance(), TokenRepository.getInstance(), PlayerRepository.getInstance(), LobbyRepository.getInstance());
+        MoveSenderRepository.initialize(ApiService.getInstance().getGameApi());
     }
 }

@@ -31,4 +31,5 @@ public class Building extends Intersection {
     public Player getPlayer() {
         return player;
     }
+
 }

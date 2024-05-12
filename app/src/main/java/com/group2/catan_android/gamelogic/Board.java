@@ -21,6 +21,9 @@ public class Board {
     private int[][] surroundingHexagons;
     private int[][] connectedIntersections;
     private static final int NON_EXISTING_HEXAGON = 19;
+
+
+
     private boolean isSetupPhase = true;
 
     public Board() {
@@ -346,6 +349,17 @@ public class Board {
     public void setIntersections(Intersection[][] intersections1){
         if(intersections1.length!=6 || intersections1[0].length!=11)return;
         this.intersections=intersections1;
+    }
+
+    public void setValue(Board otherBoard) {
+        this.adjacencyMatrix=otherBoard.getAdjacencyMatrix();
+        this.hexagonList=otherBoard.getHexagonList();
+        this.intersections=otherBoard.getIntersections();
+        this.isSetupPhase=otherBoard.isSetupPhase;
+    }
+
+    public boolean isSetupPhase() {
+        return isSetupPhase;
     }
 }
 

@@ -5,33 +5,27 @@ import com.group2.catan_android.data.live.MessageDto;
 import com.group2.catan_android.data.live.MessageType;
 import com.group2.catan_android.data.live.PlayerDto;
 
+import java.util.List;
+
 public class GameProgressDto extends MessageDto {
     public GameProgressDto() {
         this.setEventType(MessageType.GAME_MOVE_NOTIFIER);
     }
-    public GameProgressDto(GameMoveDto moveDto, PlayerDto playerDto) {
+
+    public GameProgressDto(List<IngamePlayerDto> players) {
         this.setEventType(MessageType.GAME_MOVE_NOTIFIER);
-        this.moveDto = moveDto;
-        this.playerDto = playerDto;
+        this.players = players;
 
     }
 
-    private GameMoveDto moveDto;
-    private PlayerDto playerDto;
-
-    public GameMoveDto getMoveDto() {
-        return moveDto;
+    public List<IngamePlayerDto> getPlayers() {
+        return players;
     }
 
-    public void setMoveDto(GameMoveDto moveDto) {
-        this.moveDto = moveDto;
+    public void setPlayers(List<IngamePlayerDto> players) {
+        this.players = players;
     }
 
-    public PlayerDto getPlayerDto() {
-        return playerDto;
-    }
+    private List<IngamePlayerDto> players;
 
-    public void setPlayerDto(PlayerDto playerDto) {
-        this.playerDto = playerDto;
-    }
 }

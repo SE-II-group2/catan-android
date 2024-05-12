@@ -8,11 +8,12 @@ import com.group2.catan_android.data.live.PlayerDto;
 import java.util.List;
 
 public class CurrentGameStateDto extends MessageDto {
-    public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<PlayerDto> playerOrder) {
+    public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<IngamePlayerDto> playerOrder, boolean isSetupPhase) {
         this.hexagons = hexagons;
         this.intersections=intersections;
         this.connections = connections;
         this.playerOrder=playerOrder;
+        this.isSetupPhase=isSetupPhase;
         this.setEventType(MessageType.GAME_OBJECT);
     }
 
@@ -44,18 +45,28 @@ public class CurrentGameStateDto extends MessageDto {
         this.connections = connections;
     }
 
-    public List<PlayerDto> getPlayerOrder() {
+    public List<IngamePlayerDto> getPlayerOrder() {
         return playerOrder;
     }
 
-    public void setPlayerOrder(List<PlayerDto> playerOrder) {
+    public void setPlayerOrder(List<IngamePlayerDto> playerOrder) {
         this.playerOrder = playerOrder;
     }
 
     private List<HexagonDto> hexagons;
     private List<IntersectionDto> intersections;
     private List<ConnectionDto> connections;
-    private List<PlayerDto> playerOrder;
+    private List<IngamePlayerDto> playerOrder;
+
+    public boolean isSetupPhase() {
+        return isSetupPhase;
+    }
+
+    public void setSetupPhase(boolean setupPhase) {
+        isSetupPhase = setupPhase;
+    }
+
+    private boolean isSetupPhase;
 }
 
 

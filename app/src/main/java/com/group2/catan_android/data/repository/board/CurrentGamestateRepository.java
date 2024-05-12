@@ -1,15 +1,13 @@
 package com.group2.catan_android.data.repository.board;
 
-import android.database.Observable;
-
-import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.game.ConnectionDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
-import com.group2.catan_android.data.live.game.GameProgressDto;
 import com.group2.catan_android.data.live.game.HexagonDto;
+import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.data.live.game.IntersectionDto;
 import com.group2.catan_android.data.repository.LiveDataReceiver;
 import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.CurrentGameState;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.objects.Building;
@@ -25,56 +23,90 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class BoardRepository implements LiveDataReceiver<CurrentGameStateDto>, BoardProvider {
+public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameStateDto>, CurrentgamestateProvider {
 
-    private final BehaviorSubject <Board> boardBehaviorSubject;
+    private final BehaviorSubject<CurrentGameState> currentGameStateBehaviorSubject;
+    private final BehaviorSubject<Player> activePlayerBehaviorSubject;
+    private final BehaviorSubject<List<Player>> playerListBehaviorSubject;
     private Board board;
+    private List<Player> players;
+    CurrentGameState currentGameState;
+    HashMap<String, Player> playerHashMap;
     private Flowable<CurrentGameStateDto> liveDataIn;
 
-    private static BoardRepository instance;
+    private static CurrentGamestateRepository instance;
 
     Disposable d;
-    private BoardRepository(){
-        this.boardBehaviorSubject = BehaviorSubject.create();
+
+    private CurrentGamestateRepository() {
+        this.currentGameStateBehaviorSubject = BehaviorSubject.create();
+        this.activePlayerBehaviorSubject = BehaviorSubject.create();
+        this.playerListBehaviorSubject = BehaviorSubject.create();
         board = new Board();
     }
-    public static BoardRepository getInstance(){
-        if(instance == null){
-            instance = new BoardRepository();
+
+    public static CurrentGamestateRepository getInstance() {
+        if (instance == null) {
+            instance = new CurrentGamestateRepository();
         }
         return instance;
     }
 
     @Override
-    public Observable<Board> getBoardObservable() {
-        return null;
+    public Observable<CurrentGameState> getCurrentGameStateObservable() {
+        return currentGameStateBehaviorSubject;
     }
 
     @Override
-    public void setLiveData(Flowable<CurrentGameStateDto> in) {
+    public Observable<Player> getCurrentActivePlayerObservable() {
+        return activePlayerBehaviorSubject;
+    }
+
+    @Override
+    public Observable<List<Player>> getAllPlayerObservable() {
+        return playerListBehaviorSubject;
+    }
+
+    @Override
+    public void setLiveData(Flowable<CurrentGameStateDto> liveDataIn) {
         this.liveDataIn = liveDataIn;
         cleanup();
         wireDataSources();
     }
 
-    private void cleanup(){
-        boardBehaviorSubject.onNext(board);
-        if(d != null)
+
+    private void cleanup() {
+        currentGameStateBehaviorSubject.onNext(new CurrentGameState());
+        if (d != null)
             d.dispose();
     }
 
-    private void wireDataSources(){
+    private void wireDataSources() {
         d = liveDataIn
                 .doOnComplete(this::cleanup)
                 .subscribe(CurrentGameStateDto -> {
+                    players = getPlayersFromDto(CurrentGameStateDto.getPlayerOrder());
                     board.setHexagonList(getHexagonListFromDto(CurrentGameStateDto.getHexagons()));
                     board.setIntersections(generateIntersectionsFromDto(CurrentGameStateDto.getIntersections()));
                     board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
-                    boardBehaviorSubject.onNext(board);
+                    board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
+                    currentGameState = new CurrentGameState(players, board);
+                    currentGameStateBehaviorSubject.onNext(currentGameState);
                 });
+    }
+
+    private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> playerOrder) {
+        ArrayList<Player> playersList = new ArrayList<>();
+        for (IngamePlayerDto playerDto : playerOrder) {
+            Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
+            playersList.add(player);
+            playerHashMap.put(playerDto.getDisplayName(), player);
+        }
+        return playersList;
     }
 
     private Connection[][] generateAdjacencyMatrixFromDto(List<ConnectionDto> connectionList) {
@@ -85,19 +117,16 @@ public class BoardRepository implements LiveDataReceiver<CurrentGameStateDto>, B
 
         int[] connectionIntersections = new int[2];
         Connection con = new Connection();
-        for(ConnectionDto connectionDto : connectionList){
+        for (ConnectionDto connectionDto : connectionList) {
             connectionIntersections[0] = connectedIntersections[0][connectionDto.getId()];
             connectionIntersections[1] = connectedIntersections[1][connectionDto.getId()];
-            if(connectionDto.getOwner()==null){
+            if (connectionDto.getOwner() == null) {
 
                 connections[connectionIntersections[0]][connectionIntersections[1]] = con;
                 connections[connectionIntersections[1]][connectionIntersections[0]] = con;
-            }
-            else {
-                //TODO Set player properly
-                Player player = new Player("","","",1);
-                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(player);
-                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(player);
+            } else {
+                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(playerHashMap.get(connectionDto.getOwner().getDisplayName()));
+                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(playerHashMap.get(connectionDto.getOwner().getDisplayName()));
             }
         }
 
@@ -110,11 +139,11 @@ public class BoardRepository implements LiveDataReceiver<CurrentGameStateDto>, B
         Intersection intersection;
         // Create Intersection objects and map their IDs to the objects
         for (IntersectionDto dto : intersectionDtos) {
-            if(dto.getBuildingType().equals(BuildingType.EMPTY)){
+            if (dto.getBuildingType().equals(BuildingType.EMPTY)) {
                 intersection = new Intersection();
-            }else {
+            } else {
                 BuildingType buildingType;
-                switch (dto.getBuildingType()){
+                switch (dto.getBuildingType()) {
                     case "CITY":
                         buildingType = BuildingType.CITY;
                         break;
@@ -125,7 +154,6 @@ public class BoardRepository implements LiveDataReceiver<CurrentGameStateDto>, B
                         buildingType = BuildingType.EMPTY;
                         break;
                 }
-                //TODO Add player properly
                 intersection = new Building(new Player("", "", "", 1), buildingType);
             }
             idToIntersectionMap.put(dto.getId(), intersection);
@@ -146,8 +174,8 @@ public class BoardRepository implements LiveDataReceiver<CurrentGameStateDto>, B
 
 
     private ArrayList<Hexagon> getHexagonListFromDto(List<HexagonDto> hexagons) {
-        ArrayList<Hexagon> hexagonsList= new ArrayList<>();
-        for(HexagonDto hexagonDto : hexagons){
+        ArrayList<Hexagon> hexagonsList = new ArrayList<>();
+        for (HexagonDto hexagonDto : hexagons) {
             hexagonsList.add(new Hexagon(hexagonDto.getLocation(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId()));
         }
 
