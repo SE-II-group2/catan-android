@@ -7,14 +7,39 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.gamelogic.Player;
+
+import java.util.List;
 
 public class PlayerScoresFragment extends Fragment {
+    private TextView firstPlayer;
+    private TextView secondPlayer;
+    private TextView thirdPlayer;
+    private TextView fourthPlayer;
+    private TextView[] playerScoreViews;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_player_scores, container, false);
+        View view = inflater.inflate(R.layout.fragment_player_scores, container, false);
+
+        firstPlayer = view.findViewById(R.id.firstPlayerScore);
+        secondPlayer = view.findViewById(R.id.secondPlayerScore);
+        thirdPlayer = view.findViewById(R.id.thirdPlayerScore);
+        fourthPlayer = view.findViewById(R.id.fourthPlayerScore);
+
+        playerScoreViews = new TextView[]{firstPlayer,secondPlayer,thirdPlayer,fourthPlayer};
+
+        return view;
+    }
+
+    public void updateScores(List<Player> players){
+        for(int i = 0; i < playerScoreViews.length; i++){
+            String playerScore = players.get(i).getDisplayName() + ": " + String.valueOf(players.get(i).getVictoryPoints());
+            playerScoreViews[i].setText(playerScore);
+            playerScoreViews[i].setTextColor(players.get(i).getColor());
+        }
     }
 }

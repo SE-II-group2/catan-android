@@ -84,6 +84,7 @@ public class Board {
             intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
             addBuildingToSurroundingHexagons(intersectionID,village);
+            player.increaseVictoryPoints(1);
             return true;
         }
 
@@ -92,6 +93,7 @@ public class Board {
             Building village = (Building)intersections[row][col];
 
             addBuildingToSurroundingHexagons(intersectionID,village);
+            player.increaseVictoryPoints(1);
             return true;
         }
         return false;
@@ -114,6 +116,7 @@ public class Board {
                 intersections[row][col] = new Building(player, BuildingType.CITY, intersectionID);
                 Building city = (Building) intersections[row][col];
                 addBuildingToSurroundingHexagons(intersectionID, city);
+                player.increaseVictoryPoints(2);
                 return true;
             }
 
