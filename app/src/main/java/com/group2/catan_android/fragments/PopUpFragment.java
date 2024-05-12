@@ -19,5 +19,4 @@ public class PopUpFragment extends DialogFragment {
         return inflater.inflate(R.layout.fragment_pop_up, container, false);
     }
 
-
 }

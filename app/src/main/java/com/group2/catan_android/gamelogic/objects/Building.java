@@ -7,11 +7,13 @@ import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 public class Building extends Intersection {
 
     Player player;
+    int id;
     BuildingType type;
 
-    public Building(Player player, BuildingType type) {
+    public Building(Player player, BuildingType type, int id) {
         this.player = player;
         this.type = type;
+        this.id = id;
     }
 
     public void giveResources(ResourceDistribution distribution) {
@@ -32,4 +34,7 @@ public class Building extends Intersection {
         return player;
     }
 
+    public int getId() {
+        return id;
+    }
 }

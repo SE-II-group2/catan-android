@@ -14,16 +14,21 @@ public class Hexagon {
     private final int rollValue;
     private Building[] buildings;
     private int numOfAdjacentBuildings = 0;
+    private boolean hasRobber;
 
-    public Hexagon(Hexagontype hexagontype, ResourceDistribution distribution, int rollValue, int id) {
+    public Hexagon(Hexagontype hexagontype, ResourceDistribution distribution, int rollValue, int id, boolean hasRobber) {
         this.hexagontype = hexagontype;
         this.distribution = distribution;
         this.rollValue = rollValue;
         this.buildings = new Building[3];
+        this.hasRobber = hasRobber;
         this.id = id;
     }
 
     public void distributeResources() {
+        if(hasRobber){
+            return;
+        }
         for (Building building : buildings) {
             if (building != null) {
                 building.giveResources(distribution);
@@ -75,9 +80,13 @@ public class Hexagon {
         return id;
     }
 
+    public boolean isHavingRobber(){
+        return hasRobber;
+    }
+
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.US,"Hexagon Type: %s; Rollvalue: %d; Number of Buildings adjecent: %d\n", hexagontype, rollValue, numOfAdjacentBuildings);
+        return String.format(Locale.US,"Hexagon Type: %s; Rollvalue: %d; Number of Buildings adjecent: %d\n",location, rollValue, numOfAdjacentBuildings);
     }
 }
