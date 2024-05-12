@@ -59,33 +59,21 @@ public class ButtonsOpenFragment extends Fragment {
         road.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.ROAD);
             setButtonBorders(v);
-
-            // TODO: Make the player be able to place the road in possible locations and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
-            //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
         village.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.VILLAGE);
             setButtonBorders(v);
-
-            // TODO: Make the player be able to place the settlement in possible locations and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
-            //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
         city.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.CITY);
             setButtonBorders(v);
-
-            // TODO: Make the player be able to place the city in possible locations and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
-            //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
         progressCard.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.PROGRESS_CARD);
             setButtonBorders(v);
-
-            // TODO: Give the player a random progress card and afterwards return the fragment "leftButtons" to "ButtonsClosedFragment".
-            //getParentFragmentManager().beginTransaction().replace(R.id.leftButtons, new ButtonsClosedFragment()).addToBackStack(null).commit();
         });
 
     }

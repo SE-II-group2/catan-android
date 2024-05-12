@@ -1,5 +1,7 @@
 package com.group2.catan_android.gamelogic;
 
+import android.util.Log;
+
 import com.group2.catan_android.gamelogic.enums.Location;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -55,7 +57,7 @@ public class Board {
         int toIntersection = connectionIntersections[1];
 
         if(isSetupPhase && adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road)){
-            Road road = new Road(player);
+            Road road = new Road(player,connectionID);
             adjacencyMatrix[fromIntersection][toIntersection] = road;
             adjacencyMatrix[toIntersection][fromIntersection] = road;
             return true;
@@ -63,7 +65,7 @@ public class Board {
 
         if(adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road) // check if null or road already
                 && (isNextToOwnRoad(fromIntersection,player) || isNextToOwnRoad(toIntersection,player))){ //check if a road is next to one of the intersections
-            Road road = new Road(player);
+            Road road = new Road(player, connectionID);
             adjacencyMatrix[fromIntersection][toIntersection] = road;
             adjacencyMatrix[toIntersection][fromIntersection] = road;
             return true;
@@ -81,14 +83,14 @@ public class Board {
         int col = intersectionCoordinates[1];
 
         if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
-            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
             addBuildingToSurroundingHexagons(intersectionID,village);
             return true;
         }
 
         if((intersections[row][col] != null) && !(intersections[row][col] instanceof Building) && noBuildingAdjacent(row,col) && isNextToOwnRoad(intersectionID,player)){
-            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
 
             addBuildingToSurroundingHexagons(intersectionID,village);
@@ -110,7 +112,7 @@ public class Board {
             int col = intersectionCoordinates[1];
 
             if (intersections[row][col].getType() == BuildingType.VILLAGE && intersections[row][col].getPlayer() == player) {
-                intersections[row][col] = new Building(player, BuildingType.CITY);
+                intersections[row][col] = new Building(player, BuildingType.CITY, intersectionID);
                 Building city = (Building) intersections[row][col];
                 addBuildingToSurroundingHexagons(intersectionID, city);
                 return true;
@@ -316,6 +318,10 @@ public class Board {
 
     public Intersection[][] getIntersections() {
         return intersections;
+    }
+
+    public boolean isSetupPhase() {
+        return isSetupPhase;
     }
 }
 
