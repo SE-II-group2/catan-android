@@ -123,43 +123,6 @@ public class Board {
         return false;
     }
 
-    /**
-     * Method to insert a Road from another player after receiving an according DTO from the server
-     * assumes server is always correct and doesnt check anything, also overwrites roads from other players if there are any
-     * @param player
-     * @param connectionID
-     */
-    public void insertRoadFromServerMessage(Player player, int connectionID) {
-        int[] connectionIntersections = getConnectedIntersections(connectionID);
-        int fromIntersection = connectionIntersections[0];
-        int toIntersection = connectionIntersections[1];
-        Road road = new Road(player, connectionID);
-        adjacencyMatrix[fromIntersection][toIntersection] = road;
-        adjacencyMatrix[toIntersection][fromIntersection] = road;
-    }
-
-    /**
-     * Method to insert a building from another player after receiving an according DTO from the server
-     * assumes server is always correct and doesnt check anything special, also overwrites buildings already there if there are any
-     * @param player
-     * @param intersectionID
-     * @param buildingType
-     */
-    public void insertBuildingFromServerMessage(Player player, int intersectionID, BuildingType buildingType){
-
-        int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
-        int row = intersectionCoordinates[0];
-        int col = intersectionCoordinates[1];
-
-        if(intersections[row][col] != null && intersections[row][col] instanceof Building){
-            removeBuildingFromSurroundingHexagons(intersectionID, (Building) intersections[row][col]);
-        }
-        intersections[row][col] = new Building(player, buildingType, intersectionID);
-        Building city = (Building) intersections[row][col];
-        addBuildingToSurroundingHexagons(intersectionID, city);
-        player.increaseVictoryPoints(1);
-    }
-
     private void removeBuildingFromSurroundingHexagons(int intersection, Building building) {
         int firstHexagon = surroundingHexagons[0][intersection];
         int secondHexagon = surroundingHexagons[1][intersection];
