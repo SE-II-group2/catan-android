@@ -3,6 +3,11 @@ package com.group2.catan_android.data.service;
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
+import com.group2.catan_android.data.live.game.CurrentGameStateDto;
+import com.group2.catan_android.data.live.game.GameProgressDto;
+import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
+import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
+import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
 
@@ -22,19 +27,23 @@ public class GameController implements GameJoiner, GameLeaver{
     private final StompManager stompManager;
     private final TokenRepository tokenRepository;
     private final PlayerRepository playerRepository;
-    private final com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner;
+    private final LobbyJoiner lobbyJoiner;
+    private final CurrentGamestateRepository currentGamestateRepository;
+    private final GameProgressRepository gameProgressRepository;
 
-    private GameController(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner){
+    private GameController(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, LobbyJoiner lobbyJoiner, CurrentGamestateRepository currentGamestateRepository, GameProgressRepository gameProgressRepository){
         this.stompManager = stompManager;
         this.tokenRepository = tokenRepository;
         this.playerRepository = playerRepository;
         this.lobbyJoiner = lobbyJoiner;
+        this.currentGamestateRepository=currentGamestateRepository;
+        this.gameProgressRepository=gameProgressRepository;
     }
     public static GameController getInstance(){
         return instance;
     }
-    public static void initialize(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner){
-        instance = new GameController(stompManager, tokenRepository, playerRepository, lobbyJoiner);
+    public static void initialize(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, LobbyJoiner lobbyJoiner, CurrentGamestateRepository currentGamestateRepository, GameProgressRepository gameProgressRepository){
+        instance = new GameController(stompManager, tokenRepository, playerRepository, lobbyJoiner, currentGamestateRepository, gameProgressRepository);
     }
     public Completable joinGame(JoinGameRequest request){
         return processGameRequest(request, lobbyJoiner::joinGame);
@@ -72,9 +81,14 @@ public class GameController implements GameJoiner, GameLeaver{
     }
 
     private void wireUpLiveDataSources(JoinGameResponse joinGameResponse){
-        Flowable<PlayersInLobbyDto> flowable = stompManager.filterByType(PlayersInLobbyDto.class);
+        Flowable<PlayersInLobbyDto> playerFlowable = stompManager.filterByType(PlayersInLobbyDto.class);
         playerRepository.setCurrentPlayerID(joinGameResponse.getInGameID());
-        playerRepository.setLiveData(flowable);
+        playerRepository.setLiveData(playerFlowable);
+        Flowable<CurrentGameStateDto> currentGameStateFlowable = stompManager.filterByType(CurrentGameStateDto.class);
+        currentGamestateRepository.setLiveData(currentGameStateFlowable);
+        currentGamestateRepository.setActivePlayerIngameID(joinGameResponse.getInGameID());
+        Flowable<GameProgressDto> gameProgressFlowable = stompManager.filterByType(GameProgressDto.class);
+        gameProgressRepository.setLiveData(gameProgressFlowable);
     }
 
     private void storeSession(JoinGameResponse joinGameResponse){

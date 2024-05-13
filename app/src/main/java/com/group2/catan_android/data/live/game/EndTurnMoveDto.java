@@ -7,21 +7,22 @@ import java.util.ArrayList;
 
 public class EndTurnMoveDto extends GameMoveDto{
 
-    public ArrayList<PlayerDto> getTurnOder() {
-        return turnOder;
-    }
 
-    public void setTurnOder(ArrayList<PlayerDto> turnOder) {
-        this.turnOder = turnOder;
-    }
-
-    private ArrayList<PlayerDto> turnOder;
     public EndTurnMoveDto() {
         this.setEventType(GameMoveType.ENTTURNMOVE);
     }
-
-    public EndTurnMoveDto(ArrayList<PlayerDto> turnOder) {
+    public EndTurnMoveDto(IngamePlayerDto nextPlayer) {
         this.setEventType(GameMoveType.ENTTURNMOVE);
-        this.turnOder=turnOder;
+        this.nextPlayer = nextPlayer;
     }
+
+    public IngamePlayerDto getNextPlayer() {
+        return nextPlayer;
+    }
+
+    public void setNextPlayer(IngamePlayerDto nextPlayer) {
+        this.nextPlayer = nextPlayer;
+    }
+
+    private IngamePlayerDto nextPlayer;
 }

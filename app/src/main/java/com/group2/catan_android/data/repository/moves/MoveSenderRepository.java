@@ -34,7 +34,12 @@ public class MoveSenderRepository implements MoveSender{
     @Override
     public Completable sendMove(GameMoveDto gameMoveDto, String token) {
         return api.makeMove(token, gameMoveDto)
-                .onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
+              .onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
+    }
+
+    //HERE FOR THE MOMENT, NOT FINAL DESTINATION
+    public Completable startGame(String token){
+        return api.startGame(token).onErrorResumeNext(throwable -> Completable.error(convertAPIError(throwable)));
     }
 
     private Throwable convertAPIError(Throwable throwable) {

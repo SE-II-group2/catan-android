@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
+import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
+import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
@@ -38,10 +40,16 @@ class GameControllerTests {
     PlayerRepository playerRepository;
     @Mock
     LobbyJoiner lobbyJoiner;
+
+    @Mock
+    CurrentGamestateRepository currentGamestateRepository;
+
+    @Mock
+    GameProgressRepository gameProgressRepository;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
-        GameController.initialize(stompManager, tokenRepository, playerRepository, lobbyJoiner);
+        GameController.initialize(stompManager, tokenRepository, playerRepository, lobbyJoiner, currentGamestateRepository, gameProgressRepository);
         gameController = GameController.getInstance();
     }
 
@@ -168,6 +176,10 @@ class GameControllerTests {
                     verify(tokenRepository).storeToken(response.getToken());
                     verify(tokenRepository).storeInGameID(response.getInGameID());
                     verify(tokenRepository).storeGameID(response.getGameID());
+
+                    verify(gameProgressRepository).setLiveData(any());
+
+                    verify(currentGamestateRepository).setLiveData(any());
                 },
                 t -> Assertions.fail()
         );
