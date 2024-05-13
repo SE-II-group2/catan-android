@@ -37,9 +37,6 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape">
         </activity>
-        <activity
-            android:name=".DemoActivity"
-            android:exported="false" />
     </application>
 
 </manifest>
