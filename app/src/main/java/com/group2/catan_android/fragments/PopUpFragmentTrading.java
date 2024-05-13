@@ -50,5 +50,6 @@ public class PopUpFragmentTrading extends DialogFragment {
         manager.beginTransaction().add(R.id.trading_popup_time_selection, new TradingTimeSelection()).commit();
         getChildFragmentManager().beginTransaction().add(R.id.trading_popup_bottomfragment,new PlayerResourcesFragment()).commit();
         manager.beginTransaction().add(R.id.trading_popup_topfragment, new TradingResourceSelectionFragment()).commit();
+        manager.beginTransaction().add(R.id.trading_popup_middlefragment, new TradingResourceSelectionFragment()).commit();
     }
 }
