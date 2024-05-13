@@ -38,6 +38,7 @@ public class TradingResourceSelectionFragment extends Fragment {
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         plus = new ImageView[]{
                 view.findViewById(R.id.resource_selection_wood_plus),
@@ -90,16 +91,5 @@ public class TradingResourceSelectionFragment extends Fragment {
         try {
             return Integer.parseInt(num);
         }catch(NumberFormatException e){Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();return -1;}
-
-         /*
-        ImageView temp = view.findViewById(R.id.resource_selection_wood_plus);
-        TextView text = view.findViewById(R.id.resource_selection_wood_count);
-        temp.setOnClickListener(v->{
-                text.setText("2");
-
-
-
-        });
-          */
     }
 }
