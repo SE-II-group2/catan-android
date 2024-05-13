@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.0"
+core = "1.5.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 junitJupiterApi = "5.7.0"
@@ -9,6 +10,8 @@ material = "1.11.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
 okhttp = "4.10.0"
+robolectric = "4.6.1"
+robolectricVersion = "4.5.1"
 stomp = "1.6.6"
 reactivex = "2.2.21"
 rxandroid =  "2.1.1"
@@ -16,8 +19,10 @@ retrofit = "2.10.0"
 navigationFragment = "2.6.0"
 navigationUi = "2.6.0"
 lifecycle = "2.2.0"
+fragmentTesting = "1.7.0"
 
 [libraries]
+core = { module = "androidx.test:core", version.ref = "core" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
@@ -28,6 +33,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+robolectric-v451 = { module = "org.robolectric:robolectric", version.ref = "robolectricVersion" }
 stomp = { module = 'com.github.NaikSoftware:StompProtocolAndroid', version.ref = "stomp"}
 reactivex = { module = 'io.reactivex.rxjava2:rxjava', version.ref = "reactivex"}
 rxandroid = { module = 'io.reactivex.rxjava2:rxandroid', version.ref = "rxandroid"}
@@ -37,6 +44,7 @@ retrofit_rxandroid = {module = 'com.squareup.retrofit2:adapter-rxjava2', version
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 lifecycle = {module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycle"}
+fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 
