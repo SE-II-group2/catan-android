@@ -4,6 +4,13 @@ public class PlayerDto {
     private String displayName;
     private int inGameID;
     private PlayerState state;
+    public PlayerDto(){}
+
+    public PlayerDto(String displayName, int inGameID, PlayerState state) {
+        this.displayName = displayName;
+        this.inGameID = inGameID;
+        this.state = state;
+    }
 
     public String getDisplayName() {
         return displayName;

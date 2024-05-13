@@ -1,25 +1,17 @@
 package com.group2.catan_android.data.service;
 
-import android.graphics.Paint;
-
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
-import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
-import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
-import com.group2.catan_android.networking.dto.Game;
-import com.group2.catan_android.networking.socket.SocketManager;
 
 import java.util.function.Function;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ua.naiksoftware.stomp.Stomp;
 
 /**
  * GameController manages everything related to a game. It coordinates all app components.
@@ -30,9 +22,9 @@ public class GameController implements GameJoiner, GameLeaver{
     private final StompManager stompManager;
     private final TokenRepository tokenRepository;
     private final PlayerRepository playerRepository;
-    private final LobbyJoiner lobbyJoiner;
+    private final com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner;
 
-    private GameController(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, LobbyJoiner lobbyJoiner){
+    private GameController(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner){
         this.stompManager = stompManager;
         this.tokenRepository = tokenRepository;
         this.playerRepository = playerRepository;
@@ -41,7 +33,7 @@ public class GameController implements GameJoiner, GameLeaver{
     public static GameController getInstance(){
         return instance;
     }
-    public static void initialize(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, LobbyJoiner lobbyJoiner){
+    public static void initialize(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, com.group2.catan_android.data.repository.lobby.LobbyJoiner lobbyJoiner){
         instance = new GameController(stompManager, tokenRepository, playerRepository, lobbyJoiner);
     }
     public Completable joinGame(JoinGameRequest request){
