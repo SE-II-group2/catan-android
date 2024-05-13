@@ -11,27 +11,39 @@ import com.group2.catan_android.gamelogic.Player;
 
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PlayerUnitTests {
 
-    Player player1;
+    private Player player1;
+    private final String playerToken = "player1";
+    private final String displayName = "player1";
+    private final String gameID = "player1";
+    static int playerColor = Color.RED;
 
     @BeforeEach
-    public void setUp() {
-        player1 = new Player("player1","player1","player1", Color.RED);
+    void setUp() {
+        player1 = new Player(playerToken,displayName,gameID, playerColor);
     }
 
     @Test
-    public void testAdjustResources() {
-        player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
-
-        assertArrayEquals(ResourceDistribution.FOREST.getDistribution(), player1.getResources());
+    void testAdjustResourcesNull(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            player1.adjustResources(null);
+        });
     }
 
     @Test
-    public void testVictoryPoints() {
+    void testAdjustResourcesWrongLength(){
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            player1.adjustResources((new int[]{1}));
+        });
+    }
+
+    @Test
+    void testVictoryPoints() {
         player1.increaseVictoryPoints(2);
         assertEquals(2,player1.getVictoryPoints());
 
@@ -40,7 +52,7 @@ public class PlayerUnitTests {
     }
 
     @Test
-    public void testResourceSufficient() {
+    void testResourceSufficient() {
         player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
 
         int[] costs1 = new int[]{0, 0, -1, 0, 0}; // -FOREST
@@ -48,4 +60,26 @@ public class PlayerUnitTests {
         assertTrue(player1.resourcesSufficient(costs1));
         assertFalse(player1.resourcesSufficient(costs2));
     }
+
+    @Test
+    void testResourceSufficientWithoutCost() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                player1.resourcesSufficient(null);
+        });
+    }
+
+    @Test
+    void testResourceWrongLength(){
+        int[] resourceCost = new int[]{1};
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            player1.resourcesSufficient(resourceCost);
+        });
+    }
+
+    @Test
+    void testPlayerGetter() {
+        Assertions.assertEquals(displayName, player1.getDisplayName());
+        Assertions.assertEquals(playerColor, player1.getColor());
+    }
+
 }

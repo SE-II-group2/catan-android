@@ -49,7 +49,8 @@ public class StompManager {
     }
 
     public Completable connect(String token){
-        shutdown();
+        if(isConnected())
+            shutdown();
         this.dispatcher = PublishProcessor.create();
         originTopics = new HashMap<>();
         originDisposables = new CompositeDisposable();
@@ -86,9 +87,7 @@ public class StompManager {
         return driver.lifecycle();
     }
     synchronized public static void initialize(@NotNull StompDriver driver, @NotNull ObjectMapper objectMapper) {
-        if (instance == null) {
-            instance = new StompManager(driver, objectMapper);
-        }
+        instance = new StompManager(driver, objectMapper);
     }
     @NotNull
     public static StompManager getInstance(){

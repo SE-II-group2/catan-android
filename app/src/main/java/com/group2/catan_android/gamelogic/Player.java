@@ -1,21 +1,20 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
+import com.group2.catan_android.gamelogic.objects.ProgressCard;
+
+import java.util.List;
 
 public class Player {
 
-    private final String token;
-    private final String gameID;
+    private String token;
+    private String gameID;
+    private int inGameID;
     private final String displayName;
     private int victoryPoints = 0;
-    private final int[] resources = new int[]{0,0,0,0,0};
+    private int[] resources = new int[]{0,0,0,0,0};
     private final int color;
 
-    private ResourceUpdateListener listener;
-
-    public void setResourceUpdateListener(ResourceUpdateListener listener) {
-        this.listener = listener;
-    }
+    private List<ProgressCard> progressCards;
 
     public Player(String token, String displayName, String gameID, int color) {
         this.token = token;
@@ -24,15 +23,20 @@ public class Player {
         this.color = color;
     }
 
+    public Player( String displayName, int victoryPoints, int[] resources,  int color) {
+        this.displayName = displayName;
+        this.victoryPoints=victoryPoints;
+        this.resources=resources;
+        this.color = color;
+    }
+
     public void adjustResources(int[] resources) {
         if (resources != null && resources.length == 5) {
             for (int i = 0; i < resources.length; i++) {
                 this.resources[i] += resources[i];
             }
-
-            if (listener != null) {
-                listener.onResourcesUpdated(this.resources);
-            }
+        } else {
+            throw new IllegalArgumentException("Resources array must be not-null and have exactly 5 elements.");
         }
 
     }
@@ -45,8 +49,11 @@ public class Player {
                     return false;
                 }
             }
+            return true;
+        } else {
+            throw new IllegalArgumentException("Resources Cost array must be not-null and have exactly 5 elements.");
         }
-        return true;
+
     }
 
     public void increaseVictoryPoints(int amount){

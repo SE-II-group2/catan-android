@@ -3,11 +3,24 @@
     android:height="500dp"
     android:viewportWidth="250"
     android:viewportHeight="500">
+
   <path
       android:strokeWidth="1"
-      android:pathData="M-0,0h250v499h-250z"
+      android:pathData="
+        M250,500
+        l-210,0
+        a40,40 0 0 1 -40,-40
+        l0,-420
+        a40,40 0 0 1 40,-40
+        l210,0
+        l0,499
+        z"
+
       android:fillColor="#D8D8D8"
-      android:strokeColor="#000000"/>
+      android:strokeColor="#000000"
+      android:fillType="evenOdd" />
+
+
   <path
       android:pathData="M80.74,362.93C80.76,352.48 86.6,343.8 94.14,342.43C93.11,342.07 92.08,342.07 91.06,342.07C79.76,342.04 70.5,351.41 70.47,362.9C70.44,374.4 79.65,383.83 90.94,383.86C91.97,383.86 93,383.86 94.03,383.52C86.5,382.1 80.71,373.38 80.74,362.93"
       android:fillColor="#59200F"/>

@@ -7,60 +7,39 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.gamelogic.Player;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PlayerScoresFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
 public class PlayerScoresFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public PlayerScoresFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment score.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PlayerScoresFragment newInstance(String param1, String param2) {
-        PlayerScoresFragment fragment = new PlayerScoresFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private TextView firstPlayer;
+    private TextView secondPlayer;
+    private TextView thirdPlayer;
+    private TextView fourthPlayer;
+    private TextView[] playerScoreViews;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_player_scores, container, false);
+
+        firstPlayer = view.findViewById(R.id.firstPlayerScore);
+        secondPlayer = view.findViewById(R.id.secondPlayerScore);
+        thirdPlayer = view.findViewById(R.id.thirdPlayerScore);
+        fourthPlayer = view.findViewById(R.id.fourthPlayerScore);
+
+        playerScoreViews = new TextView[]{firstPlayer,secondPlayer,thirdPlayer,fourthPlayer};
+
+        return view;
+    }
+
+    public void updateScores(List<Player> players){
+        for(int i = 0; i < playerScoreViews.length; i++){
+            String playerScore = players.get(i).getDisplayName() + ": " + String.valueOf(players.get(i).getVictoryPoints());
+            playerScoreViews[i].setText(playerScore);
+            playerScoreViews[i].setTextColor(players.get(i).getColor());
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_player_scores, container, false);
     }
 }
