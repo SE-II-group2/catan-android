@@ -4,8 +4,6 @@
     android:viewportWidth="250"
     android:viewportHeight="500">
 
-  "M0,0 h250v499h-250z"
-
   <path
       android:strokeWidth="1"
       android:pathData="
