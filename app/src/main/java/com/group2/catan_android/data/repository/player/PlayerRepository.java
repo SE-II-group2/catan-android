@@ -6,7 +6,6 @@ import com.group2.catan_android.data.live.PlayersInLobbyDto;
 import com.group2.catan_android.data.model.DisplayablePlayer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -17,7 +16,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, AdminPlayerProvider {
     private static PlayerRepository instance;
     private PlayerRepository(){
-        this.playerSubject = BehaviorSubject.create();
+        this.playerSubject = BehaviorSubject.createDefault(new ArrayList<>());
         this.adminSubject = BehaviorSubject.createDefault(false);
         this.players = new ArrayList<>();
     }
@@ -73,10 +72,8 @@ public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, Ad
         if(admin != null)
             admin.setAdmin(true);
         if(currentPlayerID == serverAdmin.getInGameID()){
-            setPlayerIsAdmin(true);
             adminSubject.onNext(true);
         } else {
-            setPlayerIsAdmin(false);
             adminSubject.onNext(false);
         }
     }
@@ -87,9 +84,6 @@ public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, Ad
                 return p;
         }
         return null;
-    }
-    private void setPlayerIsAdmin(boolean b){
-        playerIsAdmin = b;
     }
 
     public void setCurrentPlayerID(int playerID){

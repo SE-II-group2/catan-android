@@ -49,7 +49,8 @@ public class StompManager {
     }
 
     public Completable connect(String token){
-        shutdown();
+        if(isConnected())
+            shutdown();
         this.dispatcher = PublishProcessor.create();
         originTopics = new HashMap<>();
         originDisposables = new CompositeDisposable();
