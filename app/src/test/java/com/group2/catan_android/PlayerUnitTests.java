@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import android.graphics.Color;
 
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.Player;
 
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -16,12 +15,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 public class PlayerUnitTests {
 
     private Player player1;
-    private ResourceUpdateListener mockListener;
     private final String playerToken = "player1";
     private final String displayName = "player1";
     private final String gameID = "player1";
@@ -30,19 +26,6 @@ public class PlayerUnitTests {
     @BeforeEach
     void setUp() {
         player1 = new Player(playerToken,displayName,gameID, playerColor);
-        mockListener = new ResourceUpdateListener() {
-            @Override
-            public void onResourcesUpdated(int[] resources) {
-                System.out.println("Resources updated: " + Arrays.toString(resources));
-            }
-        };
-    }
-
-    @Test
-    void testAdjustResources() {
-        player1.setResourceUpdateListener(mockListener);
-        player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
-        assertArrayEquals(ResourceDistribution.FOREST.getDistribution(), player1.getResources());
     }
 
     @Test
@@ -60,15 +43,6 @@ public class PlayerUnitTests {
     }
 
     @Test
-    void testAdjustResourcesWithoutListener(){
-        player1.setResourceUpdateListener(null);
-        int[] distribution = new int[]{1, 1, 1, 1, 1};
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            player1.adjustResources(distribution);
-        });
-    }
-
-    @Test
     void testVictoryPoints() {
         player1.increaseVictoryPoints(2);
         assertEquals(2,player1.getVictoryPoints());
@@ -79,7 +53,6 @@ public class PlayerUnitTests {
 
     @Test
     void testResourceSufficient() {
-        player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(ResourceDistribution.FOREST.getDistribution());
 
         int[] costs1 = new int[]{0, 0, -1, 0, 0}; // -FOREST

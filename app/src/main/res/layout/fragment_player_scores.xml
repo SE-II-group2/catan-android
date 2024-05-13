@@ -6,11 +6,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.PlayerScoresFragment">
 
-<TextView
-    android:id="@+id/score_p1"
-    android:text="Player 1: 1"
+    <TextView
+    android:id="@+id/firstPlayerScore"
     android:textColor="@color/black"
-    android:gravity="left|center_vertical"
+    android:gravity="end|center_vertical"
     android:autoSizeTextType="uniform"
     android:layout_width="0dp"
     android:layout_height="0dp"
@@ -19,42 +18,42 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHeight_percent="0.25"
     />
+
     <TextView
-        android:id="@+id/score_p2"
-        android:text="Player 2: 1"
+        android:id="@+id/secondPlayerScore"
         android:textColor="@color/black"
-        android:gravity="left|center_vertical"
+        android:gravity="end|center_vertical"
         android:autoSizeTextType="uniform"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/score_p1"
+        app:layout_constraintTop_toBottomOf="@id/firstPlayerScore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.25"
         />
+
     <TextView
-        android:id="@+id/score_p3"
-        android:text="Player 3: 1"
+        android:id="@+id/thirdPlayerScore"
         android:textColor="@color/black"
-        android:gravity="left|center_vertical"
+        android:gravity="end|center_vertical"
         android:autoSizeTextType="uniform"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/score_p2"
+        app:layout_constraintTop_toBottomOf="@+id/secondPlayerScore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.25"
         />
+
     <TextView
-        android:id="@+id/score_p4"
-        android:text="Player 4: 1"
+        android:id="@+id/fourthPlayerScore"
         android:textColor="@color/black"
-        android:gravity="left|center_vertical"
+        android:gravity="end|center_vertical"
         android:autoSizeTextType="uniform"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/score_p3"
+        app:layout_constraintTop_toBottomOf="@+id/thirdPlayerScore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent="0.25"

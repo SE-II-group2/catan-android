@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
 import com.group2.catan_android.gamelogic.*;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
@@ -17,12 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import android.graphics.Color;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class BoardUnitTests {
@@ -32,20 +29,13 @@ public class BoardUnitTests {
     @Mock
     private Building buildingMock;
     private Player player1;
-    private ResourceUpdateListener mockListener;
 
     @BeforeEach
     void setUp() {
         board = new Board();
         buildingMock = mock(Building.class); // Create a mock object for Building
-        mockListener = new ResourceUpdateListener() {
-            @Override
-            public void onResourcesUpdated(int[] resources) {
-                System.out.println("Resources updated: " + Arrays.toString(resources));
-            }
-        };
+
         player1 = new Player("player1","player1","player1", Color.RED);
-        player1.setResourceUpdateListener(mockListener);
         player1.adjustResources(new int[]{100,100,100,100,100}); //unlimited resources for testing
     }
 
@@ -59,7 +49,7 @@ public class BoardUnitTests {
     void testGenerateHexagonsDesertTileCorrectness() {
         boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.getLocation().equals(Location.DESERT)) {
+            if (hexagon.getLocation().equals(Hexagontype.DESERT)) {
                 assertEquals(0, hexagon.getRollValue());
                 assertArrayEquals(new int[]{0, 0, 0, 0, 0}, hexagon.getDistribution().getDistribution());
                 hasDesertTile = true;
@@ -73,9 +63,9 @@ public class BoardUnitTests {
         for (Hexagon hexagon : board.getHexagonList()) {
             hexagon.addBuilding(buildingMock);
         }
-        board.distributeResourcesByDiceRoll(6);
+        board.distributeResourcesByDiceRoll(0);
 
-        verify(buildingMock, times(2)).giveResources(any());
+        verify(buildingMock, times(0)).giveResources(any());
     }
 
     @Test

@@ -67,6 +67,7 @@ public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, Ad
             players.add(p);
         });
     }
+
     private void handleAdmin(PlayerDto serverAdmin){
         DisplayablePlayer admin = getPlayerWithID(serverAdmin.getInGameID());
         if(admin != null)

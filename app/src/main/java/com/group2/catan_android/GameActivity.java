@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
@@ -24,9 +22,15 @@ import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
+import com.group2.catan_android.gamelogic.objects.Building;
+import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.objects.Intersection;
+import com.group2.catan_android.gamelogic.objects.Road;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,107 +38,102 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private ButtonType mLastButtonClicked;
 
-    // hexagon icon measurements
-    final static int hexagonHeight = 198;
-    final static int hexagonWidth = hexagonHeight / 99 * 86; // 99:86 is the aspect ratio of a hexagon with equal sites
-    final static int hexagonHalfHeight = hexagonHeight / 2;
-    final static int hexagonQuarterWidth = hexagonWidth / 4;
-    final static int hexagonQuarterHeight = hexagonHeight / 4;
+    // drawables measurements
+    final static int HEXAGON_HEIGHT = 230;
+    final static int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
+    final static int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
+    final static int HEXAGON_WIDTH_QUARTER = HEXAGON_WIDTH / 4;
+    final static int HEXAGON_HEIGHT_QUARTER = HEXAGON_HEIGHT / 4;
+    static int INTERSECTION_SIZE = 40;
+    static int connectionSize = HEXAGON_WIDTH_HALF;
+    int statusBarHeight;
 
-    // intersection Size
-    static int intersectionSize = 40;
-    static int connectionSize = hexagonHalfHeight;
+    // number of total elements
+    final static int TOTAL_HEXAGONS = 19;
+    final static int TOTAL_CONNECTIONS = 72;
+    final static int TOTAL_INTERSECTIONS = 54;
 
-    // view IDs offsets
-    final static int CONNECTIONS_OFFSET = 20; // 19 Hexagons + 1 (0 index)
-    final static int INTERSECTIONS_OFFSET = 92; // 19 Hexagons + 72 Connections + 1
-
-    Player player = new Player("token","displayName","gameID",Color.GREEN);
-
+    // init demo board and players
+    Player player1 = new Player("token","Jakob","gameID",Color.GREEN);
+    Player player2 = new Player("token","Lukas","gameID",Color.RED);
+    Player player3 = new Player("token","Lukas","gameID",Color.BLUE);
+    Player player4 = new Player("token","Nico","gameID",Color.YELLOW);
+    List<Player> players = Arrays.asList(player1, player2, player3, player4);
     Board board = new Board();
-    List<Hexagon> hexagonList = board.getHexagonList();
 
+    // fragments
+    PlayerResourcesFragment playerResourcesFragment;
+    PlayerScoresFragment playerScoresFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(uiOptions);
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
 
+        //init of arrays to store displayable views
+        ImageView[] hexagonViews = new ImageView[TOTAL_HEXAGONS];
+        TextView[] rollValueViews = new TextView[TOTAL_HEXAGONS];
+        ImageView[] robberViews = new ImageView[TOTAL_HEXAGONS];
+        ImageView[] intersectionViews = new ImageView[TOTAL_INTERSECTIONS];
+        ImageView[] connectionViews = new ImageView[TOTAL_CONNECTIONS];
 
-        //init of arrays to store displayable views and values
-        int[] hexagonPictures = new int[19];
-        int[] hexagonRollValues = new int[19];
-        ImageView[] hexagonViews = new ImageView[hexagonPictures.length];
-        ImageView[] intersectionViews = new ImageView[54];
-        ImageView[] connectionViews = new ImageView[72];
-        TextView[] rollValueViews = new TextView[19];
-
-
-        //get Roll Values and set images of Hexagons
-        for (int i = 0; i < hexagonPictures.length; i++) {
-            Hexagon hexagon = hexagonList.get(i);
-
-            hexagonRollValues[i] = hexagon.getRollValue(); // save roll Value
-
-            switch (hexagon.getLocation()) { // save SVG
-                case HILLS:
-                    hexagonPictures[i] = R.drawable.hexagon_brick_svg;
-                    break;
-                case FOREST:
-                    hexagonPictures[i] = R.drawable.hexagon_wood_svg;
-                    break;
-                case MOUNTAINS:
-                    hexagonPictures[i] = R.drawable.hexagon_stone_svg;
-                    break;
-                case PASTURE:
-                    hexagonPictures[i] = R.drawable.hexagon_sheep_svg;
-                    break;
-                case FIELDS:
-                    hexagonPictures[i] = R.drawable.hexagon_wheat_svg;
-                    break;
-                default:
-                    hexagonPictures[i] = R.drawable.desert_hexagon_svg;
-                    break;
-            }
-        }
-
-        //draw Hexagons
-        for (int i = 0; i < hexagonPictures.length; i++) {
+        //draw Hexagons with Roll Values and Robber
+        for (int i = 0; i < TOTAL_HEXAGONS; i++) {
             ImageView hexagonView = new ImageView(this);
-            hexagonView.setId(ViewCompat.generateViewId());
-            hexagonView.setImageDrawable(ContextCompat.getDrawable(this, hexagonPictures[i]));
+            TextView rollValueView = new TextView(this);
+            ImageView robberView = new ImageView(this);
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(hexagonWidth, hexagonHeight);
-            constraintLayout.addView(hexagonView, params);
+            hexagonView.setId(i + 1); // must start at ID 1, because view with ID 0 is not allowed in Android Studio
+            rollValueView.setId(hexagonView.getId() + TOTAL_HEXAGONS);
+            robberView.setId(rollValueView.getId() + TOTAL_HEXAGONS);
+
+            ConstraintLayout.LayoutParams paramsHexagon = new ConstraintLayout.LayoutParams(HEXAGON_WIDTH, HEXAGON_HEIGHT);
+            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3);
+            constraintLayout.addView(hexagonView, paramsHexagon);
+            constraintLayout.addView(rollValueView, paramsRollValues);
+            constraintLayout.addView(robberView, paramsRobber);
+
             hexagonViews[i] = hexagonView;
+            rollValueViews[i] = rollValueView;
+            robberViews[i] = robberView;
+
+            //formatting of TextView
+            rollValueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            rollValueView.setTextColor(Color.BLACK);
+            rollValueView.setGravity(Gravity.CENTER);
         }
 
         //draw Connections
-        for (int i = 0; i < connectionViews.length; i++) {
+        for (int i = 0; i < TOTAL_CONNECTIONS; i++) {
             ImageView connectionView = new ImageView(this);
-            connectionView.setId(ViewCompat.generateViewId());
+            connectionView.setId(i + TOTAL_HEXAGONS*3 + 1);
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
-            int connectionID = connectionView.getId() - CONNECTIONS_OFFSET;
+            int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
 
             connectionView.setOnClickListener(v -> {
+                Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
                 if(mLastButtonClicked == ButtonType.ROAD){
-                    if(board.addNewRoad(player,connectionID)){
-                        player.adjustResources(ResourceCost.ROAD.getCost());
-                        connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
-                        connectionView.setColorFilter(player.getColor());
+                    Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
+                    if(board.addNewRoad(player1,connectionID)){
+                        player1.adjustResources(ResourceCost.ROAD.getCost());
+                        updateUiBoard(board);
+                        updateUiPlayerRessources(player1);
+                        updateUiPlayerScores(players);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
@@ -143,30 +142,32 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
 
         //draw Intersections
-        for (int i = 0; i < 54; i++) {
+        for (int i = 0; i < TOTAL_INTERSECTIONS; i++) {
             ImageView intersectionView = new ImageView(this);
-            intersectionView.setId(ViewCompat.generateViewId());
+            intersectionView.setId(i + TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS + 1);
             intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(intersectionSize, intersectionSize);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(INTERSECTION_SIZE, INTERSECTION_SIZE);
             constraintLayout.addView(intersectionView, params);
             intersectionViews[i] = intersectionView;
-            int intersectionID = intersectionView.getId() - INTERSECTIONS_OFFSET;
+            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS*3 - TOTAL_CONNECTIONS - 1;
 
             intersectionView.setOnClickListener(v -> {
+                Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
                 if(mLastButtonClicked == ButtonType.VILLAGE) {
-                    if (board.addNewVillage(player, intersectionID)) {
-                        player.adjustResources(ResourceCost.VILLAGE.getCost());
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
-                        intersectionView.setColorFilter(player.getColor());
+                    if (board.addNewVillage(player1, intersectionID)) {
+                        player1.adjustResources(ResourceCost.VILLAGE.getCost());
+                        updateUiBoard(board);
+                        updateUiPlayerRessources(player1);
+                        updateUiPlayerScores(players);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
                 } else if(mLastButtonClicked == ButtonType.CITY){
-                    if (board.addNewCity(player,intersectionID)){
-                        player.adjustResources(ResourceCost.CITY.getCost());
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
-                        intersectionView.setColorFilter(player.getColor());
+                    if (board.addNewCity(player1,intersectionID)){
+                        player1.adjustResources(ResourceCost.CITY.getCost());
+                        updateUiBoard(board);
+                        updateUiPlayerScores(players);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -174,41 +175,129 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             });
         }
 
-        //draw Roll Values
-        for (int i = 0; i < hexagonRollValues.length; i++) {
-            TextView rollValueView = new TextView(this);
-            rollValueView.setId(ViewCompat.generateViewId());
-            String rollValue = String.format(Locale.getDefault(), "%d", hexagonRollValues[i]);
-            rollValueView.setText(rollValue);
-
-            rollValueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            rollValueView.setTextColor(Color.BLACK);
-            rollValueView.setGravity(Gravity.CENTER);
-
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
-            constraintLayout.addView(rollValueView, params);
-            rollValueViews[i] = rollValueView;
-        }
-
-        //constrain the drawables to the right position
+        //constrain the views to the right position
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
-            applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, layoutWidth, layoutHeight);
+            applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, robberViews, layoutWidth, layoutHeight);
         });
 
         // initialisation of button fragments
-        PlayerResourcesFragment playerResourcesFragment = new PlayerResourcesFragment();
-        player.setResourceUpdateListener(playerResourcesFragment);
+        playerResourcesFragment = new PlayerResourcesFragment();
+        playerScoresFragment = new PlayerScoresFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
-            Toast.makeText(getApplicationContext(), "End Turn Button", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
+            demoBoardMoves();
+            updateUiBoard(board);
+            updateUiPlayerRessources(player1);
+            updateUiPlayerScores(players);
         });
+
+    }
+
+
+    public void updateUiBoard(Board board){
+
+        Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
+        Intersection[][] intersections = board.getIntersections();
+        List<Hexagon> hexagonList = board.getHexagonList();
+
+        // update connections
+        for(int row = 0; row < adjacencyMatrix.length; row++) {
+            for (int col = 0; col < adjacencyMatrix[row].length; col++) {
+
+                if(adjacencyMatrix[row][col] instanceof Road){
+                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS*3 + 1);
+
+                    ImageView connectionView = findViewById(id);
+                    connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
+                    connectionView.setColorFilter((adjacencyMatrix[row][col]).getPlayer().getColor());
+                }
+            }
+        }
+
+        // update intersections
+        for(int row = 0; row < intersections.length; row++) {
+            for (int col = 0; col < intersections[row].length; col++) {
+                if(intersections[row][col] instanceof Building){
+
+                    int id = (((Building) intersections[row][col]).getId() + 3*TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
+                    ImageView intersectionView = findViewById(id);
+
+                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
+                    } else if(intersections[row][col].getType() == BuildingType.CITY){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
+                        intersectionView.setScaleX(1.5F);
+                        intersectionView.setScaleY(1.5F);
+                    }
+                    intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
+                }
+            }
+
+
+        }
+
+        // update hexagons with robber
+        for(Hexagon hexagon : hexagonList){
+            int hexagonViewID = hexagon.getId() + 1;
+            int rollValueViewID = hexagon.getId() + TOTAL_HEXAGONS + 1;
+            int robberViewID = rollValueViewID + TOTAL_HEXAGONS;
+
+            ImageView hexagonView = findViewById(hexagonViewID);
+            TextView rollValueView = findViewById(rollValueViewID);
+            ImageView robberView = findViewById(robberViewID);
+
+            // set hexagon image
+            switch(hexagon.getLocation()){
+                case HILLS:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_hills));
+                    break;
+                case FOREST:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_forest));
+                    break;
+                case MOUNTAINS:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_mountains));
+                    break;
+                case PASTURE:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_pasture));
+                    break;
+                case FIELDS:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_fields));
+                    break;
+                default:
+                    hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_desert));
+                    break;
+            }
+
+            // set robber image and roll values
+            rollValueView.setText(String.format(Locale.getDefault(), "%d", hexagon.getRollValue()));
+            robberView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.robber));
+
+            // show value or robber
+            if(hexagon.isHavingRobber()){
+                rollValueView.setVisibility(View.INVISIBLE);
+                robberView.setVisibility(View.VISIBLE);
+            } else{
+                robberView.setVisibility(View.INVISIBLE);
+                rollValueView.setVisibility(View.VISIBLE);
+            }
+        }
+
+    }
+
+    public void updateUiPlayerRessources(Player player){
+        playerResourcesFragment.updateResources(player);
+    }
+
+    public void updateUiPlayerScores(List<Player> players){
+        playerScoresFragment.updateScores(players);
     }
 
     @Override
@@ -234,24 +323,25 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
 
     //drawing of board
-    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews, int layoutWidth, int layoutHeight) {
+    private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews, ImageView[] robberView, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
         set.clone(constraintLayout);
 
         //margins for Hexagons
-        int hexStartMargin = layoutWidth / 2 - 6 * hexagonQuarterWidth;
-        int hexTopMargin = (layoutHeight / 2) - 2 * hexagonHeight - getStatusBarHeight();
-        int secondRowMargin = -10 * hexagonQuarterWidth;
-        int thirdRowMargin = secondRowMargin - hexagonWidth;
-        int rowHeightDifference = hexagonHalfHeight + hexagonQuarterHeight;
+        int hexStartMargin = layoutWidth / 2 - 6 * HEXAGON_WIDTH_QUARTER;
+        int hexTopMargin = (layoutHeight / 2) - 2 * HEXAGON_HEIGHT - statusBarHeight;
+        int secondRowMargin = -2 * HEXAGON_WIDTH -2 * HEXAGON_WIDTH_QUARTER -2; // -2 to make up some integer rounding
+        int thirdRowMargin = secondRowMargin - HEXAGON_WIDTH;
+        int rowHeightDifference = HEXAGON_WIDTH_HALF + HEXAGON_HEIGHT_QUARTER;
 
         //margins for drawing connections and intersection
-        int[] conMargins = {hexagonQuarterWidth, hexagonQuarterWidth * 3, hexagonHalfHeight + hexagonQuarterHeight, 0};
-        int[] intMargins = {0, 0, -hexagonHalfHeight, 0, hexagonHalfHeight}; // last value is the height difference for every second intersection
+        int[] conMargins = {HEXAGON_WIDTH_QUARTER, HEXAGON_WIDTH_QUARTER * 3, HEXAGON_WIDTH_HALF + HEXAGON_HEIGHT_QUARTER, 0};
+        int[] intMargins = {0, 0, -HEXAGON_WIDTH_HALF, 0, HEXAGON_WIDTH_HALF}; // last value is the height difference for every second intersection
 
         //starting values for drawables
         int hexagon = hexagonViews[0].getId();
         int rollValue = rollValueViews[0].getId();
+        int robber = robberView[0].getId();
         int intersection = intersectionViews[0].getId();
         int connection = connectionViews[0].getId();
         int prevHexagon = constraintLayout.getId();
@@ -298,11 +388,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 intersection = drawIntersections(set, hexagonsInRow * 2 + 1, hexagon, intersection, intMargins[2], intMargins[3], intMargins[4]);
 
             } else { //draw all other hexagons that are not the first in a row
-                drawHexagon(set, hexagon, prevHexagon, hexagonWidth, 0);
+                drawHexagon(set, hexagon, prevHexagon, HEXAGON_WIDTH, 0);
             }
 
-            //draw RollValues
-            drawView(set, hexagon, rollValue++, 0, 0, 0, hexagonQuarterHeight);
+            //draw RollValues & Robber
+            drawView(set, hexagon, rollValue++, 0, 0, 0, HEXAGON_HEIGHT_QUARTER);
+            drawView(set, hexagon, robber++, 0, 0, 0, HEXAGON_WIDTH/3);
 
             prevHexagon = hexagon++;
         }
@@ -319,14 +410,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     public int drawIntersections(ConstraintSet set, int intersectionsInRow, int hexagon, int intersection, int topMargin, int bottomMargin, int offset) {
         int startMargin = 0;
-        int endMargin = hexagonWidth;
+        int endMargin = HEXAGON_WIDTH;
 
         for (int i = 0; i < intersectionsInRow; i++) {
             drawView(set, hexagon, intersection++, startMargin, endMargin, topMargin, bottomMargin);
 
             //move every intersection a half hexagon to the right
-            startMargin += hexagonWidth / 2;
-            endMargin -= hexagonWidth / 2;
+            startMargin += HEXAGON_WIDTH / 2;
+            endMargin -= HEXAGON_WIDTH / 2;
 
             //add height offset to every second intersection
             if (i % 2 == 0) {
@@ -345,15 +436,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     public int drawHorizontalConnections(ConstraintSet set, int hexagonsInRow, int hexagon, int connection, int startMargin, int endMargin, int topMargin, int bottomMargin) {
         for (int i = 0; i < hexagonsInRow; i++) {
-            drawConnection(set, hexagon, connection++, startMargin + hexagonWidth * i, endMargin - hexagonWidth * i, -topMargin, -bottomMargin, -30); //top left
-            drawConnection(set, hexagon, connection++, endMargin + hexagonWidth * i, startMargin - hexagonWidth * i, -topMargin, -bottomMargin, 30); //top right
+            drawConnection(set, hexagon, connection++, startMargin + HEXAGON_WIDTH * i, endMargin - HEXAGON_WIDTH * i, -topMargin, -bottomMargin, -30); //top left
+            drawConnection(set, hexagon, connection++, endMargin + HEXAGON_WIDTH * i, startMargin - HEXAGON_WIDTH * i, -topMargin, -bottomMargin, 30); //top right
         }
         return connection;
     }
 
     public int drawVerticalConnections(ConstraintSet set, int hexagonsInRow, int hexagon, int connection) {
         for (int i = 0; i < hexagonsInRow + 1; i++) {
-            drawConnection(set, hexagon, connection++, -hexagonWidth + hexagonWidth * i, -hexagonWidth * i, 0, 0, 90); //right down
+            drawConnection(set, hexagon, connection++, -HEXAGON_WIDTH + HEXAGON_WIDTH * i, -HEXAGON_WIDTH * i, 0, 0, 90); //right down
         }
         return connection;
     }
@@ -373,20 +464,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         return margins;
     }
 
-    //TODO: find alternative Method to get StatusBarHeight
-    // does not work correctly on all devices
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
     public void demoBoardMoves(){
-        player.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
-        board.addNewRoad(player,0);
-        board.setSetupPhase(false);
+
+        // demo board moves
+        player1.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
+
+        board.addNewRoad(player1,0); // add one road at first top Hexagon to "simulate" fake starting phase
+        board.addNewRoad(player2,9);
+        board.addNewRoad(player3,68);
+        board.addNewRoad(player4,66);
+        board.addNewRoad(player1,1);
+        board.addNewRoad(player1,2);
+        board.addNewRoad(player1,7);
+        board.addNewRoad(player1,12);
+        board.addNewRoad(player2,16);
+        board.addNewRoad(player2,5);
+        board.addNewRoad(player2,21);
+        board.addNewRoad(player2,21);
+        board.addNewRoad(player3,49);
+        board.addNewRoad(player3,52);
+        board.addNewRoad(player4,71);
+        board.addNewRoad(player4,56);
+        board.addNewVillage(player4,44);
+        board.addNewVillage(player3,40);
+        board.addNewCity(player3,40);
+        board.setSetupPhase(false); // end fake starting phase
     }
 }

@@ -1,6 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.gamelogic.enums.Location;
+import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 import com.group2.catan_android.gamelogic.objects.Building;
@@ -24,8 +24,8 @@ public class Board {
     private static final int NON_EXISTING_HEXAGON = 19;
     private boolean isSetupPhase = true;
 
-    public Board(){
-        generateHexagons();
+    public Board() {
+        generateWaitingHexagonList();
         generateAdjacencyMatrix();
         generateIntersectionsStartingArray();
         generateSurroundingHexagonArray();
@@ -55,7 +55,7 @@ public class Board {
         int toIntersection = connectionIntersections[1];
 
         if(isSetupPhase && adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road)){
-            Road road = new Road(player);
+            Road road = new Road(player,connectionID);
             adjacencyMatrix[fromIntersection][toIntersection] = road;
             adjacencyMatrix[toIntersection][fromIntersection] = road;
             return true;
@@ -63,7 +63,7 @@ public class Board {
 
         if(adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road) // check if null or road already
                 && (isNextToOwnRoad(fromIntersection,player) || isNextToOwnRoad(toIntersection,player))){ //check if a road is next to one of the intersections
-            Road road = new Road(player);
+            Road road = new Road(player, connectionID);
             adjacencyMatrix[fromIntersection][toIntersection] = road;
             adjacencyMatrix[toIntersection][fromIntersection] = road;
             return true;
@@ -81,45 +81,102 @@ public class Board {
         int col = intersectionCoordinates[1];
 
         if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
-            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
             addBuildingToSurroundingHexagons(intersectionID,village);
+            player.increaseVictoryPoints(1);
             return true;
         }
 
         if((intersections[row][col] != null) && !(intersections[row][col] instanceof Building) && noBuildingAdjacent(row,col) && isNextToOwnRoad(intersectionID,player)){
-            intersections[row][col] = new Building(player,BuildingType.VILLAGE);
+            intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
 
             addBuildingToSurroundingHexagons(intersectionID,village);
+            player.increaseVictoryPoints(1);
             return true;
         }
         return false;
     }
 
-    public boolean addNewCity(Player player, int intersectionID){
-        if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.CITY.getCost())){
+    public boolean addNewCity(Player player, int intersectionID) {
+        if (isSetupPhase) {
+            return false;
+        }
+        if (!player.resourcesSufficient(ResourceCost.CITY.getCost())) {
             return false;
         }
 
-        if(isSetupPhase){
-            return false;
-        } else {
-            int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
-            int row = intersectionCoordinates[0];
-            int col = intersectionCoordinates[1];
+        int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
+        int row = intersectionCoordinates[0];
+        int col = intersectionCoordinates[1];
 
             if (intersections[row][col].getType() == BuildingType.VILLAGE && intersections[row][col].getPlayer() == player) {
-                intersections[row][col] = new Building(player, BuildingType.CITY);
+                removeBuildingFromSurroundingHexagons(intersectionID, (Building) intersections[row][col]);
+                intersections[row][col] = new Building(player, BuildingType.CITY, intersectionID);
                 Building city = (Building) intersections[row][col];
                 addBuildingToSurroundingHexagons(intersectionID, city);
+                player.increaseVictoryPoints(2);
                 return true;
             }
-        }
+
         return false;
     }
 
-    private void addBuildingToSurroundingHexagons(int intersection, Building building){
+    /**
+     * Method to insert a Road from another player after receiving an according DTO from the server
+     * assumes server is always correct and doesnt check anything, also overwrites roads from other players if there are any
+     * @param player
+     * @param connectionID
+     */
+    public void insertRoadFromServerMessage(Player player, int connectionID) {
+        int[] connectionIntersections = getConnectedIntersections(connectionID);
+        int fromIntersection = connectionIntersections[0];
+        int toIntersection = connectionIntersections[1];
+        Road road = new Road(player, connectionID);
+        adjacencyMatrix[fromIntersection][toIntersection] = road;
+        adjacencyMatrix[toIntersection][fromIntersection] = road;
+    }
+
+    /**
+     * Method to insert a building from another player after receiving an according DTO from the server
+     * assumes server is always correct and doesnt check anything special, also overwrites buildings already there if there are any
+     * @param player
+     * @param intersectionID
+     * @param buildingType
+     */
+    public void insertBuildingFromServerMessage(Player player, int intersectionID, BuildingType buildingType){
+
+        int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
+        int row = intersectionCoordinates[0];
+        int col = intersectionCoordinates[1];
+
+        if(intersections[row][col] != null && intersections[row][col] instanceof Building){
+            removeBuildingFromSurroundingHexagons(intersectionID, (Building) intersections[row][col]);
+        }
+        intersections[row][col] = new Building(player, buildingType, intersectionID);
+        Building city = (Building) intersections[row][col];
+        addBuildingToSurroundingHexagons(intersectionID, city);
+        player.increaseVictoryPoints(1);
+    }
+
+    private void removeBuildingFromSurroundingHexagons(int intersection, Building building) {
+        int firstHexagon = surroundingHexagons[0][intersection];
+        int secondHexagon = surroundingHexagons[1][intersection];
+        int thirdHexagon = surroundingHexagons[2][intersection];
+
+        if (firstHexagon != NON_EXISTING_HEXAGON) {
+            hexagonList.get(firstHexagon).removeBuilding(building);
+        }
+        if (secondHexagon != NON_EXISTING_HEXAGON) {
+            hexagonList.get(secondHexagon).removeBuilding(building);
+        }
+        if (thirdHexagon != NON_EXISTING_HEXAGON) {
+            hexagonList.get(thirdHexagon).removeBuilding(building);
+        }
+    }
+
+    private void addBuildingToSurroundingHexagons(int intersection, Building building) {
         int firstHexagon = surroundingHexagons[0][intersection];
         int secondHexagon = surroundingHexagons[1][intersection];
         int thirdHexagon = surroundingHexagons[2][intersection];
@@ -254,56 +311,13 @@ public class Board {
         connectedIntersections[1] = new int[] {1,2,3,4,5,6,8,10,12,14,8,9,10,11,12,13,14,15,17,19,21,23,25,17,18,19,20,21,22,23,24,25,26,29,28,31,30,33,32,35,34,37,36,27,29,31,33,35,37,40,39,42,41,44,43,46,45,38,40,42,44,46,49,48,51,50,53,52,47,49,51,53};
     }
 
-    private void generateHexagons() {
-        List<Location> locations = new ArrayList<>();
-        List<Integer> values = new ArrayList<>();
-
-        // Copy locations and values lists to ensure original lists remain unchanged (19 locations total)
-        Collections.addAll(locations, Location.HILLS, Location.HILLS, Location.HILLS, Location.FOREST,
-                Location.FOREST, Location.FOREST, Location.FOREST, Location.MOUNTAINS, Location.MOUNTAINS,
-                Location.MOUNTAINS, Location.FIELDS, Location.FIELDS, Location.FIELDS, Location.FIELDS,
-                Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.PASTURE, Location.DESERT);
-        Collections.addAll(values, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
-
+    private void generateWaitingHexagonList() {
         hexagonList = new ArrayList<>();
-
-        Collections.shuffle(locations);
-        Collections.shuffle(values);
-
-        for (int i = 0; i<locations.size(); i++) {
-            Location location = locations.get(i);
-            int value;
-            boolean hasRobber = false;
-
-            if (location == Location.DESERT) {
-                value = 0; // Desert location should have value 0
-                hasRobber = true;
-            } else {
-                value = values.remove(0);
-            }
-
-            ResourceDistribution resourceDistribution;
-            switch (location) {
-                case FIELDS:
-                    resourceDistribution = ResourceDistribution.FIELDS;
-                    break;
-                case PASTURE:
-                    resourceDistribution = ResourceDistribution.PASTURE;
-                    break;
-                case FOREST:
-                    resourceDistribution = ResourceDistribution.FOREST;
-                    break;
-                case HILLS:
-                    resourceDistribution = ResourceDistribution.HILLS;
-                    break;
-                case MOUNTAINS:
-                    resourceDistribution = ResourceDistribution.MOUNTAINS;
-                    break;
-                default:
-                    resourceDistribution = ResourceDistribution.DESERT;
-            }
-            hexagonList.add(new Hexagon(location, resourceDistribution, value, hasRobber, i));
+        for (int i = 0; i < 19; i++) {
+            hexagonList.add(new Hexagon(Hexagontype.DESERT, ResourceDistribution.DESERT, 0, i, true));
         }
+
+
     }
 
     public void setSetupPhase(boolean setupPhase) {
@@ -316,6 +330,34 @@ public class Board {
 
     public Intersection[][] getIntersections() {
         return intersections;
+    }
+
+    public boolean setHexagonList(ArrayList<Hexagon> hexagonList) {
+        if (hexagonList.size() != 19) return false;
+        this.hexagonList = hexagonList;
+        return true;
+    }
+
+    public boolean setAdjacencyMatrix(Connection[][] connections){
+        if(connections.length!=54 || connections[0].length!=54)return false;
+        this.adjacencyMatrix=connections;
+        return true;
+    }
+
+    public void setIntersections(Intersection[][] intersections1){
+        if(intersections1.length!=6 || intersections1[0].length!=11)return;
+        this.intersections=intersections1;
+    }
+
+    public void setValue(Board otherBoard) {
+        this.adjacencyMatrix=otherBoard.getAdjacencyMatrix();
+        this.hexagonList=otherBoard.getHexagonList();
+        this.intersections=otherBoard.getIntersections();
+        this.isSetupPhase=otherBoard.isSetupPhase;
+    }
+
+    public boolean isSetupPhase() {
+        return isSetupPhase;
     }
 }
 
