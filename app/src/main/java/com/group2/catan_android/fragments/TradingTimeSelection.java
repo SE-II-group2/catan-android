@@ -38,14 +38,16 @@ public class TradingTimeSelection extends Fragment {
         plus.setOnClickListener(v->{
             int num = getNumberofTextView(count);
             if(num==-1){return;}//Error
-            count.setText(Integer.toString(++num)+"s");
+            String res = ++num +"s";
+            count.setText(res);
         });
         minus.setOnClickListener(v->{
             int num = getNumberofTextView(count);
             if(num==-1){return;}//Error
             num--;
             if(num<1){Toast.makeText(getContext(), "clicked resource can not be less or equal to zero", Toast.LENGTH_SHORT).show();return;}
-            count.setText(Integer.toString(num)+"s");
+            String res = num+"s";
+            count.setText(res);
         });
     }
     public int getNumberofTextView(TextView view){

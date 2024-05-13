@@ -1,14 +1,12 @@
 package com.group2.catan_android.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,7 +16,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.group2.catan_android.R;
-import com.group2.catan_android.gamelogic.Player;
+
 
 public class PopUpFragmentTrading extends DialogFragment {
 
