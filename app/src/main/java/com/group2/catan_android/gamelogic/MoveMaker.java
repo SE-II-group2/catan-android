@@ -53,34 +53,34 @@ public class MoveMaker {
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
                 if (hasRolled) throw new Exception("Has already Rolled the dice this turn");
-                moveSenderRepository.sendMove(gameMove, token);
+                sendMove(gameMove);
                 hasRolled = true;
                 break;
             case "BuildRoadMoveDto":
                 if (isSetupPhase && hasPlacedVillageInSetupPhase) {
-                    moveSenderRepository.sendMove(gameMove, token);
+                    sendMove(gameMove);
                 } else {
                     if (!activePlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
                         throw new Exception("Not enough resources");
                     if (!board.addNewRoad(activePlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
                         throw new Exception("invalid place to build a road!");
-                    moveSenderRepository.sendMove(gameMove, token);
+                    sendMove(gameMove);
                 }
                 break;
             case "BuildVillageMoveDto":
-                if (!isSetupPhase && activePlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
+                if (!isSetupPhase && !activePlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
                     throw new Exception("Not enough Resources");
                 if (!board.addNewVillage(activePlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID())) {
                     Log.d("else", "getIntersectinID: " + ((BuildVillageMoveDto) gameMove).getIntersectionID());
                     throw new Exception("Cant build a Village here");
                 }
-                Log.d("test", "added Village");
-                moveSenderRepository.sendMove(gameMove, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+                hasPlacedVillageInSetupPhase=true;
+                sendMove(gameMove);
                 break;
             case "EndTurnMoveDto":
                 if (isSetupPhase)
                     throw new Exception("End your turn during setupphase by placing a village and a road");
-                moveSenderRepository.sendMove(gameMove, token);
+                sendMove(gameMove);
                 hasRolled = false;
                 break;
             default:
@@ -105,6 +105,10 @@ public class MoveMaker {
                 });
         disposable.add(gameStateDisposable);
         disposable.add(activePlayerDisposable);
+    }
+
+    private void sendMove(GameMoveDto gameMoveDto){
+        moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
 }

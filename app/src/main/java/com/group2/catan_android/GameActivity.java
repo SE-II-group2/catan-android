@@ -2,12 +2,14 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -37,10 +39,12 @@ import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
 import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
+import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.InLobbyViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -65,21 +69,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int TOTAL_INTERSECTIONS = 54;
 
     // init demo board and players
-    Player player1 = new Player("token","p1","gameID",Color.GREEN);
-    Player player2 = new Player("token","p2","gameID",Color.RED);
-    Player player3 = new Player("token","p3","gameID",Color.BLUE);
-    Player player4 = new Player("token","p4","gameID",Color.YELLOW);
+    Player player1 = new Player("token", "p1", "gameID", Color.GREEN);
+    Player player2 = new Player("token", "p2", "gameID", Color.RED);
+    Player player3 = new Player("token", "p3", "gameID", Color.BLUE);
+    Player player4 = new Player("token", "p4", "gameID", Color.YELLOW);
     Board board = new Board();
 
     private BoardViewModel boardViewModel;
     private ActivePlayerViewModel activePlayerViewModel;
     private PlayerListViewModel playerListViewModel;
+    private GameProgressViewModel gameProgressViewModel;
     private MoveMaker movemaker;
     PlayerResourcesFragment playerResourcesFragment;
     private List<Player> playerList;
     private Player activePlayer;
 
     private boolean hasRolled = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,8 +118,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             robberView.setId(rollValueView.getId() + TOTAL_HEXAGONS);
 
             ConstraintLayout.LayoutParams paramsHexagon = new ConstraintLayout.LayoutParams(HEXAGON_WIDTH, HEXAGON_HEIGHT);
-            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
-            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3);
+            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize, connectionSize);
+            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT / 3, HEXAGON_HEIGHT / 3);
             constraintLayout.addView(hexagonView, paramsHexagon);
             constraintLayout.addView(rollValueView, paramsRollValues);
             constraintLayout.addView(robberView, paramsRobber);
@@ -131,31 +137,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Connections
         for (int i = 0; i < TOTAL_CONNECTIONS; i++) {
             ImageView connectionView = new ImageView(this);
-            connectionView.setId(i + TOTAL_HEXAGONS*3 + 1);
+            connectionView.setId(i + TOTAL_HEXAGONS * 3 + 1);
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize, connectionSize);
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
-            int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
+            int connectionID = connectionView.getId() - TOTAL_HEXAGONS * 3 - 1;
 
             connectionView.setOnClickListener(v -> {
-                Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
-                if(mLastButtonClicked == ButtonType.ROAD){
-                    try{
+                //Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
+                if (mLastButtonClicked == ButtonType.ROAD) {
+                    try {
                         movemaker.makeMove(new BuildRoadMoveDto(connectionID));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    /*Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
-                    if(board.addNewRoad(player1,connectionID)){
-                        player1.adjustResources(ResourceCost.ROAD.getCost());
-                        updateUiBoard(board);
-                        updateUiPlayer(player1);
-                    } else{
-                        Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
-                    }*/
                 }
             });
         }
@@ -163,37 +161,22 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Intersections
         for (int i = 0; i < TOTAL_INTERSECTIONS; i++) {
             ImageView intersectionView = new ImageView(this);
-            intersectionView.setId(i + TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS + 1);
+            intersectionView.setId(i + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
             intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(INTERSECTION_SIZE, INTERSECTION_SIZE);
             constraintLayout.addView(intersectionView, params);
             intersectionViews[i] = intersectionView;
-            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS*3 - TOTAL_CONNECTIONS - 1;
+            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS * 3 - TOTAL_CONNECTIONS - 1;
 
             intersectionView.setOnClickListener(v -> {
-                Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
-                if(mLastButtonClicked == ButtonType.VILLAGE) {
-                    try{
+                //Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
+                if (mLastButtonClicked == ButtonType.VILLAGE) {
+                    try {
                         movemaker.makeMove(new BuildVillageMoveDto(intersectionID));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    /*if (board.addNewVillage(player1, intersectionID)) {
-                        player1.adjustResources(ResourceCost.VILLAGE.getCost());
-                        updateUiBoard(board);
-                        updateUiPlayer(player1);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
-                    }
-                } else if(mLastButtonClicked == ButtonType.CITY){
-                    if (board.addNewCity(player1,intersectionID)){
-                        player1.adjustResources(ResourceCost.CITY.getCost());
-                        updateUiBoard(board);
-                        updateUiPlayer(player1);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
-                    }*/
                 }
             });
         }
@@ -208,7 +191,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         // initialisation of button fragments
         playerResourcesFragment = new PlayerResourcesFragment();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
 
@@ -216,60 +199,65 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
         activePlayerViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
-
         playerListViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
+        gameProgressViewModel = new ViewModelProvider(this,
+                ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
 
         boardViewModel.getBoardMutableLiveData().observe(this, this::updateUiBoard);
         activePlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
-            this.activePlayer=player;
+            this.activePlayer = player;
             updateUiPlayer(activePlayer);
-            System.out.println("Got a update:§");
         });
+        gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
+            if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
+                Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
+            }
+            if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
+                Toast.makeText(getApplicationContext(), "Turn got ended: ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
-            /*Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
-            demoBoardMoves();
-            updateUiBoard(board);
-            updateUiPlayer(player1);*/
-            if(playerList.get(0).getInGameID()!=activePlayer.getInGameID())Toast.makeText(getApplicationContext(), "Not the active Player", Toast.LENGTH_SHORT).show();
-            if(hasRolled){
-                try{
+            if (!hasRolled) {
+                try {
                     Random random = new Random();
-                    int diceRoll = random.nextInt(6)+1 + random.nextInt(6)+1;
+                    int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
                     movemaker.makeMove(new RollDiceDto(diceRoll));
-                    hasRolled=true;
-                }catch (Exception e){
+                    hasRolled = true;
+
+                } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            }else {
-                try{
+            } else {
+                try {
                     movemaker.makeMove(new EndTurnMoveDto());
-                    hasRolled=false;
-                }catch (Exception e){
+                    hasRolled = false;
+                } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        activePlayer=new Player();
+        activePlayer = new Player();
         playerList = new ArrayList<Player>();
         playerList.add(activePlayer);
-    updateUiBoard(new Board());
+        updateUiBoard(new Board());
     }
 
 
-    public void updateUiBoard(Board board){
+    public void updateUiBoard(Board board) {
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
         List<Hexagon> hexagonList = board.getHexagonList();
 
         // update connections
-        for(int row = 0; row < adjacencyMatrix.length; row++) {
+        for (int row = 0; row < adjacencyMatrix.length; row++) {
             for (int col = 0; col < adjacencyMatrix[row].length; col++) {
 
-                if(adjacencyMatrix[row][col] instanceof Road){
-                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS*3 + 1);
+                if (adjacencyMatrix[row][col] instanceof Road) {
+                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS * 3 + 1);
 
                     ImageView connectionView = findViewById(id);
                     connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
@@ -279,16 +267,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
 
         // update intersections
-        for(int row = 0; row < intersections.length; row++) {
+        for (int row = 0; row < intersections.length; row++) {
             for (int col = 0; col < intersections[row].length; col++) {
-                if(intersections[row][col] instanceof Building){
+                if (intersections[row][col] instanceof Building) {
 
-                    int id = (((Building) intersections[row][col]).getId() + 3*TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
+                    int id = (((Building) intersections[row][col]).getId() + 3 * TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
                     ImageView intersectionView = findViewById(id);
 
-                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
+                    if (intersections[row][col].getType() == BuildingType.VILLAGE) {
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
-                    } else if(intersections[row][col].getType() == BuildingType.CITY){
+                    } else if (intersections[row][col].getType() == BuildingType.CITY) {
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
                         intersectionView.setScaleX(1.5F);
                         intersectionView.setScaleY(1.5F);
@@ -301,7 +289,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
 
         // update hexagons with robber
-        for(Hexagon hexagon : hexagonList){
+        for (Hexagon hexagon : hexagonList) {
             int hexagonViewID = hexagon.getId() + 1;
             int rollValueViewID = hexagon.getId() + TOTAL_HEXAGONS + 1;
             int robberViewID = rollValueViewID + TOTAL_HEXAGONS;
@@ -311,7 +299,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             ImageView robberView = findViewById(robberViewID);
 
             // set hexagon image
-            switch(hexagon.getLocation()){
+            switch (hexagon.getLocation()) {
                 case HILLS:
                     hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_hills));
                     break;
@@ -337,10 +325,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             robberView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.robber));
 
             // show value or robber
-            if(hexagon.isHavingRobber()){
+            if (hexagon.isHavingRobber()) {
                 rollValueView.setVisibility(View.INVISIBLE);
                 robberView.setVisibility(View.VISIBLE);
-            } else{
+            } else {
                 robberView.setVisibility(View.INVISIBLE);
                 rollValueView.setVisibility(View.VISIBLE);
             }
@@ -348,7 +336,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     }
 
-    public void updateUiPlayer(Player player){
+    public void updateUiPlayer(Player player) {
         playerResourcesFragment.updateResources(player);
     }
 
@@ -356,18 +344,18 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     public void onButtonClicked(ButtonType button) {
         mLastButtonClicked = button;
 
-        if(button == ButtonType.HELP){
+        if (button == ButtonType.HELP) {
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if(helpFragment == null){
+            if (helpFragment == null) {
                 getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
-            } else{
+            } else {
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
 
-        if(button == ButtonType.BUILD){
+        if (button == ButtonType.BUILD) {
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if(helpFragment != null){
+            if (helpFragment != null) {
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
@@ -382,7 +370,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //margins for Hexagons
         int hexStartMargin = layoutWidth / 2 - 6 * HEXAGON_WIDTH_QUARTER;
         int hexTopMargin = (layoutHeight / 2) - 2 * HEXAGON_HEIGHT - statusBarHeight;
-        int secondRowMargin = -2 * HEXAGON_WIDTH -2 * HEXAGON_WIDTH_QUARTER -2; // -2 to make up some integer rounding
+        int secondRowMargin = -2 * HEXAGON_WIDTH - 2 * HEXAGON_WIDTH_QUARTER - 2; // -2 to make up some integer rounding
         int thirdRowMargin = secondRowMargin - HEXAGON_WIDTH;
         int rowHeightDifference = HEXAGON_WIDTH_HALF + HEXAGON_HEIGHT_QUARTER;
 
@@ -445,7 +433,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             //draw RollValues & Robber
             drawView(set, hexagon, rollValue++, 0, 0, 0, HEXAGON_HEIGHT_QUARTER);
-            drawView(set, hexagon, robber++, 0, 0, 0, HEXAGON_WIDTH/3);
+            drawView(set, hexagon, robber++, 0, 0, 0, HEXAGON_WIDTH / 3);
 
             prevHexagon = hexagon++;
         }
@@ -516,30 +504,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         return margins;
     }
 
-    public void demoBoardMoves(){
+    public void demoBoardMoves() {
 
         // demo board moves
-        player1.adjustResources(new int[]{99,99,99,99,99}); //unlimited resources for testing
+        player1.adjustResources(new int[]{99, 99, 99, 99, 99}); //unlimited resources for testing
 
-        board.addNewRoad(player1,0); // add one road at first top Hexagon to "simulate" fake starting phase
-        board.addNewRoad(player2,9);
-        board.addNewRoad(player3,68);
-        board.addNewRoad(player4,66);
-        board.addNewRoad(player1,1);
-        board.addNewRoad(player1,2);
-        board.addNewRoad(player1,7);
-        board.addNewRoad(player1,12);
-        board.addNewRoad(player2,16);
-        board.addNewRoad(player2,5);
-        board.addNewRoad(player2,21);
-        board.addNewRoad(player2,21);
-        board.addNewRoad(player3,49);
-        board.addNewRoad(player3,52);
-        board.addNewRoad(player4,71);
-        board.addNewRoad(player4,56);
-        board.addNewVillage(player4,44);
-        board.addNewVillage(player3,40);
-        board.addNewCity(player3,40);
+        board.addNewRoad(player1, 0); // add one road at first top Hexagon to "simulate" fake starting phase
+        board.addNewRoad(player2, 9);
+        board.addNewRoad(player3, 68);
+        board.addNewRoad(player4, 66);
+        board.addNewRoad(player1, 1);
+        board.addNewRoad(player1, 2);
+        board.addNewRoad(player1, 7);
+        board.addNewRoad(player1, 12);
+        board.addNewRoad(player2, 16);
+        board.addNewRoad(player2, 5);
+        board.addNewRoad(player2, 21);
+        board.addNewRoad(player2, 21);
+        board.addNewRoad(player3, 49);
+        board.addNewRoad(player3, 52);
+        board.addNewRoad(player4, 71);
+        board.addNewRoad(player4, 56);
+        board.addNewVillage(player4, 44);
+        board.addNewVillage(player3, 40);
+        board.addNewCity(player3, 40);
         board.setSetupPhase(false); // end fake starting phase
     }
 }

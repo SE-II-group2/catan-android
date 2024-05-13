@@ -107,7 +107,6 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                     board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
                     currentGameState = new CurrentGameState(players, board);
                     activePlayer = playerHashMap.get(activePlayerIngameID);
-
                     activePlayerBehaviorSubject.onNext(activePlayer);
                     playerListBehaviorSubject.onNext(players);
                     currentGameStateBehaviorSubject.onNext(currentGameState);
