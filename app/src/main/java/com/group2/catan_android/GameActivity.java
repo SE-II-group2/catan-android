@@ -30,6 +30,7 @@ import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,13 +54,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int TOTAL_INTERSECTIONS = 54;
 
     // init demo board and players
-    Player player1 = new Player("token","p1","gameID",Color.GREEN);
-    Player player2 = new Player("token","p2","gameID",Color.RED);
-    Player player3 = new Player("token","p3","gameID",Color.BLUE);
-    Player player4 = new Player("token","p4","gameID",Color.YELLOW);
+    Player player1 = new Player("token","Jakob","gameID",Color.GREEN);
+    Player player2 = new Player("token","Lukas","gameID",Color.RED);
+    Player player3 = new Player("token","Lukas","gameID",Color.BLUE);
+    Player player4 = new Player("token","Nico","gameID",Color.YELLOW);
+    List<Player> players = Arrays.asList(player1, player2, player3, player4);
     Board board = new Board();
 
+    // fragments
     PlayerResourcesFragment playerResourcesFragment;
+    PlayerScoresFragment playerScoresFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +132,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     if(board.addNewRoad(player1,connectionID)){
                         player1.adjustResources(ResourceCost.ROAD.getCost());
                         updateUiBoard(board);
-                        updateUiPlayer(player1);
+                        updateUiPlayerRessources(player1);
+                        updateUiPlayerScores(players);
                     } else{
                         Toast.makeText(getApplicationContext(), "Invalid Move " + connectionID, Toast.LENGTH_SHORT).show();
                     }
@@ -153,7 +158,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     if (board.addNewVillage(player1, intersectionID)) {
                         player1.adjustResources(ResourceCost.VILLAGE.getCost());
                         updateUiBoard(board);
-                        updateUiPlayer(player1);
+                        updateUiPlayerRessources(player1);
+                        updateUiPlayerScores(players);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -161,7 +167,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     if (board.addNewCity(player1,intersectionID)){
                         player1.adjustResources(ResourceCost.CITY.getCost());
                         updateUiBoard(board);
-                        updateUiPlayer(player1);
+                        updateUiPlayerScores(players);
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Move", Toast.LENGTH_SHORT).show();
                     }
@@ -178,17 +184,19 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // initialisation of button fragments
         playerResourcesFragment = new PlayerResourcesFragment();
+        playerScoresFragment = new PlayerScoresFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
             Toast.makeText(getApplicationContext(), "End Turn (Currently Update Board) Button", Toast.LENGTH_SHORT).show();
             demoBoardMoves();
             updateUiBoard(board);
-            updateUiPlayer(player1);
+            updateUiPlayerRessources(player1);
+            updateUiPlayerScores(players);
         });
 
     }
@@ -284,8 +292,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     }
 
-    public void updateUiPlayer(Player player){
+    public void updateUiPlayerRessources(Player player){
         playerResourcesFragment.updateResources(player);
+    }
+
+    public void updateUiPlayerScores(List<Player> players){
+        playerScoresFragment.updateScores(players);
     }
 
     @Override

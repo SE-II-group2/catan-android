@@ -6,11 +6,12 @@ import java.util.List;
 
 public class Player {
 
-    private final String token;
-    private final String gameID;
+    private String token;
+    private String gameID;
+    private int inGameID;
     private final String displayName;
     private int victoryPoints = 0;
-    private final int[] resources = new int[]{0,0,0,0,0};
+    private int[] resources = new int[]{0,0,0,0,0};
     private final int color;
 
     private List<ProgressCard> progressCards;
@@ -19,6 +20,13 @@ public class Player {
         this.token = token;
         this.displayName = displayName;
         this.gameID = gameID;
+        this.color = color;
+    }
+
+    public Player( String displayName, int victoryPoints, int[] resources,  int color) {
+        this.displayName = displayName;
+        this.victoryPoints=victoryPoints;
+        this.resources=resources;
         this.color = color;
     }
 

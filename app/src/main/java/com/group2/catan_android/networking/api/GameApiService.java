@@ -22,4 +22,5 @@ public interface GameApiService {
     @GET("list")
     Call<ListGameResponse> list();
 
+
 }
