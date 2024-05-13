@@ -68,13 +68,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int TOTAL_CONNECTIONS = 72;
     final static int TOTAL_INTERSECTIONS = 54;
 
-    // init demo board and players
-    Player player1 = new Player("token", "p1", "gameID", Color.GREEN);
-    Player player2 = new Player("token", "p2", "gameID", Color.RED);
-    Player player3 = new Player("token", "p3", "gameID", Color.BLUE);
-    Player player4 = new Player("token", "p4", "gameID", Color.YELLOW);
-    Board board = new Board();
-
     private BoardViewModel boardViewModel;
     private ActivePlayerViewModel activePlayerViewModel;
     private PlayerListViewModel playerListViewModel;
@@ -504,30 +497,4 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         return margins;
     }
 
-    public void demoBoardMoves() {
-
-        // demo board moves
-        player1.adjustResources(new int[]{99, 99, 99, 99, 99}); //unlimited resources for testing
-
-        board.addNewRoad(player1, 0); // add one road at first top Hexagon to "simulate" fake starting phase
-        board.addNewRoad(player2, 9);
-        board.addNewRoad(player3, 68);
-        board.addNewRoad(player4, 66);
-        board.addNewRoad(player1, 1);
-        board.addNewRoad(player1, 2);
-        board.addNewRoad(player1, 7);
-        board.addNewRoad(player1, 12);
-        board.addNewRoad(player2, 16);
-        board.addNewRoad(player2, 5);
-        board.addNewRoad(player2, 21);
-        board.addNewRoad(player2, 21);
-        board.addNewRoad(player3, 49);
-        board.addNewRoad(player3, 52);
-        board.addNewRoad(player4, 71);
-        board.addNewRoad(player4, 56);
-        board.addNewVillage(player4, 44);
-        board.addNewVillage(player3, 40);
-        board.addNewCity(player3, 40);
-        board.setSetupPhase(false); // end fake starting phase
-    }
 }
