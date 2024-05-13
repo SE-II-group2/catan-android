@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.interfaces.ResourceUpdateListener;
+import com.group2.catan_android.gamelogic.Player;
 
-public class PlayerResourcesFragment extends Fragment implements ResourceUpdateListener {
+
+public class PlayerResourcesFragment extends Fragment {
 
     private TextView woodCount;
     private TextView brickCount;
@@ -40,17 +42,13 @@ public class PlayerResourcesFragment extends Fragment implements ResourceUpdateL
         return view;
     }
 
-    @Override
-    public void onResourcesUpdated(int[] resources) {
-        updateResources(resources);
-    }
 
-    public void updateResources(int[] resources) {
-        woodCount.setText(String.valueOf(resources[0]));
-        brickCount.setText(String.valueOf(resources[1]));
-        sheepCount.setText(String.valueOf(resources[2]));
-        wheatCount.setText(String.valueOf(resources[3]));
-        stoneCount.setText(String.valueOf(resources[4]));
+    public void updateResources(Player player) {
+        woodCount.setText(String.valueOf(player.getResources()[2]));
+        brickCount.setText(String.valueOf(player.getResources()[3]));
+        sheepCount.setText(String.valueOf(player.getResources()[1]));
+        wheatCount.setText(String.valueOf(player.getResources()[0]));
+        stoneCount.setText(String.valueOf(player.getResources()[4]));
     }
 
 }

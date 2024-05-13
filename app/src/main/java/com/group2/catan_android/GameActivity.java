@@ -202,7 +202,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // initialisation of button fragments
         PlayerResourcesFragment playerResourcesFragment = new PlayerResourcesFragment();
-        player.setResourceUpdateListener(playerResourcesFragment);
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
