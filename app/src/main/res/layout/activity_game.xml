@@ -56,6 +56,12 @@
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.25" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/width"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
     <!--android:name="com.group2.catan_android.buttonsOpenFragmentagment"-->
