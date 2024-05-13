@@ -208,7 +208,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Turn got ended, active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
             }
         });
-        playerListViewModel.getPlayerMutableLiveData().observe(this, this::updateUiPlayerScores);
+
+        playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
+            List<Player> tempList = new ArrayList<>();
+            for(Player player : data){
+                tempList.add(player);
+            }
+            tempList.sort(Comparator.comparingInt(Player::getInGameID));
+            updateUiPlayerScores(tempList);
+        });
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
