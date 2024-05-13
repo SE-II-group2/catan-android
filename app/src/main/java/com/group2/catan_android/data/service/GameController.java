@@ -1,7 +1,5 @@
 package com.group2.catan_android.data.service;
 
-import android.graphics.Paint;
-
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
@@ -10,20 +8,15 @@ import com.group2.catan_android.data.live.game.GameProgressDto;
 import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
-import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
-import com.group2.catan_android.networking.dto.Game;
-import com.group2.catan_android.networking.socket.SocketManager;
 
 import java.util.function.Function;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ua.naiksoftware.stomp.Stomp;
 
 /**
  * GameController manages everything related to a game. It coordinates all app components.

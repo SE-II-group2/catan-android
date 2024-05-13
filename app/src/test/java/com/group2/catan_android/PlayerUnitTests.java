@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,6 +36,14 @@ public class PlayerUnitTests {
         });
     }
 
+    @Test
+    void testConstructor(){
+        Player p = new Player("Player", 0, null, 0);
+        assertEquals("Player", p.getDisplayName());
+        assertNull(p.getResources());
+        p.setInGameID(1);
+        assertEquals(1, p.getInGameID());
+    }
     @Test
     void testAdjustResourcesWrongLength(){
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
