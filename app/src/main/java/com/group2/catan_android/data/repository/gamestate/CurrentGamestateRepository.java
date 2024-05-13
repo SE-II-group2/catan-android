@@ -115,7 +115,11 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
 
     private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> playerOrder) {
         ArrayList<Player> playersList = new ArrayList<>();
+        outerloop:
         for (IngamePlayerDto playerDto : playerOrder) {
+            for( Player player : playersList){
+                if(playerDto.getInGameID()==player.getInGameID())continue outerloop;
+            }
             Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
             player.setInGameID(playerDto.getInGameID());
             playersList.add(player);

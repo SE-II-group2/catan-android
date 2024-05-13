@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -40,8 +39,8 @@ import com.group2.catan_android.gamelogic.objects.Road;
 import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
-import com.group2.catan_android.viewmodel.InLobbyViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +75,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     PlayerResourcesFragment playerResourcesFragment;
     private List<Player> playerList;
     private Player activePlayer;
-
+    PlayerScoresFragment playerScoresFragment;
     private boolean hasRolled = false;
 
     @Override
@@ -111,8 +110,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             robberView.setId(rollValueView.getId() + TOTAL_HEXAGONS);
 
             ConstraintLayout.LayoutParams paramsHexagon = new ConstraintLayout.LayoutParams(HEXAGON_WIDTH, HEXAGON_HEIGHT);
-            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize, connectionSize);
-            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT / 3, HEXAGON_HEIGHT / 3);
+            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3);
             constraintLayout.addView(hexagonView, paramsHexagon);
             constraintLayout.addView(rollValueView, paramsRollValues);
             constraintLayout.addView(robberView, paramsRobber);
@@ -130,14 +129,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Connections
         for (int i = 0; i < TOTAL_CONNECTIONS; i++) {
             ImageView connectionView = new ImageView(this);
-            connectionView.setId(i + TOTAL_HEXAGONS * 3 + 1);
+            connectionView.setId(i + TOTAL_HEXAGONS*3 + 1);
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize, connectionSize);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
             constraintLayout.addView(connectionView, params);
             connectionViews[i] = connectionView;
 
-            int connectionID = connectionView.getId() - TOTAL_HEXAGONS * 3 - 1;
+            int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
 
             connectionView.setOnClickListener(v -> {
                 //Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
@@ -154,13 +153,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //draw Intersections
         for (int i = 0; i < TOTAL_INTERSECTIONS; i++) {
             ImageView intersectionView = new ImageView(this);
-            intersectionView.setId(i + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
+            intersectionView.setId(i + TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS + 1);
             intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(INTERSECTION_SIZE, INTERSECTION_SIZE);
             constraintLayout.addView(intersectionView, params);
             intersectionViews[i] = intersectionView;
-            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS * 3 - TOTAL_CONNECTIONS - 1;
+            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS*3 - TOTAL_CONNECTIONS - 1;
 
             intersectionView.setOnClickListener(v -> {
                 //Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
@@ -183,10 +182,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // initialisation of button fragments
         playerResourcesFragment = new PlayerResourcesFragment();
+        playerScoresFragment = new PlayerScoresFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, new PlayerScoresFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment,  playerScoresFragment).commit();
 
         boardViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
@@ -200,7 +200,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         boardViewModel.getBoardMutableLiveData().observe(this, this::updateUiBoard);
         activePlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
             this.activePlayer = player;
-            updateUiPlayer(activePlayer);
+            updateUiPlayerRessources(activePlayer);
         });
         gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
             if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
@@ -210,6 +210,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Turn got ended, active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
             }
         });
+        playerListViewModel.getPlayerMutableLiveData().observe(this, this::updateUiPlayerScores);
 
         // endTurn Button
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
@@ -232,25 +233,26 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 }
             }
         });
-        activePlayer = new Player();
-        playerList = new ArrayList<Player>();
+        activePlayer = new Player("test", 0, new int[]{0,0,0,0,0}, 1);
+        playerList = new ArrayList<>();
         playerList.add(activePlayer);
         updateUiBoard(new Board());
+        //updateUiPlayerScores(playerList);
     }
 
 
-    public void updateUiBoard(Board board) {
+    public void updateUiBoard(Board board){
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
         List<Hexagon> hexagonList = board.getHexagonList();
 
         // update connections
-        for (int row = 0; row < adjacencyMatrix.length; row++) {
+        for(int row = 0; row < adjacencyMatrix.length; row++) {
             for (int col = 0; col < adjacencyMatrix[row].length; col++) {
 
-                if (adjacencyMatrix[row][col] instanceof Road) {
-                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS * 3 + 1);
+                if(adjacencyMatrix[row][col] instanceof Road){
+                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS*3 + 1);
 
                     ImageView connectionView = findViewById(id);
                     connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
@@ -260,16 +262,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
 
         // update intersections
-        for (int row = 0; row < intersections.length; row++) {
+        for(int row = 0; row < intersections.length; row++) {
             for (int col = 0; col < intersections[row].length; col++) {
-                if (intersections[row][col] instanceof Building) {
+                if(intersections[row][col] instanceof Building){
 
-                    int id = (((Building) intersections[row][col]).getId() + 3 * TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
+                    int id = (((Building) intersections[row][col]).getId() + 3*TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
                     ImageView intersectionView = findViewById(id);
 
-                    if (intersections[row][col].getType() == BuildingType.VILLAGE) {
+                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
-                    } else if (intersections[row][col].getType() == BuildingType.CITY) {
+                    } else if(intersections[row][col].getType() == BuildingType.CITY){
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
                         intersectionView.setScaleX(1.5F);
                         intersectionView.setScaleY(1.5F);
@@ -282,7 +284,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
 
         // update hexagons with robber
-        for (Hexagon hexagon : hexagonList) {
+        for(Hexagon hexagon : hexagonList){
             int hexagonViewID = hexagon.getId() + 1;
             int rollValueViewID = hexagon.getId() + TOTAL_HEXAGONS + 1;
             int robberViewID = rollValueViewID + TOTAL_HEXAGONS;
@@ -292,7 +294,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             ImageView robberView = findViewById(robberViewID);
 
             // set hexagon image
-            switch (hexagon.getLocation()) {
+            switch(hexagon.getLocation()){
                 case HILLS:
                     hexagonView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.hexagon_hills));
                     break;
@@ -318,10 +320,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             robberView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.robber));
 
             // show value or robber
-            if (hexagon.isHavingRobber()) {
+            if(hexagon.isHavingRobber()){
                 rollValueView.setVisibility(View.INVISIBLE);
                 robberView.setVisibility(View.VISIBLE);
-            } else {
+            } else{
                 robberView.setVisibility(View.INVISIBLE);
                 rollValueView.setVisibility(View.VISIBLE);
             }
@@ -329,26 +331,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     }
 
-    public void updateUiPlayer(Player player) {
+    public void updateUiPlayerRessources(Player player){
         playerResourcesFragment.updateResources(player);
+    }
+
+    public void updateUiPlayerScores(List<Player> players){
+        playerScoresFragment.updateScores(players);
     }
 
     @Override
     public void onButtonClicked(ButtonType button) {
         mLastButtonClicked = button;
 
-        if (button == ButtonType.HELP) {
+        if(button == ButtonType.HELP){
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if (helpFragment == null) {
+            if(helpFragment == null){
                 getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
-            } else {
+            } else{
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
 
-        if (button == ButtonType.BUILD) {
+        if(button == ButtonType.BUILD){
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if (helpFragment != null) {
+            if(helpFragment != null){
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
@@ -363,7 +369,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //margins for Hexagons
         int hexStartMargin = layoutWidth / 2 - 6 * HEXAGON_WIDTH_QUARTER;
         int hexTopMargin = (layoutHeight / 2) - 2 * HEXAGON_HEIGHT - statusBarHeight;
-        int secondRowMargin = -2 * HEXAGON_WIDTH - 2 * HEXAGON_WIDTH_QUARTER - 2; // -2 to make up some integer rounding
+        int secondRowMargin = -2 * HEXAGON_WIDTH -2 * HEXAGON_WIDTH_QUARTER -2; // -2 to make up some integer rounding
         int thirdRowMargin = secondRowMargin - HEXAGON_WIDTH;
         int rowHeightDifference = HEXAGON_WIDTH_HALF + HEXAGON_HEIGHT_QUARTER;
 
@@ -426,7 +432,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             //draw RollValues & Robber
             drawView(set, hexagon, rollValue++, 0, 0, 0, HEXAGON_HEIGHT_QUARTER);
-            drawView(set, hexagon, robber++, 0, 0, 0, HEXAGON_WIDTH / 3);
+            drawView(set, hexagon, robber++, 0, 0, 0, HEXAGON_WIDTH/3);
 
             prevHexagon = hexagon++;
         }
