@@ -214,7 +214,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
             }
             if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                Toast.makeText(getApplicationContext(), "Turn got ended: ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Turn got ended, active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
             }
         });
 

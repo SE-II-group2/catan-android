@@ -117,6 +117,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         ArrayList<Player> playersList = new ArrayList<>();
         for (IngamePlayerDto playerDto : playerOrder) {
             Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
+            player.setInGameID(playerDto.getInGameID());
             playersList.add(player);
             playerHashMap.put(playerDto.getInGameID(), player);
         }

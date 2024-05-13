@@ -11,6 +11,7 @@ public class Player {
 
 
 
+
     private int inGameID;
     private String displayName;
     private int victoryPoints = 0;
@@ -81,5 +82,8 @@ public class Player {
     }
     public int getInGameID() {
         return inGameID;
+    }
+    public void setInGameID(int inGameID) {
+        this.inGameID = inGameID;
     }
 }

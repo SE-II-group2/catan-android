@@ -48,8 +48,10 @@ public class MoveMaker {
     }
 
     public void makeMove(GameMoveDto gameMove) throws Exception {
-        if (players.get(0).getInGameID() != activePlayer.getInGameID())
+        if (players.get(0).getInGameID() != activePlayer.getInGameID()) {
             throw new Exception("Not active player!");
+        }
+        Log.d("active player: ", "active player id: "+activePlayer.getInGameID()+", players[0] id: "+players.get(0).getInGameID());
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
                 if (hasRolled) throw new Exception("Has already Rolled the dice this turn");
@@ -74,7 +76,7 @@ public class MoveMaker {
                     Log.d("else", "getIntersectinID: " + ((BuildVillageMoveDto) gameMove).getIntersectionID());
                     throw new Exception("Cant build a Village here");
                 }
-                hasPlacedVillageInSetupPhase=true;
+                hasPlacedVillageInSetupPhase = true;
                 sendMove(gameMove);
                 break;
             case "EndTurnMoveDto":
@@ -107,8 +109,10 @@ public class MoveMaker {
         disposable.add(activePlayerDisposable);
     }
 
-    private void sendMove(GameMoveDto gameMoveDto){
+    private void sendMove(GameMoveDto gameMoveDto) throws Exception {
+
         moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+
     }
 
 }
