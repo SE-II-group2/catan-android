@@ -2,7 +2,6 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -30,7 +29,6 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
-import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
@@ -43,7 +41,7 @@ import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -184,9 +182,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment,  playerScoresFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
 
         boardViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);

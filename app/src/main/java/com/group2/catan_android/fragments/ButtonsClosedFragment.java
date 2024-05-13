@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -16,7 +17,8 @@ import android.widget.ImageView;
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
-
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 public class ButtonsClosedFragment extends Fragment  {
 
     ImageView build;
@@ -63,7 +65,8 @@ public class ButtonsClosedFragment extends Fragment  {
         trade.setOnClickListener(v -> {
             setButtonBorders(v);
             // TODO: Write what shall happen when pressing the trade button
-
+            PopUpFragmentTrading trading = new PopUpFragmentTrading();
+            trading.show(getActivity().getSupportFragmentManager(), "popup_fragment_trading");
         });
 
         cards.setOnClickListener(v -> {
