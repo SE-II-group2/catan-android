@@ -31,7 +31,6 @@ public class MoveMaker {
         board = new Board();
         token = TokenRepository.getInstance().getToken();
         disposable = new CompositeDisposable();
-        setupListeners();
     }
 
     public void makeMove(GameMoveDto gameMove) throws Exception {
@@ -55,14 +54,6 @@ public class MoveMaker {
             default:
                 throw new Exception("Unknown Dto format");
         }
-    }
-
-    void setupListeners() {
-       Disposable boardDisposable = currentGamestateRepository.getBoardObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(currentGameState::setValue);
-        disposable.add(boardDisposable);
     }
 
     public void adjustResources(int[] resources) {
