@@ -14,7 +14,7 @@ import java.util.List;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.processors.PublishProcessor;
 
-public class PlayerRepositoryTest {
+class PlayerRepositoryTest {
     private PlayerRepository playerRepository;
     @BeforeEach
     public void setUp() {

@@ -42,7 +42,7 @@ import io.reactivex.processors.PublishProcessor;
 import ua.naiksoftware.stomp.dto.LifecycleEvent;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
-public class ControllerRepositoryIntegrationTest {
+class ControllerRepositoryIntegrationTest {
     @Mock
     StompDriver stompDriver;
     @Mock
@@ -65,7 +65,7 @@ public class ControllerRepositoryIntegrationTest {
     }
 
     @Test
-    public void testRepositoryReceivesMessagesAfterControllerJoinsGame() throws JsonProcessingException, InterruptedException {
+    void testRepositoryReceivesMessagesAfterControllerJoinsGame() throws JsonProcessingException, InterruptedException {
         JoinGameRequest request = new JoinGameRequest();
         request.setPlayerName("Player");
         request.setGameID("MyGameID");

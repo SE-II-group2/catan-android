@@ -28,7 +28,7 @@ import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.processors.PublishProcessor;
 
-public class GameControllerTests {
+class GameControllerTests {
     GameController gameController;
     @Mock
     StompManager stompManager;
@@ -46,7 +46,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void testJoinExistingGameSuccess(){
+    void testJoinExistingGameSuccess(){
         JoinGameRequest request = new JoinGameRequest();
         request.setGameID("gameID");
         request.setPlayerName("Player");
@@ -80,7 +80,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void testJoinExistingGameFailsOnInitialRequest(){
+    void testJoinExistingGameFailsOnInitialRequest(){
         JoinGameRequest request = new JoinGameRequest();
         request.setGameID("gameID");
         request.setPlayerName("Player");
@@ -107,7 +107,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void testJoinExistingGameFailsOnSocketConnection(){
+    void testJoinExistingGameFailsOnSocketConnection(){
         JoinGameRequest request = new JoinGameRequest();
         request.setGameID("gameID");
         request.setPlayerName("Player");
@@ -141,7 +141,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void testCanCreateNewGame(){
+    void testCanCreateNewGame(){
         JoinGameRequest request = new JoinGameRequest();
         request.setGameID("gameID");
         request.setPlayerName("Player");
@@ -175,7 +175,7 @@ public class GameControllerTests {
     }
 
     @Test
-    public void testLeaveGameSuccess(){
+    void testLeaveGameSuccess(){
         when(tokenRepository.getToken()).thenReturn("MyToken");
         when(lobbyJoiner.leaveGame(any())).thenReturn(Completable.complete());
 

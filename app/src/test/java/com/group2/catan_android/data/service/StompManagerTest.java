@@ -27,7 +27,7 @@ import io.reactivex.subscribers.TestSubscriber;
 import ua.naiksoftware.stomp.dto.LifecycleEvent;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
-public class StompManagerTest {
+class StompManagerTest {
     @Mock
     StompDriver stompDriver;
 
@@ -41,7 +41,7 @@ public class StompManagerTest {
     }
 
     @Test
-    public void testConnectionSuccess(){
+    void testConnectionSuccess(){
         when(stompDriver.connect(any())).thenReturn(Completable.complete());
         when(stompDriver.lifecycle()).thenReturn(PublishProcessor.create());
 
@@ -50,7 +50,7 @@ public class StompManagerTest {
     }
 
     @Test
-    public void testConnectionFailure(){
+    void testConnectionFailure(){
         when(stompDriver.connect(any())).thenReturn(Completable.error(new Throwable("Failed to connect")));
         when(stompDriver.lifecycle()).thenReturn(PublishProcessor.create());
 
@@ -59,7 +59,7 @@ public class StompManagerTest {
     }
 
     @Test
-    public void testListenOn(){
+    void testListenOn(){
         when(stompDriver.connect(any())).thenReturn(Completable.complete());
         when(stompDriver.lifecycle()).thenReturn(PublishProcessor.create());
         PublishProcessor<StompMessage> messagePublisher = PublishProcessor.create();
@@ -72,7 +72,7 @@ public class StompManagerTest {
     }
 
     @Test
-    public void testFilterByType() throws JsonProcessingException {
+    void testFilterByType() throws JsonProcessingException {
         when(stompDriver.connect(any())).thenReturn(Completable.complete());
         when(stompDriver.lifecycle()).thenReturn(PublishProcessor.create());
         PublishProcessor<StompMessage> messagePublisher = PublishProcessor.create();
@@ -90,7 +90,7 @@ public class StompManagerTest {
     }
 
     @Test
-    public void testFlowableCompletesIfConnectionTerminates() {
+    void testFlowableCompletesIfConnectionTerminates() {
         when(stompDriver.connect(any())).thenReturn(Completable.complete());
         PublishProcessor<LifecycleEvent> lifecycleEventPublisher = PublishProcessor.create();
         when(stompDriver.lifecycle()).thenReturn(lifecycleEventPublisher);

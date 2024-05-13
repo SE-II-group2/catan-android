@@ -71,11 +71,7 @@ public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, Ad
         DisplayablePlayer admin = getPlayerWithID(serverAdmin.getInGameID());
         if(admin != null)
             admin.setAdmin(true);
-        if(currentPlayerID == serverAdmin.getInGameID()){
-            adminSubject.onNext(true);
-        } else {
-            adminSubject.onNext(false);
-        }
+        adminSubject.onNext(currentPlayerID == serverAdmin.getInGameID());
     }
 
     private DisplayablePlayer getPlayerWithID(int inGameID){
