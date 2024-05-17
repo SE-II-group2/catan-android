@@ -47,6 +47,7 @@ public class MoveMaker {
         return moveMakerInstance;
     }
 
+    // fixme networking (dto switch-case, send) and game logic (addnewroad, hasrolled) are borderline intertwined
     public void makeMove(GameMoveDto gameMove) throws Exception {
         if (players.get(0).getInGameID() != activePlayer.getInGameID()) {
             throw new Exception("Not active player!");

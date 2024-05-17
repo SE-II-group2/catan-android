@@ -42,6 +42,7 @@ class PlayerRepositoryTest {
         liveIn.onNext(dto);
         assertLastValueEquals(testObserver.values(), false);
 
+        // fixme make this a second test
         //now player0 leaves the game
         dto.setPlayers(List.of(player1));
         dto.setAdmin(player1);

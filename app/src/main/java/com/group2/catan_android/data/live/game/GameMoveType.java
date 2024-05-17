@@ -1,5 +1,6 @@
 package com.group2.catan_android.data.live.game;
 
+// fixme see backend comments
 public interface GameMoveType {
     String BUILDROADMOVE = "BUILD_ROAD_MOVE";
     String BUILDVILLAGEMOVE = "BUILD_VILLAGE_MOVE";

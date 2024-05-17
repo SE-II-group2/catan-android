@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
 import com.group2.catan_android.data.live.game.GameProgressDto;
 
+// fixme see backend comments
 /**
  * Defines the Basic Structure of a Stomp Message to the client
  */
