@@ -1,5 +1,10 @@
 package com.group2.catan_android.gamelogic;
 
+import android.widget.ImageView;
+
+import androidx.core.content.ContextCompat;
+
+import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -192,6 +197,18 @@ public class Board {
             if((adjacencyMatrix[i][intersection] instanceof Road) && (adjacencyMatrix[i][intersection].getPlayer() == player)){
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean checkPossibleRoad(Player player, int connectionID){
+        int[] connectionIntersections = getConnectedIntersections(connectionID);
+        int fromIntersection = connectionIntersections[0];
+        int toIntersection = connectionIntersections[1];
+
+        if(adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road) // check if null or road already
+                && (isNextToOwnRoad(fromIntersection,player) || isNextToOwnRoad(toIntersection,player))){ //check if a road is next to one of the intersections
+            return true;
         }
         return false;
     }

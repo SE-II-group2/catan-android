@@ -13,12 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
+import com.group2.catan_android.fragments.ButtonsOpenFragment;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
@@ -65,6 +67,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int TOTAL_CONNECTIONS = 72;
     final static int TOTAL_INTERSECTIONS = 54;
 
+    // lists to store possible moves
+    private List<ImageView> possibleConnections;
+    private List<Integer> possibleVillages;
+    private List<Integer> possibleCities;
+    private boolean showingPossibleMoves = false;
+
+    // view models
     private BoardViewModel boardViewModel;
     private ActivePlayerViewModel activePlayerViewModel;
     private PlayerListViewModel playerListViewModel;
@@ -96,6 +105,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         ImageView[] robberViews = new ImageView[TOTAL_HEXAGONS];
         ImageView[] intersectionViews = new ImageView[TOTAL_INTERSECTIONS];
         ImageView[] connectionViews = new ImageView[TOTAL_CONNECTIONS];
+
+        possibleConnections = new ArrayList<>();
+        possibleVillages = new ArrayList<>();
+        possibleCities = new ArrayList<>();
 
         //draw Hexagons with Roll Values and Robber
         for (int i = 0; i < TOTAL_HEXAGONS; i++) {
@@ -132,6 +145,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
             constraintLayout.addView(connectionView, params);
+            possibleConnections.add(connectionView);
             connectionViews[i] = connectionView;
 
             int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
@@ -286,7 +300,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 }
             }
 
-
         }
 
         // update hexagons with robber
@@ -335,6 +348,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         }
 
+        updatePossibleMoves(activePlayer,board);
     }
 
     public void updateUiPlayerRessources(Player player){
@@ -345,22 +359,72 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         playerScoresFragment.updateScores(players);
     }
 
+    public void updatePossibleMoves(Player player, Board board){
+        // updatePossibleConnections
+        for(int connectionID = 0; connectionID < TOTAL_CONNECTIONS; connectionID++) {
+            if(board.checkPossibleRoad(activePlayer, connectionID)){
+
+                int id = (connectionID + TOTAL_HEXAGONS*3 + 1);
+                ImageView connectionView = findViewById(id);
+                possibleConnections.add(connectionView);
+            }
+        }
+
+    }
+
+    public void showPossibleMoves() {
+        if(mLastButtonClicked == ButtonType.ROAD){
+            // update connections
+            for (ImageView possibleConnection : possibleConnections) {
+                possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_grade_24));
+            }
+        }
+    }
+
+    public void removePossibleMoves(){
+        if(mLastButtonClicked == ButtonType.CITY){
+            // update connections
+            for (ImageView possibleConnection : possibleConnections) {
+                possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
+            }
+        }
+    }
+
     @Override
     public void onButtonClicked(ButtonType button) {
         mLastButtonClicked = button;
 
-        if(button == ButtonType.HELP){
+        if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
+            Board board = boardViewModel.getBoardMutableLiveData().getValue();
+            if (board != null) {
+                updatePossibleMoves(activePlayer,board);
+                showPossibleMoves();
+                removePossibleMoves();
+            } else {
+                boardViewModel.getBoardMutableLiveData().observe(this, new Observer<Board>() {
+                    @Override
+                    public void onChanged(Board board) {
+                        updatePossibleMoves(activePlayer,board);
+                        showPossibleMoves();
+                        removePossibleMoves();
+                        boardViewModel.getBoardMutableLiveData().removeObserver(this);
+                    }
+                });
+            }
+        }
+
+        if (button == ButtonType.HELP) {
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if(helpFragment == null){
+            if (helpFragment == null) {
                 getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
-            } else{
+            } else {
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
 
-        if(button == ButtonType.BUILD){
+        if (button == ButtonType.BUILD) {
             HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if(helpFragment != null){
+            if (helpFragment != null) {
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
