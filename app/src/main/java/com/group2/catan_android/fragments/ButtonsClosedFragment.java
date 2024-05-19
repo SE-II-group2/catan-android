@@ -9,22 +9,28 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.group2.catan_android.GameActivity;
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
+import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
+
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
-public class ButtonsClosedFragment extends Fragment  {
+public class ButtonsClosedFragment extends Fragment implements OnButtonEventListener {
 
     ImageView build;
     ImageView trade;
     ImageView cards;
     ImageView help;
+
+    ButtonsOpenFragment buttonsOpenFragment;
 
     private OnButtonClickListener mListener;
 
@@ -55,11 +61,15 @@ public class ButtonsClosedFragment extends Fragment  {
 
         build.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.BUILD);
-            Fragment newFragment = new ButtonsOpenFragment();
+            buttonsOpenFragment = new ButtonsOpenFragment();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.leftButtonsFragment, newFragment);
+            transaction.replace(R.id.leftButtonsFragment, buttonsOpenFragment);
             transaction.addToBackStack(null);
             transaction.commit();
+
+            if (getActivity() instanceof GameActivity) {
+                ((GameActivity) getActivity()).setCurrentButtonFragmentListener(buttonsOpenFragment);
+            }
         });
 
         trade.setOnClickListener(v -> {
@@ -86,5 +96,11 @@ public class ButtonsClosedFragment extends Fragment  {
         cards.setBackgroundResource(0);
         trade.setBackgroundResource(0);
         v.setBackgroundResource(R.drawable.button_clicked_border);
+    }
+
+    @Override
+    public void onButtonEvent(ButtonType button) {
+        cards.setBackgroundResource(0);
+        trade.setBackgroundResource(0);
     }
 }
