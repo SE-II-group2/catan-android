@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.core.content.ContextCompat;
@@ -85,6 +86,8 @@ public class Board {
         int row = intersectionCoordinates[0];
         int col = intersectionCoordinates[1];
 
+        Log.d("debug","row " + row + " col " + col);
+
         if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
             intersections[row][col] = new Building(player,BuildingType.VILLAGE,intersectionID);
             Building village = (Building)intersections[row][col];
@@ -168,7 +171,7 @@ public class Board {
 
         if(col == 0){
             nextToBuilding = (intersections[row][col + 1] instanceof Building);
-        } else if (col == intersections[0].length) {
+        } else if (col == intersections[0].length-1) {
             nextToBuilding = (intersections[row][col - 1] instanceof Building);
         }else nextToBuilding = (intersections[row][col - 1] instanceof Building || intersections[row][col + 1] instanceof Building);
 
@@ -177,13 +180,13 @@ public class Board {
         }
 
         //if even uneven or uneven even check below, else above if there is a building
-        if((evenRow && !evenCol) || (!evenRow && evenCol)){
-            if(row != 0 && intersections[row-1][col] instanceof Building){
+        if((evenRow && evenCol) || (!evenRow && !evenCol)){
+            if(row != intersections.length-1 && intersections[row + 1][col] instanceof Building){
                 nextToBuilding = true;
             }
 
         } else{
-            if(row != intersections[0].length && intersections[row + 1][col] instanceof Building) {
+            if(row != 0 && intersections[row - 1][col] instanceof Building) {
                 nextToBuilding = true;
             }
         }
@@ -202,14 +205,47 @@ public class Board {
     }
 
     public boolean checkPossibleRoad(Player player, int connectionID){
+
         int[] connectionIntersections = getConnectedIntersections(connectionID);
         int fromIntersection = connectionIntersections[0];
         int toIntersection = connectionIntersections[1];
+
+        if(isSetupPhase && adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road)){
+            return true;
+        }
 
         if(adjacencyMatrix[fromIntersection][toIntersection] != null && !(adjacencyMatrix[fromIntersection][toIntersection] instanceof Road) // check if null or road already
                 && (isNextToOwnRoad(fromIntersection,player) || isNextToOwnRoad(toIntersection,player))){ //check if a road is next to one of the intersections
             return true;
         }
+        return false;
+    }
+
+    public boolean checkPossibleVillage(Player player, int intersectionID){
+        int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
+        int row = intersectionCoordinates[0];
+        int col = intersectionCoordinates[1];
+
+        if(isSetupPhase && intersections[row][col] != null && noBuildingAdjacent(row, col) && !(intersections[row][col] instanceof Building)){
+            return true;
+        }
+
+        if((intersections[row][col] != null) && !(intersections[row][col] instanceof Building) && noBuildingAdjacent(row,col) && isNextToOwnRoad(intersectionID,player)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkPossibleCity(Player player, int intersectionID){
+
+        int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
+        int row = intersectionCoordinates[0];
+        int col = intersectionCoordinates[1];
+
+        if (intersections[row][col].getType() == BuildingType.VILLAGE && intersections[row][col].getPlayer() == player) {
+            return true;
+        }
+
         return false;
     }
 

@@ -2,9 +2,11 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +29,7 @@ import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
@@ -50,6 +53,10 @@ import java.util.Random;
 
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
+    private OnButtonEventListener currentButtonFragmentListener;
+    private ButtonsClosedFragment buttonsClosedFragment;
+    private ButtonsOpenFragment buttonsOpenFragment;
+
     private ButtonType mLastButtonClicked;
 
     // drawables measurements
@@ -59,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int HEXAGON_WIDTH_QUARTER = HEXAGON_WIDTH / 4;
     final static int HEXAGON_HEIGHT_QUARTER = HEXAGON_HEIGHT / 4;
     static int INTERSECTION_SIZE = 40;
-    static int connectionSize = HEXAGON_WIDTH_HALF;
+    static int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
     int statusBarHeight;
 
     // number of total elements
@@ -69,9 +76,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     // lists to store possible moves
     private List<ImageView> possibleConnections;
-    private List<Integer> possibleVillages;
-    private List<Integer> possibleCities;
-    private boolean showingPossibleMoves = false;
+    private List<ImageView> possibleVillages;
+    private List<ImageView> possibleCities;
+    private boolean showingPossibleRoads = false;
+    private boolean showingPossibleVillages = false;
+    private boolean showingPossibleCities = false;
 
     // view models
     private BoardViewModel boardViewModel;
@@ -121,7 +130,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             robberView.setId(rollValueView.getId() + TOTAL_HEXAGONS);
 
             ConstraintLayout.LayoutParams paramsHexagon = new ConstraintLayout.LayoutParams(HEXAGON_WIDTH, HEXAGON_HEIGHT);
-            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(CONNECTION_SIZE,CONNECTION_SIZE);
             ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3);
             constraintLayout.addView(hexagonView, paramsHexagon);
             constraintLayout.addView(rollValueView, paramsRollValues);
@@ -143,7 +152,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             connectionView.setId(i + TOTAL_HEXAGONS*3 + 1);
             connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(connectionSize,connectionSize);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(CONNECTION_SIZE,CONNECTION_SIZE);
             constraintLayout.addView(connectionView, params);
             possibleConnections.add(connectionView);
             connectionViews[i] = connectionView;
@@ -155,6 +164,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 if (mLastButtonClicked == ButtonType.ROAD) {
                     try {
                         movemaker.makeMove(new BuildRoadMoveDto(connectionID));
+                        currentButtonFragmentListener.onButtonEvent(ButtonType.ROAD);
                     } catch (Exception e) {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -178,6 +188,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 if (mLastButtonClicked == ButtonType.VILLAGE) {
                     try {
                         movemaker.makeMove(new BuildVillageMoveDto(intersectionID));
+                        currentButtonFragmentListener.onButtonEvent(ButtonType.VILLAGE);
                     } catch (Exception e) {
                         Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -195,10 +206,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         // initialisation of button fragments
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
+        buttonsClosedFragment = new ButtonsClosedFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, new ButtonsClosedFragment()).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
+
+        currentButtonFragmentListener = buttonsClosedFragment;
 
         boardViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
@@ -224,10 +238,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
-            List<Player> tempList = new ArrayList<>();
-            for(Player player : data){
-                tempList.add(player);
-            }
+            List<Player> tempList = new ArrayList<>(data);
             tempList.sort(Comparator.comparingInt(Player::getInGameID));
             updateUiPlayerScores(tempList);
         });
@@ -253,6 +264,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 }
             }
         });
+
         activePlayer = new Player("test", 0, new int[]{0,0,0,0,0}, 1);
         playerList = new ArrayList<>();
         playerList.add(activePlayer);
@@ -262,6 +274,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
 
     public void updateUiBoard(Board board){
+        if(showingPossibleRoads){
+            showPossibleMoves();
+        }
+
+        updatePossibleMoves(board);
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
@@ -277,6 +294,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     ImageView connectionView = findViewById(id);
                     connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.steet_red));
                     connectionView.setColorFilter((adjacencyMatrix[row][col]).getPlayer().getColor());
+                    connectionView.clearAnimation();
                 }
             }
         }
@@ -348,7 +366,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         }
 
-        updatePossibleMoves(activePlayer,board);
+        mLastButtonClicked = null;
     }
 
     public void updateUiPlayerRessources(Player player){
@@ -359,54 +377,74 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         playerScoresFragment.updateScores(players);
     }
 
-    public void updatePossibleMoves(Player player, Board board){
-        // updatePossibleConnections
+    public void updatePossibleMoves(Board board){
+        possibleConnections.clear();
+
+        // update possible roads
         for(int connectionID = 0; connectionID < TOTAL_CONNECTIONS; connectionID++) {
             if(board.checkPossibleRoad(activePlayer, connectionID)){
-
                 int id = (connectionID + TOTAL_HEXAGONS*3 + 1);
                 ImageView connectionView = findViewById(id);
                 possibleConnections.add(connectionView);
             }
         }
-
     }
 
     public void showPossibleMoves() {
         if(mLastButtonClicked == ButtonType.ROAD){
-            // update connections
-            for (ImageView possibleConnection : possibleConnections) {
-                possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_grade_24));
+            if(showingPossibleRoads){
+                for (ImageView possibleConnection : possibleConnections) {
+                    possibleConnection.setImageDrawable(null);
+                    showingPossibleRoads = false;
+                }
+            } else{
+                for (ImageView possibleConnection : possibleConnections) {
+                    possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.possible_street));
+                    possibleConnection.setColorFilter(activePlayer.getColor());
+                    possibleConnection.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse_animation));
+                }
+                showingPossibleRoads = true;
             }
         }
-    }
 
-    public void removePossibleMoves(){
+        if(mLastButtonClicked == ButtonType.VILLAGE){
+            if(showingPossibleVillages) {
+                for (ImageView possibleVillage : possibleVillages) {
+                    possibleVillage.setImageDrawable(null);
+                }
+            }else{
+                for (ImageView possibleVillage : possibleVillages) {
+                    possibleVillage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_network_check_24));
+                }
+            }
+        }
+
         if(mLastButtonClicked == ButtonType.CITY){
-            // update connections
-            for (ImageView possibleConnection : possibleConnections) {
-                possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
+            if(showingPossibleCities){
+                for (ImageView possibleCities : possibleCities) {
+                    possibleCities.setImageDrawable(null);
+                }
+            }else{
+                for (ImageView possibleCities : possibleCities) {
+                    possibleCities.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_network_check_24));
+                }
             }
         }
     }
 
     @Override
     public void onButtonClicked(ButtonType button) {
-        mLastButtonClicked = button;
+        currentButtonFragmentListener.onButtonEvent(button);
 
         if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
             Board board = boardViewModel.getBoardMutableLiveData().getValue();
             if (board != null) {
-                updatePossibleMoves(activePlayer,board);
                 showPossibleMoves();
-                removePossibleMoves();
             } else {
                 boardViewModel.getBoardMutableLiveData().observe(this, new Observer<Board>() {
                     @Override
                     public void onChanged(Board board) {
-                        updatePossibleMoves(activePlayer,board);
                         showPossibleMoves();
-                        removePossibleMoves();
                         boardViewModel.getBoardMutableLiveData().removeObserver(this);
                     }
                 });
@@ -428,6 +466,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
+
+        mLastButtonClicked = button;
+    }
+
+    public void setCurrentButtonFragmentListener(OnButtonEventListener listener) {
+        currentButtonFragmentListener = listener;
     }
 
 
