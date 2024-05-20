@@ -1,6 +1,7 @@
 package com.group2.catan_android;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -75,7 +76,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final static int TOTAL_INTERSECTIONS = 54;
 
     // lists to store possible moves
-    private List<ImageView> possibleConnections;
+    private List<ImageView> possibleRoads;
     private List<ImageView> possibleVillages;
     private List<ImageView> possibleCities;
     private boolean showingPossibleRoads = false;
@@ -115,7 +116,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         ImageView[] intersectionViews = new ImageView[TOTAL_INTERSECTIONS];
         ImageView[] connectionViews = new ImageView[TOTAL_CONNECTIONS];
 
-        possibleConnections = new ArrayList<>();
+        possibleRoads = new ArrayList<>();
         possibleVillages = new ArrayList<>();
         possibleCities = new ArrayList<>();
 
@@ -154,7 +155,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(CONNECTION_SIZE,CONNECTION_SIZE);
             constraintLayout.addView(connectionView, params);
-            possibleConnections.add(connectionView);
+            possibleRoads.add(connectionView);
             connectionViews[i] = connectionView;
 
             int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
@@ -274,9 +275,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
 
     public void updateUiBoard(Board board){
-        if(showingPossibleRoads){
-            showPossibleMoves();
-        }
+        removePossibleMovesFromUI(possibleRoads);
+        removePossibleMovesFromUI(possibleVillages);
+        removePossibleMovesFromUI(possibleCities,R.drawable.village);
+        showingPossibleRoads = showingPossibleVillages = showingPossibleCities = false;
 
         updatePossibleMoves(board);
 
@@ -309,10 +311,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
                     if(intersections[row][col].getType() == BuildingType.VILLAGE){
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.village));
+                        intersectionView.clearAnimation();
                     } else if(intersections[row][col].getType() == BuildingType.CITY){
                         intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.city));
                         intersectionView.setScaleX(1.5F);
                         intersectionView.setScaleY(1.5F);
+                        intersectionView.clearAnimation();
                     }
                     intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
                 }
@@ -378,57 +382,86 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     public void updatePossibleMoves(Board board){
-        possibleConnections.clear();
+        possibleRoads.clear();
+        possibleVillages.clear();
+        possibleCities.clear();
 
         // update possible roads
         for(int connectionID = 0; connectionID < TOTAL_CONNECTIONS; connectionID++) {
             if(board.checkPossibleRoad(activePlayer, connectionID)){
-                int id = (connectionID + TOTAL_HEXAGONS*3 + 1);
+                int id = (connectionID + TOTAL_HEXAGONS * 3 + 1);
                 ImageView connectionView = findViewById(id);
-                possibleConnections.add(connectionView);
+                possibleRoads.add(connectionView);
+            }
+        }
+
+        // update possible villages and cities
+        for(int intersectionsID = 0; intersectionsID < TOTAL_INTERSECTIONS; intersectionsID++) {
+            if(board.checkPossibleVillage(activePlayer, intersectionsID)){
+                int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
+                ImageView intersectionView = findViewById(id);
+                possibleVillages.add(intersectionView);
+            }
+
+            if(board.checkPossibleCity(activePlayer, intersectionsID)){
+                int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
+                ImageView intersectionView = findViewById(id);
+                possibleCities.add(intersectionView);
             }
         }
     }
 
-    public void showPossibleMoves() {
-        if(mLastButtonClicked == ButtonType.ROAD){
-            if(showingPossibleRoads){
-                for (ImageView possibleConnection : possibleConnections) {
-                    possibleConnection.setImageDrawable(null);
-                    showingPossibleRoads = false;
-                }
+    public void showPossibleMoves(ButtonType button) {
+        // remove all possible moves and then draw the ones according to pressed button
+        removePossibleMovesFromUI(possibleRoads);
+        removePossibleMovesFromUI(possibleVillages);
+        removePossibleMovesFromUI(possibleCities,R.drawable.village);
+
+            switch (button) {
+                case ROAD:
+                    showingPossibleVillages = showingPossibleCities = false;
+                    showingPossibleRoads = drawPossibleMovesToUI(showingPossibleRoads,possibleRoads, R.drawable.possible_street, button);
+                    break;
+                case VILLAGE:
+                    showingPossibleRoads = showingPossibleCities = false;
+                    showingPossibleVillages = drawPossibleMovesToUI(showingPossibleVillages, possibleVillages, R.drawable.village, button);
+                    break;
+                case CITY:
+                    showingPossibleRoads = showingPossibleVillages = false;
+                    showingPossibleCities = drawPossibleMovesToUI(showingPossibleCities, possibleCities, R.drawable.city, button);
+                    break;
+            }
+    }
+
+    public boolean drawPossibleMovesToUI(boolean showingMoves, List<ImageView> possibleMoveViews, int drawable, ButtonType button){
+        if(showingMoves){
+            if(button == ButtonType.CITY){
+                removePossibleMovesFromUI(possibleMoveViews,R.drawable.village);
             } else{
-                for (ImageView possibleConnection : possibleConnections) {
-                    possibleConnection.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.possible_street));
-                    possibleConnection.setColorFilter(activePlayer.getColor());
-                    possibleConnection.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse_animation));
-                }
-                showingPossibleRoads = true;
-            }
-        }
+                removePossibleMovesFromUI(possibleMoveViews);
 
-        if(mLastButtonClicked == ButtonType.VILLAGE){
-            if(showingPossibleVillages) {
-                for (ImageView possibleVillage : possibleVillages) {
-                    possibleVillage.setImageDrawable(null);
-                }
-            }else{
-                for (ImageView possibleVillage : possibleVillages) {
-                    possibleVillage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_network_check_24));
-                }
             }
+            return false;
         }
+        for (ImageView possibleMoveView : possibleMoveViews) {
+            possibleMoveView.setImageDrawable(ContextCompat.getDrawable(this, drawable));
+            possibleMoveView.setColorFilter(activePlayer.getColor());
+            possibleMoveView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse_animation));
+        }
+        return true;
+    }
 
-        if(mLastButtonClicked == ButtonType.CITY){
-            if(showingPossibleCities){
-                for (ImageView possibleCities : possibleCities) {
-                    possibleCities.setImageDrawable(null);
-                }
-            }else{
-                for (ImageView possibleCities : possibleCities) {
-                    possibleCities.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.baseline_network_check_24));
-                }
-            }
+    public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews){
+        for (ImageView possibleMoveView : possibleMoveViews) {
+            possibleMoveView.setImageDrawable(null);
+        }
+    }
+
+    public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews,int drawable){
+        for (ImageView possibleMoveView : possibleMoveViews) {
+            possibleMoveView.setImageDrawable(ContextCompat.getDrawable(this, drawable));
+            possibleMoveView.setColorFilter(activePlayer.getColor());
+            possibleMoveView.clearAnimation();
         }
     }
 
@@ -439,12 +472,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
             Board board = boardViewModel.getBoardMutableLiveData().getValue();
             if (board != null) {
-                showPossibleMoves();
+                showPossibleMoves(button);
             } else {
                 boardViewModel.getBoardMutableLiveData().observe(this, new Observer<Board>() {
                     @Override
                     public void onChanged(Board board) {
-                        showPossibleMoves();
+                        showPossibleMoves(button);
                         boardViewModel.getBoardMutableLiveData().removeObserver(this);
                     }
                 });
@@ -456,13 +489,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             if (helpFragment == null) {
                 getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
             } else {
-                getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
-            }
-        }
-
-        if (button == ButtonType.BUILD) {
-            HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if (helpFragment != null) {
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
