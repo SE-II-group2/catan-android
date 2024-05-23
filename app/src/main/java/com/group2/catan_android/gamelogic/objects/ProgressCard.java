@@ -6,7 +6,7 @@ import com.group2.catan_android.gamelogic.enums.ResourceCost;
 
 public class ProgressCard {
 
-    Player player;
+    public Player player;
     ProgressCardType type;
 
     ResourceCost cost = ResourceCost.PROGRESS_CARD;
@@ -18,6 +18,7 @@ public class ProgressCard {
 
     //TODO: progress cards cannot be played in the same turn as received, except victory card if player has 9 VPS
 
+    // fixme subclasses for polymorphism
     public void use(){
         switch (type){
             case KNIGHT:

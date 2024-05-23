@@ -7,4 +7,13 @@
     <style name="ImageButtonStyle" parent="Widget.AppCompat.ImageButton">
         <item name="android:background">@color/GrassGreen</item>
     </style>
+    <style name="Trade_ButtonStyle" parent ="Widget.Material3.Button">
+        <item name="android:insetTop">2dp</item>
+        <item name="android:insetLeft">2dp</item>
+        <item name="android:insetRight">2dp</item>
+        <item name="android:insetBottom">2dp</item>
+        <item name="backgroundTint">@color/GrassGreenHighlighted</item>
+        <item name="cornerRadius">5dp</item>
+        <item name="borderWidth">5dp</item>
+    </style>
 </resources>

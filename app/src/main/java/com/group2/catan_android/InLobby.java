@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -11,10 +12,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.group2.catan_android.adapter.PlayerListAdapter;
+import com.group2.catan_android.data.live.GameStartedDto;
+import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
+import com.group2.catan_android.data.repository.token.TokenRepository;
+import com.group2.catan_android.data.service.StompManager;
 import com.group2.catan_android.databinding.ActivityInLobbyBinding;
 import com.group2.catan_android.viewmodel.InLobbyViewModel;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class InLobby extends AppCompatActivity {
     private ActivityInLobbyBinding binding;
@@ -22,6 +29,7 @@ public class InLobby extends AppCompatActivity {
     private InLobbyViewModel mViewModel;
 
     Disposable leaveDisposable;
+    Disposable gameStartDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +41,8 @@ public class InLobby extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this,
                 ViewModelProvider.Factory.from(InLobbyViewModel.initializer)).get(InLobbyViewModel.class);
 
+        gameStartDisposable = StompManager.getInstance().filterByType(GameStartedDto.class).subscribe((gameStartedDto -> navigateToGameActivity()));
+
         adapter = new PlayerListAdapter(this);
         binding.playerList.setAdapter(adapter);
         binding.playerList.setLayoutManager(new LinearLayoutManager(this));
@@ -43,14 +53,27 @@ public class InLobby extends AppCompatActivity {
         binding.leave.setOnClickListener(v -> {
             doLeave();
         });
-
+        binding.start.setOnClickListener(v ->{
+            doStart();
+        });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
         setGameID();
+    }
 
+    private void navigateToGameActivity(){
+        Intent i = new Intent(getApplicationContext(), GameActivity.class);
+        startActivity(i);
+        finish();
+    }
+
+    private void doStart() {
+        MoveSenderRepository.getInstance().startGame(TokenRepository.getInstance().getToken()).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe();
+        //navigateToGameActivity();
     }
 
     private void setGameID(){
@@ -76,11 +99,13 @@ public class InLobby extends AppCompatActivity {
         doLeave();
         super.onBackPressed();
     }
-
     @Override
     public void onDestroy(){
         if(leaveDisposable != null)
             leaveDisposable.dispose();
+        if(gameStartDisposable != null)
+            gameStartDisposable.dispose();
         super.onDestroy();
     }
+
 }

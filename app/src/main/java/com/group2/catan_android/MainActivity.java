@@ -24,10 +24,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        Button demo = findViewById(R.id.btnDemo);
-        demo.setOnClickListener(v -> navigate(DemoActivity.class));
-
-
         Button demoBoard = findViewById(R.id.demoBoard);
         demoBoard.setOnClickListener(v -> navigate(GameActivity.class));
 
