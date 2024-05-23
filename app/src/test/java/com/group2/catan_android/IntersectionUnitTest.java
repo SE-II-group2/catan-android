@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
+// fixme if you want to test getters set the values first
 public class IntersectionUnitTest {
     private Intersection intersection;
     @BeforeEach

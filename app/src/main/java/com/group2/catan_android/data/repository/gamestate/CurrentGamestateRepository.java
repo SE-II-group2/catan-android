@@ -128,6 +128,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         return playersList;
     }
 
+    // fixme are the intersections a duplicate from the backend? could you provide set-up roads from the backend for the clients?
     private Connection[][] generateAdjacencyMatrixFromDto(List<ConnectionDto> connectionList) {
         Connection[][] connections = new Connection[54][54];
         int[][] connectedIntersections = new int[2][72];

@@ -25,6 +25,7 @@ public class ProgressCardUnitTest {
         MockitoAnnotations.openMocks(this);
     }
     //TODO: Assert/Verify the cases after implementation
+    // fixme see todo above
     @Test
     void testKnightCardUse(){
         progressCard = new ProgressCard(ProgressCardType.KNIGHT, ResourceCost.PROGRESS_CARD);

@@ -18,6 +18,7 @@ public class ProgressCard {
 
     //TODO: progress cards cannot be played in the same turn as received, except victory card if player has 9 VPS
 
+    // fixme subclasses for polymorphism
     public void use(){
         switch (type){
             case KNIGHT:

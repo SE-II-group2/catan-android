@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+// fixme avoid making this class a god class. it is also the only one implementing the OnButtonClickListener, handling events from the fragments
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
     private ButtonType mLastButtonClicked;
@@ -76,6 +77,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     PlayerScoresFragment playerScoresFragment;
     private boolean hasRolled = false;
 
+    // fixme extract methods based on comments/code blocks
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -246,7 +248,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         //updateUiPlayerScores(playerList);
     }
 
-
+    // fixme extract methods based on comments/code blocks
     public void updateUiBoard(Board board){
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
@@ -366,7 +368,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
     }
 
-
+    // fixme extract methods based on comments/code blocks
     //drawing of board
     private void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews, ImageView[] robberView, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();

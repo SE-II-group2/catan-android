@@ -22,6 +22,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
+// fixme document the magic constants for test readability and understandability
 public class BoardUnitTests {
 
     private Board board;
