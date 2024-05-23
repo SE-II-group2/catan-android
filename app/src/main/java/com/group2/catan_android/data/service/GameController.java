@@ -31,6 +31,7 @@ public class GameController implements GameJoiner, GameLeaver{
     private final CurrentGamestateRepository currentGamestateRepository;
     private final GameProgressRepository gameProgressRepository;
 
+    // fixme looks like a god class with all the required repos
     private GameController(StompManager stompManager, TokenRepository tokenRepository, PlayerRepository playerRepository, LobbyJoiner lobbyJoiner, CurrentGamestateRepository currentGamestateRepository, GameProgressRepository gameProgressRepository){
         this.stompManager = stompManager;
         this.tokenRepository = tokenRepository;

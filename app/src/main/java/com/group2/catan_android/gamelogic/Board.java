@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// fixme here the low-level logic creates readability and maintenance issues (the impact was not obvious in the backend)
+//  methods like isnextto*, *adjacent etc would be instance methods of a corresponding object in oop
+//  maybe you can find such a solution or consult the tutors for a discussion
 public class Board {
 
     private List<Hexagon> hexagonList;

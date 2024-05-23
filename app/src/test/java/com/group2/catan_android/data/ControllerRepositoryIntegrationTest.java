@@ -70,6 +70,7 @@ class ControllerRepositoryIntegrationTest {
         gameController = GameController.getInstance();
     }
 
+    // fixme extract the setup into a method
     @Test
     void testRepositoryReceivesMessagesAfterControllerJoinsGame() throws JsonProcessingException, InterruptedException {
         JoinGameRequest request = new JoinGameRequest();
