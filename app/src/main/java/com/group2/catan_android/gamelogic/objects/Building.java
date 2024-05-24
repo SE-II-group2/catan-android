@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic.objects;
 
+import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
@@ -37,4 +38,5 @@ public class Building extends Intersection {
     public int getId() {
         return id;
     }
+
 }
