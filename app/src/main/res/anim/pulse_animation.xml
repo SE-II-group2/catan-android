@@ -3,8 +3,8 @@
     android:interpolator="@android:anim/accelerate_decelerate_interpolator">
     <alpha
         android:duration="1200"
-        android:fromAlpha="0.8"
-        android:toAlpha="0.3"
+        android:fromAlpha="0.9"
+        android:toAlpha="0.0"
         android:repeatCount="infinite"
         android:repeatMode="reverse"
         />
