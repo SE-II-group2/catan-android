@@ -1,7 +1,6 @@
 package com.group2.catan_android;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -35,6 +34,7 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
+import com.group2.catan_android.gamelogic.enums.ResourceCost;
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
@@ -45,7 +45,6 @@ import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -55,28 +54,21 @@ import java.util.Random;
 // fixme avoid making this class a god class. it is also the only one implementing the OnButtonClickListener, handling events from the fragments
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
-    private OnButtonEventListener currentButtonFragmentListener;
-    private ButtonsClosedFragment buttonsClosedFragment;
-    private ButtonsOpenFragment buttonsOpenFragment;
-
-    private ButtonType mLastButtonClicked;
-
     // drawables measurements
-    final static int HEXAGON_HEIGHT = 230;
-    final static int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
-    final static int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
-    final static int HEXAGON_WIDTH_QUARTER = HEXAGON_WIDTH / 4;
-    final static int HEXAGON_HEIGHT_QUARTER = HEXAGON_HEIGHT / 4;
-    static int INTERSECTION_SIZE = 40;
-    static int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
-    int statusBarHeight;
+    final int HEXAGON_HEIGHT = 230;
+    final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
+    final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
+    final int HEXAGON_WIDTH_QUARTER = HEXAGON_WIDTH / 4;
+    final int HEXAGON_HEIGHT_QUARTER = HEXAGON_HEIGHT / 4;
+    final int INTERSECTION_SIZE = 40;
+    final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
     // number of total elements
-    final static int TOTAL_HEXAGONS = 19;
-    final static int TOTAL_CONNECTIONS = 72;
-    final static int TOTAL_INTERSECTIONS = 54;
+    final int TOTAL_HEXAGONS = 19;
+    final int TOTAL_CONNECTIONS = 72;
+    final int TOTAL_INTERSECTIONS = 54;
 
-    // lists to store possible moves
+    // storing of possible moves
     private List<ImageView> possibleRoads;
     private List<ImageView> possibleVillages;
     private List<ImageView> possibleCities;
@@ -84,171 +76,93 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private boolean showingPossibleVillages = false;
     private boolean showingPossibleCities = false;
 
-    // view models
+    // viewModels
     private BoardViewModel boardViewModel;
-    private ActivePlayerViewModel activePlayerViewModel;
+    private ActivePlayerViewModel localPlayerViewModel;
     private PlayerListViewModel playerListViewModel;
     private GameProgressViewModel gameProgressViewModel;
+    private Player localPlayer;
+    private Board board;
     private MoveMaker movemaker;
-    PlayerResourcesFragment playerResourcesFragment;
-    private List<Player> playerList;
-    private Player activePlayer;
-    PlayerScoresFragment playerScoresFragment;
     private boolean hasRolled = false;
 
-    // fixme extract methods based on comments/code blocks
+    // fragments and button listeners
+    private PlayerResourcesFragment playerResourcesFragment;
+    private PlayerScoresFragment playerScoresFragment;
+    private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
+    private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
 
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        decorView.setSystemUiVisibility(uiOptions);
-
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
-        //init of arrays to store displayable views
-        ImageView[] hexagonViews = new ImageView[TOTAL_HEXAGONS];
-        TextView[] rollValueViews = new TextView[TOTAL_HEXAGONS];
-        ImageView[] robberViews = new ImageView[TOTAL_HEXAGONS];
-        ImageView[] intersectionViews = new ImageView[TOTAL_INTERSECTIONS];
-        ImageView[] connectionViews = new ImageView[TOTAL_CONNECTIONS];
 
+        setToFullScreen();
+
+        createViews(constraintLayout);
+
+        createFragments();
+
+        setupViewModels();
+
+        setupEndTurnButton();
+        setupDiceRollButton();
+    }
+
+    private void setToFullScreen() {
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+    }
+
+    private void createFragments() {
+        playerResourcesFragment = new PlayerResourcesFragment();
+        playerScoresFragment = new PlayerScoresFragment();
+        ButtonsClosedFragment buttonsClosedFragment = new ButtonsClosedFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
+        currentButtonFragmentListener = buttonsClosedFragment;
+    }
+
+    private void createViews(ConstraintLayout constraintLayout) {
+        ImageView[] hexagonViews = drawViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
+        TextView[] rollValueViews = drawTextViews(constraintLayout,TOTAL_HEXAGONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS);
+        ImageView[] robberViews = drawViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2,null);
+        ImageView[] connectionViews = drawViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,ButtonType.ROAD);
+        ImageView[] intersectionViews = drawViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),ButtonType.VILLAGE);
         possibleRoads = new ArrayList<>();
         possibleVillages = new ArrayList<>();
         possibleCities = new ArrayList<>();
 
-        //draw Hexagons with Roll Values and Robber
-        for (int i = 0; i < TOTAL_HEXAGONS; i++) {
-            ImageView hexagonView = new ImageView(this);
-            TextView rollValueView = new TextView(this);
-            ImageView robberView = new ImageView(this);
-
-            hexagonView.setId(i + 1); // must start at ID 1, because view with ID 0 is not allowed in Android Studio
-            rollValueView.setId(hexagonView.getId() + TOTAL_HEXAGONS);
-            robberView.setId(rollValueView.getId() + TOTAL_HEXAGONS);
-
-            ConstraintLayout.LayoutParams paramsHexagon = new ConstraintLayout.LayoutParams(HEXAGON_WIDTH, HEXAGON_HEIGHT);
-            ConstraintLayout.LayoutParams paramsRollValues = new ConstraintLayout.LayoutParams(CONNECTION_SIZE,CONNECTION_SIZE);
-            ConstraintLayout.LayoutParams paramsRobber = new ConstraintLayout.LayoutParams(HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3);
-            constraintLayout.addView(hexagonView, paramsHexagon);
-            constraintLayout.addView(rollValueView, paramsRollValues);
-            constraintLayout.addView(robberView, paramsRobber);
-
-            hexagonViews[i] = hexagonView;
-            rollValueViews[i] = rollValueView;
-            robberViews[i] = robberView;
-
-            //formatting of TextView
-            rollValueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            rollValueView.setTextColor(Color.BLACK);
-            rollValueView.setGravity(Gravity.CENTER);
-        }
-
-        //draw Connections
-        for (int i = 0; i < TOTAL_CONNECTIONS; i++) {
-            ImageView connectionView = new ImageView(this);
-            connectionView.setId(i + TOTAL_HEXAGONS*3 + 1);
-            connectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.street));
-
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(CONNECTION_SIZE,CONNECTION_SIZE);
-            constraintLayout.addView(connectionView, params);
-            possibleRoads.add(connectionView);
-            connectionViews[i] = connectionView;
-
-            int connectionID = connectionView.getId() - TOTAL_HEXAGONS*3 - 1;
-
-            connectionView.setOnClickListener(v -> {
-                //Toast.makeText(getApplicationContext(), " " + connectionID, Toast.LENGTH_SHORT).show();
-                if (mLastButtonClicked == ButtonType.ROAD) {
-                    try {
-                        movemaker.makeMove(new BuildRoadMoveDto(connectionID));
-                        currentButtonFragmentListener.onButtonEvent(ButtonType.ROAD);
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-
-        //draw Intersections
-        for (int i = 0; i < TOTAL_INTERSECTIONS; i++) {
-            ImageView intersectionView = new ImageView(this);
-            intersectionView.setId(i + TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS + 1);
-            intersectionView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.intersection));
-
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(INTERSECTION_SIZE, INTERSECTION_SIZE);
-            constraintLayout.addView(intersectionView, params);
-            intersectionViews[i] = intersectionView;
-            int intersectionID = intersectionView.getId() - TOTAL_HEXAGONS*3 - TOTAL_CONNECTIONS - 1;
-
-            intersectionView.setOnClickListener(v -> {
-                //Toast.makeText(getApplicationContext(), " " + intersectionID, Toast.LENGTH_SHORT).show();
-                if (mLastButtonClicked == ButtonType.VILLAGE) {
-                    try {
-                        movemaker.makeMove(new BuildVillageMoveDto(intersectionID));
-                        currentButtonFragmentListener.onButtonEvent(ButtonType.VILLAGE);
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-
-        //constrain the views to the right position
+        //constrain views to the right position
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
             int layoutHeight = constraintLayout.getHeight();
             applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, robberViews, layoutWidth, layoutHeight);
         });
+    }
 
-        // initialisation of button fragments
-        playerResourcesFragment = new PlayerResourcesFragment();
-        playerScoresFragment = new PlayerScoresFragment();
-        buttonsClosedFragment = new ButtonsClosedFragment();
-
-        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
-
-        currentButtonFragmentListener = buttonsClosedFragment;
-
-        boardViewModel = new ViewModelProvider(this,
-                ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
-        activePlayerViewModel = new ViewModelProvider(this,
-                ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
-        playerListViewModel = new ViewModelProvider(this,
-                ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
-        gameProgressViewModel = new ViewModelProvider(this,
-                ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
-
-        boardViewModel.getBoardMutableLiveData().observe(this, this::updateUiBoard);
-        activePlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
-            this.activePlayer = player;
-            updateUiPlayerRessources(activePlayer);
-        });
-        gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
-            if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
-                Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
-            }
-            if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                Toast.makeText(getApplicationContext(), "Turn got ended, active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
-            List<Player> tempList = new ArrayList<>(data);
-            tempList.sort(Comparator.comparingInt(Player::getInGameID));
-            updateUiPlayerScores(tempList);
-        });
-
-        // endTurn Button
+    private void setupEndTurnButton() {
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
-            if (!hasRolled) {
+            if (hasRolled) {
+                try {
+                    movemaker.makeMove(new EndTurnMoveDto());
+                    hasRolled = false;
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void setupDiceRollButton() {
+        findViewById(R.id.diceRollButton).setOnClickListener(v -> {
+            if (!hasRolled && !board.isSetupPhase()) {
                 try {
                     Random random = new Random();
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
@@ -258,21 +172,95 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            } else {
+            }
+        });
+    }
+
+    private void setupViewModels() {
+        boardViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
+        localPlayerViewModel = new ViewModelProvider(this,ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
+        playerListViewModel = new ViewModelProvider(this,ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
+        gameProgressViewModel = new ViewModelProvider(this,ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
+
+        boardViewModel.getBoardMutableLiveData().observe(this, board -> {
+            this.board = board;
+            updateUiBoard(board);
+        });
+
+        localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
+            this.localPlayer = player;
+            updateUiPlayerRessources(localPlayer);
+        });
+
+        gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
+            if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
+                Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
+            }
+            if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
+                Toast.makeText(getApplicationContext(), "Turn ended. New active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
+            List<Player> tempList = new ArrayList<>(data);
+            tempList.sort(Comparator.comparingInt(Player::getInGameID));
+            updateUiPlayerScores(tempList);
+        });
+    }
+
+    private ImageView[] drawViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset, ButtonType type) {
+        ImageView[] views = new ImageView[totalViews];
+
+        for (int i = 0; i < totalViews; i++) {
+            ImageView view = new ImageView(this);
+            view.setId(i + offset + 1);
+            int correctID = view.getId() - offset - 1;
+
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(width, height);
+            constraintLayout.addView(view, params);
+            views[i] = view;
+
+            if(type != null){
+                setViewOnClickListener(view,correctID,type);
+            }
+        }
+
+        return views;
+    }
+
+    private TextView[] drawTextViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset) {
+        TextView[] views = new TextView[totalViews];
+
+        for (int i = 0; i < totalViews; i++) {
+            TextView view = new TextView(this);
+            view.setId(i + offset + 1);
+            view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            view.setTextColor(Color.BLACK);
+            view.setGravity(Gravity.CENTER);
+
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(width, height);
+            constraintLayout.addView(view, params);
+            views[i] = view;
+        }
+        return views;
+    }
+
+    private void setViewOnClickListener(View view, int correctID, ButtonType type){
+        view.setOnClickListener(v -> {
+            if (lastButtonClicked == type) {
                 try {
-                    movemaker.makeMove(new EndTurnMoveDto());
-                    hasRolled = false;
+                    switch (type){
+                        case ROAD: movemaker.makeMove(new BuildRoadMoveDto(correctID));
+                        break;
+                        case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID));
+                        break;
+                    }
+                    currentButtonFragmentListener.onButtonEvent(type);
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        activePlayer = new Player("test", 0, new int[]{0,0,0,0,0}, 1);
-        playerList = new ArrayList<>();
-        playerList.add(activePlayer);
-        updateUiBoard(new Board());
-        //updateUiPlayerScores(playerList);
     }
 
     // fixme extract methods based on comments/code blocks
@@ -372,7 +360,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         }
 
-        mLastButtonClicked = null;
+        lastButtonClicked = null;
     }
 
     public void updateUiPlayerRessources(Player player){
@@ -390,7 +378,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // update possible roads
         for(int connectionID = 0; connectionID < TOTAL_CONNECTIONS; connectionID++) {
-            if(board.checkPossibleRoad(activePlayer, connectionID)){
+            if(board.checkPossibleRoad(localPlayer, connectionID)){
                 int id = (connectionID + TOTAL_HEXAGONS * 3 + 1);
                 ImageView connectionView = findViewById(id);
                 possibleRoads.add(connectionView);
@@ -399,13 +387,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         // update possible villages and cities
         for(int intersectionsID = 0; intersectionsID < TOTAL_INTERSECTIONS; intersectionsID++) {
-            if(board.checkPossibleVillage(activePlayer, intersectionsID)){
+            if(board.checkPossibleVillage(localPlayer, intersectionsID)){
                 int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
                 ImageView intersectionView = findViewById(id);
                 possibleVillages.add(intersectionView);
             }
 
-            if(board.checkPossibleCity(activePlayer, intersectionsID)){
+            if(board.checkPossibleCity(localPlayer, intersectionsID)){
                 int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
                 ImageView intersectionView = findViewById(id);
                 possibleCities.add(intersectionView);
@@ -436,6 +424,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     public boolean drawPossibleMovesToUI(boolean showingMoves, List<ImageView> possibleMoveViews, int drawable, ButtonType button){
+        boolean resourceSufficient = true;
+
         if(showingMoves){
             if(button == ButtonType.CITY){
                 removePossibleMovesFromUI(possibleMoveViews,R.drawable.village);
@@ -445,10 +435,21 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
             return false;
         }
+
+        switch(button){
+            case ROAD: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost());
+            case VILLAGE: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost());
+            case CITY: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.CITY.getCost());
+        }
+
         for (ImageView possibleMoveView : possibleMoveViews) {
             possibleMoveView.setImageDrawable(ContextCompat.getDrawable(this, drawable));
-            possibleMoveView.setColorFilter(activePlayer.getColor());
             possibleMoveView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse_animation));
+            if(resourceSufficient || board.isSetupPhase()){
+                possibleMoveView.setColorFilter(Color.WHITE);
+            } else{
+                possibleMoveView.setColorFilter(Color.BLACK);
+            }
         }
         return true;
     }
@@ -462,7 +463,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews,int drawable){
         for (ImageView possibleMoveView : possibleMoveViews) {
             possibleMoveView.setImageDrawable(ContextCompat.getDrawable(this, drawable));
-            possibleMoveView.setColorFilter(activePlayer.getColor());
+            possibleMoveView.setColorFilter(localPlayer.getColor());
             possibleMoveView.clearAnimation();
         }
     }
@@ -472,18 +473,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         currentButtonFragmentListener.onButtonEvent(button);
 
         if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
-            Board board = boardViewModel.getBoardMutableLiveData().getValue();
-            if (board != null) {
-                showPossibleMoves(button);
-            } else {
-                boardViewModel.getBoardMutableLiveData().observe(this, new Observer<Board>() {
-                    @Override
-                    public void onChanged(Board board) {
-                        showPossibleMoves(button);
-                        boardViewModel.getBoardMutableLiveData().removeObserver(this);
-                    }
-                });
-            }
+            showPossibleMoves(button);
         }
 
         if (button == ButtonType.HELP) {
@@ -495,7 +485,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         }
 
-        mLastButtonClicked = button;
+        lastButtonClicked = button;
     }
 
     public void setCurrentButtonFragmentListener(OnButtonEventListener listener) {
@@ -510,7 +500,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         //margins for Hexagons
         int hexStartMargin = layoutWidth / 2 - 6 * HEXAGON_WIDTH_QUARTER;
-        int hexTopMargin = (layoutHeight / 2) - 2 * HEXAGON_HEIGHT - statusBarHeight;
+        int hexTopMargin = (layoutHeight / 2) - 2 * HEXAGON_HEIGHT;
         int secondRowMargin = -2 * HEXAGON_WIDTH -2 * HEXAGON_WIDTH_QUARTER -2; // -2 to make up some integer rounding
         int thirdRowMargin = secondRowMargin - HEXAGON_WIDTH;
         int rowHeightDifference = HEXAGON_WIDTH_HALF + HEXAGON_HEIGHT_QUARTER;
