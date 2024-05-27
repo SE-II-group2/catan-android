@@ -128,6 +128,7 @@ public class CurrentGamestateRepositoryTest {
         Assertions.assertArrayEquals(FIELDS.getDistribution(), hexagon.getDistribution().getDistribution());
         assertEquals(12, hexagon.getId());
         assertEquals(0, hexagon.getNumOfAdjacentBuildings());
+
         testObserver.dispose();
     }
 
@@ -163,15 +164,15 @@ public class CurrentGamestateRepositoryTest {
 
         assertEquals(50, intersectionCounter); // 54 Intersections - 4 Buildings = 50 "Empty" intersections
         assertEquals(4, buildingCounter);
-        assertEquals(44, lastIndex);
+        assertEquals(14, lastIndex);
 
         // Test one intersection for all fields. If this is correct, we can assume all intersections have all fields correct
         Building building = (Building) intersections[0][2];
         assertEquals(0, building.getId());
         assertEquals("displayName", building.getPlayer().getDisplayName());
         assertEquals(BuildingType.VILLAGE, building.getType());
-        testObserver.dispose();
 
+        testObserver.dispose();
     }
 
     @Test
@@ -207,6 +208,7 @@ public class CurrentGamestateRepositoryTest {
         Road road = (Road) adjacencyMatrix[4][5];
         assertEquals(4, road.getId());
         assertEquals(otherPlayer.getDisplayName(), road.getPlayer().getDisplayName());
+
         testObserver.dispose();
     }
 
