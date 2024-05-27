@@ -1,7 +1,5 @@
 package com.group2.catan_android.data.repository.gamestate;
 
-import android.util.Log;
-
 import com.group2.catan_android.data.live.game.ConnectionDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
 import com.group2.catan_android.data.live.game.HexagonDto;
@@ -32,23 +30,26 @@ import io.reactivex.subjects.BehaviorSubject;
 public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameStateDto>, CurrentgamestateProvider {
 
     private final BehaviorSubject<CurrentGameState> currentGameStateBehaviorSubject;
-    private final BehaviorSubject<Player> activePlayerBehaviorSubject;
+    private final BehaviorSubject<Player> localPlayerBehaviorSubject;
     private final BehaviorSubject<List<Player>> playerListBehaviorSubject;
+    private final BehaviorSubject<Player> activePlayerBehaviorSubject;
     private Board board;
     private List<Player> players;
+    private Player localPlayer;
     private Player activePlayer;
     CurrentGameState currentGameState;
     HashMap<Integer, Player> playerHashMap;
     private Flowable<CurrentGameStateDto> liveDataIn;
     private static CurrentGamestateRepository instance;
-    private int activePlayerIngameID;
+    private int localPlayerIngameID;
 
     Disposable d;
 
     private CurrentGamestateRepository() {
         this.currentGameStateBehaviorSubject = BehaviorSubject.create();
-        this.activePlayerBehaviorSubject = BehaviorSubject.create();
+        this.localPlayerBehaviorSubject = BehaviorSubject.create();
         this.playerListBehaviorSubject = BehaviorSubject.create();
+        this.activePlayerBehaviorSubject = BehaviorSubject.create();
         board = new Board();
         playerHashMap = new HashMap<>();
     }
@@ -60,8 +61,8 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         return instance;
     }
 
-    public void setActivePlayerIngameID(int inGameID) {
-        this.activePlayerIngameID=inGameID;
+    public void setLocalPlayerIngameID(int inGameID) {
+        this.localPlayerIngameID =inGameID;
     }
 
     @Override
@@ -70,8 +71,13 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     }
 
     @Override
-    public Observable<Player> getCurrentActivePlayerObservable() {
+    public Observable<Player> getActivePlayerObservable(){
         return activePlayerBehaviorSubject;
+    }
+
+    @Override
+    public Observable<Player> getCurrentLocalPlayerObservable() {
+        return localPlayerBehaviorSubject;
     }
 
     @Override
@@ -89,6 +95,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
 
     private void cleanup() {
         currentGameStateBehaviorSubject.onNext(new CurrentGameState());
+        localPlayerBehaviorSubject.onNext(new Player());
         activePlayerBehaviorSubject.onNext(new Player());
         playerListBehaviorSubject.onNext(new ArrayList<Player>());
         if (d != null)
@@ -99,15 +106,16 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         d = liveDataIn
                 .doOnComplete(this::cleanup)
                 .subscribe(CurrentGameStateDto -> {
-                    Log.d("received something", "received something");
                     players = getPlayersFromDto(CurrentGameStateDto.getPlayerOrder());
                     board.setHexagonList(getHexagonListFromDto(CurrentGameStateDto.getHexagons()));
                     board.setIntersections(generateIntersectionsFromDto(CurrentGameStateDto.getIntersections()));
                     board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
                     board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
                     currentGameState = new CurrentGameState(players, board);
-                    activePlayer = playerHashMap.get(activePlayerIngameID);
+                    localPlayer = playerHashMap.get(localPlayerIngameID);
+                    activePlayer=currentGameState.getPlayers().get(0);
                     activePlayerBehaviorSubject.onNext(activePlayer);
+                    localPlayerBehaviorSubject.onNext(localPlayer);
                     playerListBehaviorSubject.onNext(players);
                     currentGameStateBehaviorSubject.onNext(currentGameState);
                 });
@@ -154,7 +162,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     }
 
     public Intersection[][] generateIntersectionsFromDto(List<IntersectionDto> intersectionDtos) {
-        Intersection[][] intersections = new Intersection[6][11];
+        Intersection[][] intersections;
         Map<Integer, Intersection> idToIntersectionMap = new HashMap<>();
         Intersection intersection;
         // Create Intersection objects and map their IDs to the objects
@@ -199,7 +207,6 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private ArrayList<Hexagon> getHexagonListFromDto(List<HexagonDto> hexagons) {
         ArrayList<Hexagon> hexagonsList = new ArrayList<>();
         for (HexagonDto hexagonDto : hexagons) {
-            //TODO add robber to DTO
             hexagonsList.add(new Hexagon(hexagonDto.getHexagonType(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), hexagonDto.isHasRobber()));
         }
 

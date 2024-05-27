@@ -26,7 +26,7 @@ import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.gamelogic.Board;
-import com.group2.catan_android.gamelogic.MoveMaker;
+import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.objects.Building;
@@ -73,7 +73,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private MoveMaker movemaker;
     PlayerResourcesFragment playerResourcesFragment;
     private List<Player> playerList;
-    private Player activePlayer;
+    private Player localPlayer;
     PlayerScoresFragment playerScoresFragment;
     private boolean hasRolled = false;
 
@@ -199,8 +199,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         boardViewModel.getBoardMutableLiveData().observe(this, this::updateUiBoard);
         activePlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
-            this.activePlayer = player;
-            updateUiPlayerRessources(activePlayer);
+            this.localPlayer = player;
+            updateUiPlayerRessources(localPlayer);
         });
         gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
             if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
@@ -212,10 +212,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
-            List<Player> tempList = new ArrayList<>();
-            for(Player player : data){
-                tempList.add(player);
-            }
+            List<Player> tempList = new ArrayList<>(data);
             tempList.sort(Comparator.comparingInt(Player::getInGameID));
             updateUiPlayerScores(tempList);
         });
@@ -241,9 +238,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 }
             }
         });
-        activePlayer = new Player("test", 0, new int[]{0,0,0,0,0}, 1);
+        localPlayer = new Player("test", 0, new int[]{0,0,0,0,0}, 1);
         playerList = new ArrayList<>();
-        playerList.add(activePlayer);
+        playerList.add(localPlayer);
         updateUiBoard(new Board());
         //updateUiPlayerScores(playerList);
     }

@@ -87,7 +87,7 @@ public class GameController implements GameJoiner, GameLeaver{
         playerRepository.setLiveData(playerFlowable);
         Flowable<CurrentGameStateDto> currentGameStateFlowable = stompManager.filterByType(CurrentGameStateDto.class);
         currentGamestateRepository.setLiveData(currentGameStateFlowable);
-        currentGamestateRepository.setActivePlayerIngameID(joinGameResponse.getInGameID());
+        currentGamestateRepository.setLocalPlayerIngameID(joinGameResponse.getInGameID());
         Flowable<GameProgressDto> gameProgressFlowable = stompManager.filterByType(GameProgressDto.class);
         gameProgressRepository.setLiveData(gameProgressFlowable);
     }
@@ -96,6 +96,7 @@ public class GameController implements GameJoiner, GameLeaver{
         tokenRepository.storeToken(joinGameResponse.getToken());
         tokenRepository.storeGameID(joinGameResponse.getGameID());
         tokenRepository.storeInGameID(joinGameResponse.getInGameID());
+        MoveMaker.getInstance().setToken(joinGameResponse.getToken());
     }
 
 

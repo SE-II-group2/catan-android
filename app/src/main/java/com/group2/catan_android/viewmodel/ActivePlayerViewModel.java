@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
-import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -30,7 +29,7 @@ public class ActivePlayerViewModel extends ViewModel {
         return playerMutableLiveData;
     }
     private void setupListeners() {
-        Disposable playerDisposable = datasource.getCurrentActivePlayerObservable()
+        Disposable playerDisposable = datasource.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(playerMutableLiveData::setValue);
