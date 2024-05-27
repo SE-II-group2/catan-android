@@ -58,7 +58,7 @@ public class CurrentGamestateRepositoryTest {
         localPlayer.setInGameID(1);
         otherPlayer = new Player("Other displayName", 0, new int[]{0, 0, 1, 1, 1}, -1000);
         otherPlayer.setInGameID(2);
-         playerDtos = new ArrayList<>();
+        playerDtos = new ArrayList<>();
         playerDtos.add(otherPlayer.toIngamePlayerDto());
         playerDtos.add(localPlayer.toIngamePlayerDto());
         createCurrentGamestateDto();
@@ -101,7 +101,7 @@ public class CurrentGamestateRepositoryTest {
     }
 
     @Test
-    void testHexagonsEmitCorrectValue(){
+    void testHexagonsEmitCorrectValue() {
         PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
         currentGamestateRepository.setLiveData(liveIn);
         currentGamestateRepository.setLocalPlayerIngameID(1);
@@ -109,15 +109,15 @@ public class CurrentGamestateRepositoryTest {
 
         liveIn.onNext(currentGameStateDto);
         List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size()-1);
+        CurrentGameState currentGameState = values.get(values.size() - 1);
         int lastRollvalue = 0;
         // If all Hexagons are in ascending order as they were generated, assume correct transmission
-        for(Hexagon hexagon : currentGameState.getBoard().getHexagonList()){
-            if(hexagon.getHexagontype().equals(Hexagontype.DESERT)){
+        for (Hexagon hexagon : currentGameState.getBoard().getHexagonList()) {
+            if (hexagon.getHexagontype().equals(Hexagontype.DESERT)) {
                 assertEquals(0, hexagon.getRollValue());
                 continue;
             }
-            assert(lastRollvalue<=hexagon.getRollValue());
+            assert (lastRollvalue <= hexagon.getRollValue());
             lastRollvalue = hexagon.getRollValue();
         }
         // Pick one random Hexagon, if it is completely correct we can assume all hexagons are correct
@@ -132,7 +132,7 @@ public class CurrentGamestateRepositoryTest {
     }
 
     @Test
-    void testIntersectionsEmitCorrectValue(){
+    void testIntersectionsEmitCorrectValue() {
         PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
         currentGamestateRepository.setLiveData(liveIn);
         currentGamestateRepository.setLocalPlayerIngameID(1);
@@ -140,22 +140,21 @@ public class CurrentGamestateRepositoryTest {
 
         liveIn.onNext(currentGameStateDto);
         List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size()-1);
+        CurrentGameState currentGameState = values.get(values.size() - 1);
         Intersection[][] intersections = currentGameState.getBoard().getIntersections();
 
         int lastIndex = -1, buildingCounter = 0, intersectionCounter = 0;
         // Test if all intersections that arent null have a buildingType and count number of empty intersections and buildings
         // If number of intersections transferred is correct and each intersection has one field set we can assume that they got transported correctly
-        for(Intersection[] intersectionRow : intersections){
-            for( Intersection intersection : intersectionRow){
-                if(intersection==null)continue;
-                if(intersection instanceof Building){
+        for (Intersection[] intersectionRow : intersections) {
+            for (Intersection intersection : intersectionRow) {
+                if (intersection == null) continue;
+                if (intersection instanceof Building) {
                     assertEquals(BuildingType.VILLAGE, intersection.getType());
-                    assert(lastIndex < ((Building) intersection).getId());
-                    lastIndex=((Building) intersection).getId();
+                    assert (lastIndex < ((Building) intersection).getId());
+                    lastIndex = ((Building) intersection).getId();
                     buildingCounter++;
-                }
-                else {
+                } else {
                     intersectionCounter++;
                     assertEquals(BuildingType.EMPTY, intersection.getType());
                 }
@@ -176,7 +175,7 @@ public class CurrentGamestateRepositoryTest {
     }
 
     @Test
-    void testConnectionsEmitCorrectValue(){
+    void testConnectionsEmitCorrectValue() {
         PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
         currentGamestateRepository.setLiveData(liveIn);
         currentGamestateRepository.setLocalPlayerIngameID(1);
@@ -184,19 +183,18 @@ public class CurrentGamestateRepositoryTest {
 
         liveIn.onNext(currentGameStateDto);
         List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size()-1);
+        CurrentGameState currentGameState = values.get(values.size() - 1);
         Connection[][] adjacencyMatrix = currentGameState.getBoard().getAdjacencyMatrix();
 
-        int connectionCounter=0, roadCounter=0;
+        int connectionCounter = 0, roadCounter = 0;
 
-        for(Connection[] connectionRow : adjacencyMatrix){
-            for(Connection connection : connectionRow){
-                if(connection==null)continue;
-                if(connection instanceof Road){
-                    assert(connection.getPlayer().getInGameID()==1 || connection.getPlayer().getInGameID()==2);
+        for (Connection[] connectionRow : adjacencyMatrix) {
+            for (Connection connection : connectionRow) {
+                if (connection == null) continue;
+                if (connection instanceof Road) {
+                    assert (connection.getPlayer().getInGameID() == 1 || connection.getPlayer().getInGameID() == 2);
                     roadCounter++;
-                }
-                else{
+                } else {
                     connectionCounter++;
                 }
             }
@@ -205,7 +203,7 @@ public class CurrentGamestateRepositoryTest {
         assertEquals(8, roadCounter); // as there are 2 entries for each connection, multiply the actual number that should be by 2
         assertEquals(136, connectionCounter);
 
-        assert(adjacencyMatrix[4][5] instanceof Road);
+        assert (adjacencyMatrix[4][5] instanceof Road);
         Road road = (Road) adjacencyMatrix[4][5];
         assertEquals(4, road.getId());
         assertEquals(otherPlayer.getDisplayName(), road.getPlayer().getDisplayName());
@@ -213,14 +211,13 @@ public class CurrentGamestateRepositoryTest {
     }
 
 
-
     //########################################################################################
 
-    private void createCurrentGamestateDto(){
+    private void createCurrentGamestateDto() {
         ArrayList<Hexagon> hexagonList = (ArrayList<Hexagon>) createPreSetupHexagonList();
         List<HexagonDto> hexagonDtoList = new ArrayList<>();
 
-        for(Hexagon hexagon : hexagonList){
+        for (Hexagon hexagon : hexagonList) {
             hexagonDtoList.add(new HexagonDto(hexagon.getHexagontype(), hexagon.getDistribution(), hexagon.getRollValue(), hexagon.getId(), hexagon.isHasRobber()));
         }
 
@@ -283,11 +280,7 @@ public class CurrentGamestateRepositoryTest {
         List<Integer> values = new ArrayList<>();
 
         // Copy Hexagontypes and values lists to ensure original lists remain unchanged
-        Collections.addAll(Hexagontypes, Hexagontype.PASTURE, Hexagontype.FOREST, Hexagontype.HILLS,
-                Hexagontype.MOUNTAINS, Hexagontype.HILLS, Hexagontype.FOREST, Hexagontype.HILLS,
-                Hexagontype.FOREST, Hexagontype.HILLS, Hexagontype.FIELDS, Hexagontype.PASTURE, Hexagontype.FIELDS,
-                Hexagontype.FIELDS, Hexagontype.PASTURE, Hexagontype.DESERT, Hexagontype.FIELDS,
-                Hexagontype.MOUNTAINS, Hexagontype.PASTURE, Hexagontype.FOREST);
+        Collections.addAll(Hexagontypes, Hexagontype.PASTURE, Hexagontype.FOREST, Hexagontype.HILLS, Hexagontype.MOUNTAINS, Hexagontype.HILLS, Hexagontype.FOREST, Hexagontype.HILLS, Hexagontype.FOREST, Hexagontype.HILLS, Hexagontype.FIELDS, Hexagontype.PASTURE, Hexagontype.FIELDS, Hexagontype.FIELDS, Hexagontype.PASTURE, Hexagontype.DESERT, Hexagontype.FIELDS, Hexagontype.MOUNTAINS, Hexagontype.PASTURE, Hexagontype.FOREST);
         Collections.addAll(values, 2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
 
         for (int i = 0; i < Hexagontypes.size(); i++) {
