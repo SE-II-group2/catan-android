@@ -26,6 +26,7 @@ import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
+import com.group2.catan_android.gamelogic.objects.Road;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,8 +142,10 @@ public class CurrentGamestateRepositoryTest {
         List<CurrentGameState> values = testObserver.values();
         CurrentGameState currentGameState = values.get(values.size()-1);
         Intersection[][] intersections = currentGameState.getBoard().getIntersections();
-        int lastIndex = -1;
-        int intersectionCounter = 0;
+
+        int lastIndex = -1, buildingCounter = 0, intersectionCounter = 0;
+        // Test if all intersections that arent null have a buildingType and count number of empty intersections and buildings
+        // If number of intersections transferred is correct and each intersection has one field set we can assume that they got transported correctly
         for(Intersection[] intersectionRow : intersections){
             for( Intersection intersection : intersectionRow){
                 if(intersection==null)continue;
@@ -150,21 +153,65 @@ public class CurrentGamestateRepositoryTest {
                     assertEquals(BuildingType.VILLAGE, intersection.getType());
                     assert(lastIndex < ((Building) intersection).getId());
                     lastIndex=((Building) intersection).getId();
-                    intersectionCounter++;
+                    buildingCounter++;
                 }
                 else {
+                    intersectionCounter++;
                     assertEquals(BuildingType.EMPTY, intersection.getType());
                 }
             }
         }
-        assertEquals(4, intersectionCounter);
+
+        assertEquals(50, intersectionCounter); // 54 Intersections - 4 Buildings = 50 "Empty" intersections
+        assertEquals(4, buildingCounter);
         assertEquals(44, lastIndex);
+
+        // Test one intersection for all fields. If this is correct, we can assume all intersections have all fields correct
         Building building = (Building) intersections[0][2];
         assertEquals(0, building.getId());
         assertEquals("displayName", building.getPlayer().getDisplayName());
         assertEquals(BuildingType.VILLAGE, building.getType());
         testObserver.dispose();
+
     }
+
+    @Test
+    void testConnectionsEmitCorrectValue(){
+        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
+        currentGamestateRepository.setLiveData(liveIn);
+        currentGamestateRepository.setLocalPlayerIngameID(1);
+        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
+
+        liveIn.onNext(currentGameStateDto);
+        List<CurrentGameState> values = testObserver.values();
+        CurrentGameState currentGameState = values.get(values.size()-1);
+        Connection[][] adjacencyMatrix = currentGameState.getBoard().getAdjacencyMatrix();
+
+        int connectionCounter=0, roadCounter=0;
+
+        for(Connection[] connectionRow : adjacencyMatrix){
+            for(Connection connection : connectionRow){
+                if(connection==null)continue;
+                if(connection instanceof Road){
+                    assert(connection.getPlayer().getInGameID()==1 || connection.getPlayer().getInGameID()==2);
+                    roadCounter++;
+                }
+                else{
+                    connectionCounter++;
+                }
+            }
+        }
+
+        assertEquals(8, roadCounter); // as there are 2 entries for each connection, multiply the actual number that should be by 2
+        assertEquals(136, connectionCounter);
+
+        assert(adjacencyMatrix[4][5] instanceof Road);
+        Road road = (Road) adjacencyMatrix[4][5];
+        assertEquals(4, road.getId());
+        assertEquals(otherPlayer.getDisplayName(), road.getPlayer().getDisplayName());
+        testObserver.dispose();
+    }
+
 
 
     //########################################################################################
@@ -185,10 +232,10 @@ public class CurrentGamestateRepositoryTest {
         board.addNewRoad(localPlayer, 0);
         board.addNewVillage(otherPlayer, 4);
         board.addNewRoad(otherPlayer, 4);
-        board.addNewVillage(localPlayer, 30);
-        board.addNewRoad(localPlayer, 30);
-        board.addNewVillage(otherPlayer, 44);
-        board.addNewRoad(otherPlayer, 44);
+        board.addNewVillage(localPlayer, 10);
+        board.addNewRoad(localPlayer, 7);
+        board.addNewVillage(otherPlayer, 14);
+        board.addNewRoad(otherPlayer, 9);
 
         List<IntersectionDto> intersectionDtoList = createPreSetupIntersectionList(board);
         List<ConnectionDto> connectionDtoList = createPreSetupConnectionList(board);
