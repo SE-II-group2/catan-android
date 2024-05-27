@@ -5,6 +5,7 @@ import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.FORE
 import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.HILLS;
 import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.MOUNTAINS;
 import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.PASTURE;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.group2.catan_android.data.live.PlayerDto;
@@ -18,12 +19,15 @@ import com.group2.catan_android.data.repository.gamestate.CurrentGamestateReposi
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.CurrentGameState;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
+import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -108,8 +112,57 @@ public class CurrentGamestateRepositoryTest {
         int lastRollvalue = 0;
         // If all Hexagons are in ascending order as they were generated, assume correct transmission
         for(Hexagon hexagon : currentGameState.getBoard().getHexagonList()){
+            if(hexagon.getHexagontype().equals(Hexagontype.DESERT)){
+                assertEquals(0, hexagon.getRollValue());
+                continue;
+            }
             assert(lastRollvalue<=hexagon.getRollValue());
+            lastRollvalue = hexagon.getRollValue();
         }
+        // Pick one random Hexagon, if it is completely correct we can assume all hexagons are correct
+        Hexagon hexagon = currentGameState.getBoard().getHexagonList().get(12);
+        // FIELDS, 9
+        assertEquals(Hexagontype.FIELDS, hexagon.getHexagontype());
+        assertEquals(9, hexagon.getRollValue());
+        Assertions.assertArrayEquals(FIELDS.getDistribution(), hexagon.getDistribution().getDistribution());
+        assertEquals(12, hexagon.getId());
+        assertEquals(0, hexagon.getNumOfAdjacentBuildings());
+        testObserver.dispose();
+    }
+
+    @Test
+    void testIntersectionsEmitCorrectValue(){
+        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
+        currentGamestateRepository.setLiveData(liveIn);
+        currentGamestateRepository.setLocalPlayerIngameID(1);
+        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
+
+        liveIn.onNext(currentGameStateDto);
+        List<CurrentGameState> values = testObserver.values();
+        CurrentGameState currentGameState = values.get(values.size()-1);
+        Intersection[][] intersections = currentGameState.getBoard().getIntersections();
+        int lastIndex = -1;
+        int intersectionCounter = 0;
+        for(Intersection[] intersectionRow : intersections){
+            for( Intersection intersection : intersectionRow){
+                if(intersection==null)continue;
+                if(intersection instanceof Building){
+                    assertEquals(BuildingType.VILLAGE, intersection.getType());
+                    assert(lastIndex < ((Building) intersection).getId());
+                    lastIndex=((Building) intersection).getId();
+                    intersectionCounter++;
+                }
+                else {
+                    assertEquals(BuildingType.EMPTY, intersection.getType());
+                }
+            }
+        }
+        assertEquals(4, intersectionCounter);
+        assertEquals(44, lastIndex);
+        Building building = (Building) intersections[0][2];
+        assertEquals(0, building.getId());
+        assertEquals("displayName", building.getPlayer().getDisplayName());
+        assertEquals(BuildingType.VILLAGE, building.getType());
         testObserver.dispose();
     }
 
