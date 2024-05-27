@@ -285,6 +285,15 @@ public class Board {
 
 
     }
+    public int getConnectionIdFromIntersections(int intersectionId1, int intersectionId2) {
+        for (int connectionId = 0; connectionId < connectedIntersections[0].length; connectionId++) {
+            if ((connectedIntersections[0][connectionId] == intersectionId1 && connectedIntersections[1][connectionId] == intersectionId2) ||
+                    (connectedIntersections[0][connectionId] == intersectionId2 && connectedIntersections[1][connectionId] == intersectionId1)) {
+                return connectionId;
+            }
+        }
+        return -1; // Return -1 if no matching connection is found
+    }
 
     public void setSetupPhase(boolean setupPhase) {
         isSetupPhase = setupPhase;

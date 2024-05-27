@@ -16,10 +16,13 @@ import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.data.live.game.IntersectionDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.CurrentGameState;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
+import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.objects.Intersection;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +30,10 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.processors.PublishProcessor;
@@ -37,6 +43,8 @@ public class CurrentGamestateRepositoryTest {
     private ArrayList<IngamePlayerDto> playerDtos;
     private Player localPlayer;
     private Player otherPlayer;
+
+    private CurrentGameStateDto currentGameStateDto;
 
     @BeforeEach
     public void setUp() {
@@ -48,6 +56,7 @@ public class CurrentGamestateRepositoryTest {
          playerDtos = new ArrayList<>();
         playerDtos.add(otherPlayer.toIngamePlayerDto());
         playerDtos.add(localPlayer.toIngamePlayerDto());
+        createCurrentGamestateDto();
     }
 
     @Test
@@ -87,20 +96,83 @@ public class CurrentGamestateRepositoryTest {
     }
 
     @Test
-    void testIntersectionsEmitCorrectValue(){
+    void testHexagonsEmitCorrectValue(){
+        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
+        currentGamestateRepository.setLiveData(liveIn);
+        currentGamestateRepository.setLocalPlayerIngameID(1);
+        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
 
+        liveIn.onNext(currentGameStateDto);
+        List<CurrentGameState> values = testObserver.values();
+        CurrentGameState currentGameState = values.get(values.size()-1);
+        int lastRollvalue = 0;
+        // If all Hexagons are in ascending order as they were generated, assume correct transmission
+        for(Hexagon hexagon : currentGameState.getBoard().getHexagonList()){
+            assert(lastRollvalue<=hexagon.getRollValue());
+        }
+        testObserver.dispose();
     }
 
 
     //########################################################################################
 
     private void createCurrentGamestateDto(){
-        List<Hexagon> hexagonList = createPreSetupHexagonList();
+        ArrayList<Hexagon> hexagonList = (ArrayList<Hexagon>) createPreSetupHexagonList();
         List<HexagonDto> hexagonDtoList = new ArrayList<>();
 
         for(Hexagon hexagon : hexagonList){
             hexagonDtoList.add(new HexagonDto(hexagon.getHexagontype(), hexagon.getDistribution(), hexagon.getRollValue(), hexagon.getId(), hexagon.isHasRobber()));
         }
+
+        //Add board and make moves there, then get intersections and adjacency matrix and convert to DTO list
+        Board board = new Board();
+        board.setHexagonList(hexagonList);
+        board.setSetupPhase(true);
+        board.addNewVillage(localPlayer, 0);
+        board.addNewRoad(localPlayer, 0);
+        board.addNewVillage(otherPlayer, 4);
+        board.addNewRoad(otherPlayer, 4);
+        board.addNewVillage(localPlayer, 30);
+        board.addNewRoad(localPlayer, 30);
+        board.addNewVillage(otherPlayer, 44);
+        board.addNewRoad(otherPlayer, 44);
+
+        List<IntersectionDto> intersectionDtoList = createPreSetupIntersectionList(board);
+        List<ConnectionDto> connectionDtoList = createPreSetupConnectionList(board);
+        currentGameStateDto = new CurrentGameStateDto(hexagonDtoList, intersectionDtoList, connectionDtoList, playerDtos, false);
+    }
+
+    private List<ConnectionDto> createPreSetupConnectionList(Board board) {
+        List<ConnectionDto> connectionDtos = new ArrayList<>();
+        Map<String, Boolean> visitedConnections = new HashMap<>();
+
+        for (int i = 0; i < board.getAdjacencyMatrix().length; i++) {
+            for (int j = i + 1; j < board.getAdjacencyMatrix()[i].length; j++) {
+                Connection connection = board.getAdjacencyMatrix()[i][j];
+                if (connection != null && !visitedConnections.containsKey(i + "-" + j)) {
+                    connectionDtos.add(new ConnectionDto((connection.getPlayer() == null) ? null : connection.getPlayer().toIngamePlayerDto(), board.getConnectionIdFromIntersections(i, j)));
+                    visitedConnections.put(i + "-" + j, true);
+                    visitedConnections.put(j + "-" + i, true);  // Mark both [i][j] and [j][i] as visited
+                }
+            }
+        }
+        Comparator<ConnectionDto> connectionDtoComparator = Comparator.comparingInt(ConnectionDto::getId);
+        connectionDtos.sort(connectionDtoComparator);
+
+        return connectionDtos;
+    }
+
+    private List<IntersectionDto> createPreSetupIntersectionList(Board board) {
+        List<IntersectionDto> intersectionDtos = new ArrayList<>();
+        int id = 0;
+        for (Intersection[] intersectionRow : board.getIntersections()) {
+            for (Intersection intersection : intersectionRow) {
+                if (intersection != null) {
+                    intersectionDtos.add(new IntersectionDto((intersection.getPlayer() == null) ? null : intersection.getPlayer().toIngamePlayerDto(), intersection.getType().name(), id++));
+                }
+            }
+        }
+        return intersectionDtos;
     }
 
     private List<Hexagon> createPreSetupHexagonList() {
