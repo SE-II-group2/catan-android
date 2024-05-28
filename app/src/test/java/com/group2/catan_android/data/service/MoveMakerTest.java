@@ -1,6 +1,7 @@
 package com.group2.catan_android.data.service;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -135,6 +136,42 @@ public class MoveMakerTest {
 
         BuildRoadMoveDto roadMove = new BuildRoadMoveDto();
         assertThrows(Exception.class, () -> moveMaker.makeMove(roadMove));
+    }
+
+    @Test
+    void testEndTurnMoveOutOfSetupPhaseSuccess() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        EndTurnMoveDto endTurnMoveDto = new EndTurnMoveDto();
+        moveMaker.makeMove(endTurnMoveDto);
+
+        verify(moveMaker, times(1)).sendMove(any());
+    }
+
+    @Test
+    void testBuildVillageInvalidLocation() throws Exception{
+        isSetupPhaseField.set(moveMaker,false);
+        playerList.get(0).adjustResources(new int[]{5,5,5,5,5});
+
+        BuildVillageMoveDto buildVillageMoveDto = new BuildVillageMoveDto(5);
+        moveMaker.makeMove(buildVillageMoveDto);
+
+        assertThrows(Exception.class, () -> moveMaker.makeMove(buildVillageMoveDto));
+    }
+
+    @Test
+    void testBuildRoadInvalidLocation() throws Exception{
+        isSetupPhaseField.set(moveMaker,false);
+        playerList.get(0).adjustResources(new int[]{5,5,5,5,5});
+
+        BuildRoadMoveDto buildRoadMoveDto = new BuildRoadMoveDto(5);
+        moveMaker.makeMove(buildRoadMoveDto);
+
+        assertThrows(Exception.class, () -> moveMaker.makeMove(buildRoadMoveDto));
+    }
+
+    @Test
+    void testIsSetupPhaseReturnsCorrectValue(){
+        assertTrue(moveMaker.isSetupPhase());
     }
 }
 

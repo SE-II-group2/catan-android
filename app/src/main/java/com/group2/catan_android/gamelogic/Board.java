@@ -11,7 +11,6 @@ import com.group2.catan_android.gamelogic.objects.Road;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 // fixme here the low-level logic creates readability and maintenance issues (the impact was not obvious in the backend)
@@ -285,7 +284,7 @@ public class Board {
 
 
     }
-    public int getConnectionIdFromIntersections(int intersectionId1, int intersectionId2) {
+    public int translateIntersectionsToConnection(int intersectionId1, int intersectionId2) {
         for (int connectionId = 0; connectionId < connectedIntersections[0].length; connectionId++) {
             if ((connectedIntersections[0][connectionId] == intersectionId1 && connectedIntersections[1][connectionId] == intersectionId2) ||
                     (connectedIntersections[0][connectionId] == intersectionId2 && connectedIntersections[1][connectionId] == intersectionId1)) {

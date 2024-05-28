@@ -1,15 +1,9 @@
 package com.group2.catan_android.data.repository;
 
 import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.FIELDS;
-import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.FOREST;
-import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.HILLS;
-import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.MOUNTAINS;
-import static com.group2.catan_android.gamelogic.enums.ResourceDistribution.PASTURE;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.group2.catan_android.data.live.PlayerDto;
-import com.group2.catan_android.data.live.PlayersInLobbyDto;
 import com.group2.catan_android.data.live.game.ConnectionDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
 import com.group2.catan_android.data.live.game.HexagonDto;
@@ -33,7 +27,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -225,7 +218,7 @@ public class CurrentGamestateRepositoryTest {
             for (int j = i + 1; j < board.getAdjacencyMatrix()[i].length; j++) {
                 Connection connection = board.getAdjacencyMatrix()[i][j];
                 if (connection != null && !visitedConnections.containsKey(i + "-" + j)) {
-                    connectionDtos.add(new ConnectionDto((connection.getPlayer() == null) ? null : connection.getPlayer().toIngamePlayerDto(), board.getConnectionIdFromIntersections(i, j)));
+                    connectionDtos.add(new ConnectionDto((connection.getPlayer() == null) ? null : connection.getPlayer().toIngamePlayerDto(), board.translateIntersectionsToConnection(i, j)));
                     visitedConnections.put(i + "-" + j, true);
                     visitedConnections.put(j + "-" + i, true);  // Mark both [i][j] and [j][i] as visited
                 }
