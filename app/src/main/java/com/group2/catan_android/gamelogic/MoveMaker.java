@@ -116,5 +116,12 @@ public class MoveMaker {
 
     }
 
+    public boolean hasRolled() {
+        return hasRolled;
+    }
+
+    public void setHasRolled(boolean hasRolled) {
+        this.hasRolled = hasRolled;
+    }
 }
 
