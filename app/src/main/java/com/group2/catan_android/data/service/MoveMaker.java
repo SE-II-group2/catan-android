@@ -129,7 +129,7 @@ public class MoveMaker {
         disposable.add(activePlayerDisposable);
     }
 
-    private void sendMove(GameMoveDto gameMoveDto) {
+    protected void sendMove(GameMoveDto gameMoveDto) {
         moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 

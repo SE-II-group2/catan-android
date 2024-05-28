@@ -3,6 +3,7 @@ package com.group2.catan_android.data.service;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -38,8 +41,6 @@ import io.reactivex.schedulers.Schedulers;
 public class MoveMakerTest {
     private MoveMaker moveMaker;
     List<Player> playerList;
-    @Mock
-    private MoveSenderRepository mockMoveSenderRepository;
     private final String token = "token";
     Field isSetupPhaseField;
 
@@ -56,49 +57,15 @@ public class MoveMakerTest {
 
         MockitoAnnotations.openMocks(this);
 
-        Constructor<MoveMaker> constructor = MoveMaker.class.getDeclaredConstructor(Board.class, Player.class, List.class);
-        constructor.setAccessible(true);
-        moveMaker = spy(constructor.newInstance(board, localPlayer, playerList));
+        // Create a spy of MoveMaker with mock dependencies
+        moveMaker = spy(new MoveMaker(board, localPlayer, playerList));
+
+        // Mock the sendMove method to do nothing
+        doNothing().when(moveMaker).sendMove(any());
         moveMaker.setToken(token);
 
-
-        // Configure RxJava to use a different scheduler for AndroidSchedulers.mainThread()
-        //RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
-
-        // Use reflection to set the MoveSenderRepository instance to the mocked one
-        try {
-            Field moveSenderRepositoryField = MoveMaker.class.getDeclaredField("moveSenderRepository");
-            moveSenderRepositoryField.setAccessible(true);
-            moveSenderRepositoryField.set(moveMaker, mockMoveSenderRepository);
-
-            Field boardField = MoveMaker.class.getDeclaredField("board");
-            boardField.setAccessible(true);
-            boardField.set(moveMaker, board);
-
-            Field localPlayerField = MoveMaker.class.getDeclaredField("localPlayer");
-            localPlayerField.setAccessible(true);
-            localPlayerField.set(moveMaker, localPlayer);
-
-            Field playerListField = MoveMaker.class.getDeclaredField("players");
-            playerListField.setAccessible(true);
-            playerListField.set(moveMaker, playerList);
-
-            isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
-            isSetupPhaseField.setAccessible(true);
-
-            Method method = MoveMaker.class.getDeclaredMethod("sendMove", GameMoveDto.class);
-            method.setAccessible(true); // This allows us to access private methods
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @AfterEach
-    public void tearDown() {
-        // Reset RxAndroidPlugins to its default state
-        //RxAndroidPlugins.reset();
+        isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
+        isSetupPhaseField.setAccessible(true);
     }
 
     @Test
@@ -107,57 +74,58 @@ public class MoveMakerTest {
         GameMoveDto move = new BuildVillageMoveDto(2);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
     }
-/*
-    @Test
-    void testMakeRollDiceMoveSuccess() throws Exception {
-        GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
-        moveMaker.makeMove(move); // This should succeed
-        assert(moveMaker.hasRolled());
-        verify(mockMoveSenderRepository, times(1)).sendMove(move, token);
-    }
+
+
+        @Test
+        void testMakeRollDiceMoveSuccess() throws Exception {
+            GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
+            moveMaker.makeMove(move); // This should succeed
+            assert(moveMaker.hasRolled());
+            verify(moveMaker, times(1)).sendMove(move);
+        }
+
+        @Test
+        void testMakeRollDiceMoveAlreadyRolled() throws Exception {
+            GameMoveDto move = new RollDiceDto(5);
+            moveMaker.makeMove(move);
+            assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
+        }
 
     @Test
-    void testMakeRollDiceMoveAlreadyRolled() throws Exception {
-        GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
-        moveMaker.makeMove(move);
-        assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
-    }
-*/
-    @Test
     void testMakeEndTurnMoveInSetupPhase() {
-        GameMoveDto move = new EndTurnMoveDto(); // Use a proper EndTurnMoveDto instance
+        GameMoveDto move = new EndTurnMoveDto();
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
     }
 
-    /*@Test
+    @Test
     void testMakeBuildVillageMoveSuccess() throws Exception {
         BuildVillageMoveDto move = new BuildVillageMoveDto(31);
         moveMaker.makeMove(move); // This should succeed
-        verify(mockMoveSenderRepository, times(1)).sendMove(move, token);
-    }*/
-/*
+        verify(moveMaker, times(1)).sendMove(move);
+    }
+
     @Test
     void testMakeBuildVillageMoveAlreadyPlacedVillage() throws Exception {
         BuildVillageMoveDto move = new BuildVillageMoveDto();
         moveMaker.makeMove(move);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
     }
-*/
+
     @Test
     void testMakeBuildRoadMovePlaceVillageFirst() {
         BuildRoadMoveDto move = new BuildRoadMoveDto();
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
     }
 
-   /* @Test
+   @Test
     void testMakeBuildRoadMoveSuccess() throws Exception {
         BuildVillageMoveDto villageMove = new BuildVillageMoveDto(0);
         moveMaker.makeMove(villageMove);
 
         BuildRoadMoveDto roadMove = new BuildRoadMoveDto(0);
         moveMaker.makeMove(roadMove);
-        verify(mockMoveSenderRepository, times(2)).sendMove(any(), eq(token));
-    }*/
+        verify(moveMaker, times(2)).sendMove(any());
+    }
 
     @Test
     void testMakeBuildRoadMoveNotEnoughResources() throws Exception {
