@@ -3,41 +3,26 @@ package com.group2.catan_android.data.service;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
-import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Completable;
-import io.reactivex.android.plugins.RxAndroidPlugins;
-import io.reactivex.schedulers.Schedulers;
 
 public class MoveMakerTest {
     private MoveMaker moveMaker;
@@ -77,20 +62,20 @@ public class MoveMakerTest {
     }
 
 
-        @Test
-        void testMakeRollDiceMoveSuccess() throws Exception {
-            GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
-            moveMaker.makeMove(move); // This should succeed
-            assert(moveMaker.hasRolled());
-            verify(moveMaker, times(1)).sendMove(move);
-        }
+    @Test
+    void testMakeRollDiceMoveSuccess() throws Exception {
+        GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
+        moveMaker.makeMove(move); // This should succeed
+        assert (moveMaker.hasRolled());
+        verify(moveMaker, times(1)).sendMove(move);
+    }
 
-        @Test
-        void testMakeRollDiceMoveAlreadyRolled() throws Exception {
-            GameMoveDto move = new RollDiceDto(5);
-            moveMaker.makeMove(move);
-            assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
-        }
+    @Test
+    void testMakeRollDiceMoveAlreadyRolled() throws Exception {
+        GameMoveDto move = new RollDiceDto(5);
+        moveMaker.makeMove(move);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
+    }
 
     @Test
     void testMakeEndTurnMoveInSetupPhase() {
@@ -118,7 +103,7 @@ public class MoveMakerTest {
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
     }
 
-   @Test
+    @Test
     void testMakeBuildRoadMoveSuccess() throws Exception {
         BuildVillageMoveDto villageMove = new BuildVillageMoveDto(0);
         moveMaker.makeMove(villageMove);
@@ -148,9 +133,9 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testBuildVillageInvalidLocation() throws Exception{
-        isSetupPhaseField.set(moveMaker,false);
-        playerList.get(0).adjustResources(new int[]{5,5,5,5,5});
+    void testBuildVillageInvalidLocation() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
 
         BuildVillageMoveDto buildVillageMoveDto = new BuildVillageMoveDto(5);
         moveMaker.makeMove(buildVillageMoveDto);
@@ -159,9 +144,9 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testBuildRoadInvalidLocation() throws Exception{
-        isSetupPhaseField.set(moveMaker,false);
-        playerList.get(0).adjustResources(new int[]{5,5,5,5,5});
+    void testBuildRoadInvalidLocation() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
 
         BuildRoadMoveDto buildRoadMoveDto = new BuildRoadMoveDto(5);
         moveMaker.makeMove(buildRoadMoveDto);
@@ -170,7 +155,7 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testIsSetupPhaseReturnsCorrectValue(){
+    void testIsSetupPhaseReturnsCorrectValue() {
         assertTrue(moveMaker.isSetupPhase());
     }
 }

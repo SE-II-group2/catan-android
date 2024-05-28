@@ -1,7 +1,5 @@
 package com.group2.catan_android.data.service;
 
-import android.util.Log;
-
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
