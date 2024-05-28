@@ -35,14 +35,18 @@ public class TradingResourceSelectionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setOnClickListeners(view);
 
+
+    }
+
+    public void setOnClickListeners(View view){
         plus = new ImageView[]{
                 view.findViewById(R.id.resource_selection_wood_plus),
                 view.findViewById(R.id.resource_selection_brick_plus),
                 view.findViewById(R.id.resource_selection_sheep_plus),
                 view.findViewById(R.id.resource_selection_wheat_plus),
                 view.findViewById(R.id.resource_selection_stone_plus),
-
         };
         ImageView[] minus = {
                 view.findViewById(R.id.resource_selection_wood_minus),
@@ -50,7 +54,6 @@ public class TradingResourceSelectionFragment extends Fragment {
                 view.findViewById(R.id.resource_selection_sheep_minus),
                 view.findViewById(R.id.resource_selection_wheat_minus),
                 view.findViewById(R.id.resource_selection_stone_minus),
-
         };
         count = new TextView[]{
                 view.findViewById(R.id.resource_selection_wood_count),
@@ -60,10 +63,8 @@ public class TradingResourceSelectionFragment extends Fragment {
                 view.findViewById(R.id.resource_selection_stone_count)};
 
         //set OnClickListener for all plus and minus buttons
-
         for(int i=0;i<5;i++){
             final int j = i;
-            view.findViewById(R.id.resource_selection_wood_plus);
             plus[j].setOnClickListener(v->{
                 int num = getNumberofTextView(count[j]);
                 if(num==-1){return;}//Error
@@ -77,7 +78,6 @@ public class TradingResourceSelectionFragment extends Fragment {
                 count[j].setText(Integer.toString(num));
             });
         }
-
     }
     public int getNumberofTextView(TextView view){
         CharSequence content = view.getText();
