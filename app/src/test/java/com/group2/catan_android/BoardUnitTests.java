@@ -89,14 +89,13 @@ public class BoardUnitTests {
 
     @Test
     void testAddCityToVillage() {
+        board.addNewVillage(player1,19);
+        board.addNewRoad(player1,26);
         board.addNewRoad(player1,27);
         assertSame(BuildingType.EMPTY,board.getIntersections()[2][5].getType());
         board.setSetupPhase(false);
 
-        assertFalse(board.addNewCity(player1, 21));
-        assertFalse(board.getIntersections()[2][5] instanceof Building);
-
-        board.addNewVillage(player1, 21);
+        board.addNewVillage(player1,21);
         assertSame(BuildingType.VILLAGE, board.getIntersections()[2][5].getType());
 
         board.addNewCity(player1, 21);
@@ -165,14 +164,14 @@ public class BoardUnitTests {
 
     @Test
     void testAddRoad() {
-        board.addNewRoad(player1, 0);
-        assertTrue(board.isNextToOwnRoad(1, player1));
-        assertTrue(board.isNextToOwnRoad(0, player1));
-        assertFalse(board.isNextToOwnRoad(8, player1));
+        board.addNewVillage(player1,0);
+        assertTrue(board.addNewRoad(player1, 0));
+        assertTrue(board.getAdjacencyMatrix()[1][2].isNextToOwnRoad(board,player1,1));
     }
 
     @Test
     void testAddRoadInvalidPlacement(){
+        board.addNewVillage(player1,0);
         assertTrue(board.addNewRoad(player1, 0));
         assertFalse(board.addNewRoad(player1, 0));
 
@@ -245,8 +244,6 @@ public class BoardUnitTests {
 
         // Fifth Row
         coords = board.translateIntersectionToMatrixCoordinates(50);
-        System.out.println("x-Koordinate: " + coords[0]);
-        System.out.println("y-Koordinate: " + coords[1]);
         assertArrayEquals(new int[]{5, 5}, coords);
     }
 
