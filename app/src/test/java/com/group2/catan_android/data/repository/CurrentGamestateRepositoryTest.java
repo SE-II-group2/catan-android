@@ -28,6 +28,7 @@ import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,11 +49,12 @@ public class CurrentGamestateRepositoryTest {
     private ArrayList<IngamePlayerDto> playerDtos;
     private Player localPlayer;
     private Player otherPlayer;
-
     private CurrentGameStateDto currentGameStateDto;
-
+    private  PublishProcessor<CurrentGameStateDto> liveIn;
+    TestObserver<CurrentGameState> testObserver;
+    CurrentGameState currentGameState;
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         currentGamestateRepository = CurrentGamestateRepository.getInstance();
         localPlayer = new Player("displayName", 0, new int[]{0, 0, 1, 1, 1}, -1);
         localPlayer.setInGameID(1);
@@ -62,54 +64,49 @@ public class CurrentGamestateRepositoryTest {
         playerDtos.add(otherPlayer.toIngamePlayerDto());
         playerDtos.add(localPlayer.toIngamePlayerDto());
         createCurrentGamestateDto();
+
+        liveIn = PublishProcessor.create();
+        currentGamestateRepository.setLiveData(liveIn);
+        currentGamestateRepository.setLocalPlayerIngameID(1);
+        testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
+        liveIn.onNext(currentGameStateDto);
+        List<CurrentGameState> values = testObserver.values();
+        currentGameState = values.get(values.size() - 1);
+    }
+
+    @AfterEach
+    void cleanup(){
+        testObserver.dispose();
     }
 
     @Test
     void testLocalPlayerEmitsCorrectValue() {
-        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
-        currentGamestateRepository.setLiveData(liveIn);
-        currentGamestateRepository.setLocalPlayerIngameID(1);
-        TestObserver<Player> testObserver = currentGamestateRepository.getCurrentLocalPlayerObservable().test();
+        TestObserver<Player> testObserverPlayer = currentGamestateRepository.getCurrentLocalPlayerObservable().test();
 
-        CurrentGameStateDto dto = new CurrentGameStateDto(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), playerDtos, true);
+        liveIn.onNext(currentGameStateDto);
+        List<Player> playerList = testObserverPlayer.values();
 
-        liveIn.onNext(dto);
-        List<Player> playerList = testObserver.values();
-
-        //assume that if the displayName if correct all data is correct
+        //assume that if the displayName is correct all data is correct
         assertEquals(playerList.get(playerList.size() - 1).getDisplayName(), localPlayer.getDisplayName());
 
-        testObserver.dispose();
+        testObserverPlayer.dispose();
     }
 
     @Test
     void testActivePlayerEmitsCorrectValue() {
-        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
-        currentGamestateRepository.setLiveData(liveIn);
-        currentGamestateRepository.setLocalPlayerIngameID(1);
-        TestObserver<Player> testObserver = currentGamestateRepository.getActivePlayerObservable().test();
+        TestObserver<Player> testObserverPlayer = currentGamestateRepository.getActivePlayerObservable().test();
 
-        CurrentGameStateDto dto = new CurrentGameStateDto(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), playerDtos, true);
-
-        liveIn.onNext(dto);
-        List<Player> playerList = testObserver.values();
+        liveIn.onNext(currentGameStateDto);
+        List<Player> playerList = testObserverPlayer.values();
 
         //assume that if the displayName if correct all data is correct
         assertEquals(playerList.get(playerList.size() - 1).getDisplayName(), otherPlayer.getDisplayName());
 
-        testObserver.dispose();
+        testObserverPlayer.dispose();
     }
 
     @Test
     void testHexagonsEmitCorrectValue() {
-        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
-        currentGamestateRepository.setLiveData(liveIn);
-        currentGamestateRepository.setLocalPlayerIngameID(1);
-        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
-
-        liveIn.onNext(currentGameStateDto);
-        List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size() - 1);
         int lastRollvalue = 0;
         // If all Hexagons are in ascending order as they were generated, assume correct transmission
         for (Hexagon hexagon : currentGameState.getBoard().getHexagonList()) {
@@ -129,19 +126,10 @@ public class CurrentGamestateRepositoryTest {
         assertEquals(12, hexagon.getId());
         assertEquals(0, hexagon.getNumOfAdjacentBuildings());
 
-        testObserver.dispose();
     }
 
     @Test
     void testIntersectionsEmitCorrectValue() {
-        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
-        currentGamestateRepository.setLiveData(liveIn);
-        currentGamestateRepository.setLocalPlayerIngameID(1);
-        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
-
-        liveIn.onNext(currentGameStateDto);
-        List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size() - 1);
         Intersection[][] intersections = currentGameState.getBoard().getIntersections();
 
         int lastIndex = -1, buildingCounter = 0, intersectionCounter = 0;
@@ -171,20 +159,10 @@ public class CurrentGamestateRepositoryTest {
         assertEquals(0, building.getId());
         assertEquals("displayName", building.getPlayer().getDisplayName());
         assertEquals(BuildingType.VILLAGE, building.getType());
-
-        testObserver.dispose();
     }
 
     @Test
     void testConnectionsEmitCorrectValue() {
-        PublishProcessor<CurrentGameStateDto> liveIn = PublishProcessor.create();
-        currentGamestateRepository.setLiveData(liveIn);
-        currentGamestateRepository.setLocalPlayerIngameID(1);
-        TestObserver<CurrentGameState> testObserver = currentGamestateRepository.getCurrentGameStateObservable().test();
-
-        liveIn.onNext(currentGameStateDto);
-        List<CurrentGameState> values = testObserver.values();
-        CurrentGameState currentGameState = values.get(values.size() - 1);
         Connection[][] adjacencyMatrix = currentGameState.getBoard().getAdjacencyMatrix();
 
         int connectionCounter = 0, roadCounter = 0;
@@ -208,8 +186,6 @@ public class CurrentGamestateRepositoryTest {
         Road road = (Road) adjacencyMatrix[4][5];
         assertEquals(4, road.getId());
         assertEquals(otherPlayer.getDisplayName(), road.getPlayer().getDisplayName());
-
-        testObserver.dispose();
     }
 
 
