@@ -63,6 +63,9 @@ public class GameProgressRepository implements GameProgressProvider, LiveDataRec
                         case "EndTurnMoveDto":
                             endTurnMoveDtoBehaviorSubject.onNext((EndTurnMoveDto) GameProgressDto.getGameMoveDto());
                             break;
+                        default:
+                            //Log.d("GameProgressRepository UnknownDtoFormat", "unkown DTO format");
+                            break;
                     }
                     gameProgressDtoBehaviorSubject.onNext(GameProgressDto);
                 });

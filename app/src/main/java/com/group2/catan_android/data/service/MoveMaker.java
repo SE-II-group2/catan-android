@@ -37,6 +37,13 @@ public class MoveMaker {
         setupListeners();
     }
 
+    protected MoveMaker(Board board, Player localPlayer, List<Player> players){
+        disposable = new CompositeDisposable();
+        this.board=board;
+        this.localPlayer=localPlayer;
+        this.players=players;
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -126,5 +133,12 @@ public class MoveMaker {
         moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
+    public boolean hasRolled(){
+        return this.hasRolled;
+    }
+
+    public boolean isSetupPhase(){
+        return isSetupPhase;
+    }
 }
 
