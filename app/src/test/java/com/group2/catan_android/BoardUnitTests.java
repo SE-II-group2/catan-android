@@ -250,4 +250,11 @@ public class BoardUnitTests {
         assertArrayEquals(new int[]{5, 5}, coords);
     }
 
+    @Test
+    void testTranslateIntersectionsToConnection(){
+        assertEquals(0, board.translateIntersectionsToConnection(0,1));
+        assertEquals(6, board.translateIntersectionsToConnection(0,8));
+        assertEquals(-1, board.translateIntersectionsToConnection(0,16));
+    }
+
 }
