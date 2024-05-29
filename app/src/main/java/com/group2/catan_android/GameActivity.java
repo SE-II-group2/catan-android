@@ -2,7 +2,6 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -15,14 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
-import com.group2.catan_android.fragments.ButtonsOpenFragment;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
@@ -79,7 +76,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     // gamelogic and movemaking
     private Player localPlayer;
     private Board board;
-    private List<Player> playerList;
     private MoveMaker movemaker;
 
     // fragments and button listeners
@@ -94,9 +90,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
-
-        int greenColorValue = Color.parseColor("#fda400");
-        Log.d("colouur",greenColorValue + "test");
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
