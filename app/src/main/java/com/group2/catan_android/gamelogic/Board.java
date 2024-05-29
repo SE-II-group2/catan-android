@@ -44,7 +44,7 @@ public class Board {
             return false;
         }
 
-        int[] connectionIntersections = translateConnectionToConnectedIntersections(connectionID);
+        int[] connectionIntersections = translateConnectionToIntersections(connectionID);
         int fromIntersection = connectionIntersections[0];
         int toIntersection = connectionIntersections[1];
 
@@ -94,7 +94,7 @@ public class Board {
 
     public boolean checkPossibleRoad(Player player, int connectionID){
 
-        int[] connectionIntersections = translateConnectionToConnectedIntersections(connectionID);
+        int[] connectionIntersections = translateConnectionToIntersections(connectionID);
         int fromIntersection = connectionIntersections[0];
         int toIntersection = connectionIntersections[1];
         Connection connection = adjacencyMatrix[fromIntersection][toIntersection];
@@ -184,7 +184,7 @@ public class Board {
         return coordinates;
     }
 
-    private int[] translateConnectionToConnectedIntersections(int connectionID) {
+    private int[] translateConnectionToIntersections(int connectionID) {
         int[] connectionIntersections = new int[2];
         connectionIntersections[0] = connectedIntersections[0][connectionID];
         connectionIntersections[1] = connectedIntersections[1][connectionID];
@@ -235,6 +235,15 @@ public class Board {
         for (int i = 0; i < 19; i++) {
             hexagonList.add(new Hexagon(Hexagontype.DESERT, ResourceDistribution.DESERT, 0, i, true));
         }
+    }
+    public int translateIntersectionsToConnection(int intersectionId1, int intersectionId2) {
+        for (int connectionId = 0; connectionId < connectedIntersections[0].length; connectionId++) {
+            if ((connectedIntersections[0][connectionId] == intersectionId1 && connectedIntersections[1][connectionId] == intersectionId2) ||
+                    (connectedIntersections[0][connectionId] == intersectionId2 && connectedIntersections[1][connectionId] == intersectionId1)) {
+                return connectionId;
+            }
+        }
+        return -1; // Return -1 if no matching connection is found
     }
 
     public List<Hexagon> getHexagonList() {

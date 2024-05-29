@@ -31,7 +31,7 @@ import com.group2.catan_android.fragments.ButtonsClosedFragment;
 import com.group2.catan_android.fragments.enums.ButtonType;
 import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 import com.group2.catan_android.gamelogic.Board;
-import com.group2.catan_android.gamelogic.MoveMaker;
+import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
@@ -79,6 +79,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     // gamelogic and movemaking
     private Player localPlayer;
     private Board board;
+    private List<Player> playerList;
     private MoveMaker movemaker;
 
     // fragments and button listeners
@@ -93,6 +94,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
+
+        int greenColorValue = Color.parseColor("#fda400");
+        Log.d("colouur",greenColorValue + "test");
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
