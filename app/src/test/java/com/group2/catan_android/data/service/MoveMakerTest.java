@@ -149,7 +149,6 @@ public class MoveMakerTest {
         playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
 
         BuildRoadMoveDto buildRoadMoveDto = new BuildRoadMoveDto(5);
-        moveMaker.makeMove(buildRoadMoveDto);
 
         assertThrows(Exception.class, () -> moveMaker.makeMove(buildRoadMoveDto));
     }

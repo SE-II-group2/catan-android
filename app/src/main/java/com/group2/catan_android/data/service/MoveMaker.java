@@ -138,5 +138,9 @@ public class MoveMaker {
     public boolean isSetupPhase(){
         return isSetupPhase;
     }
+
+    public void setHasRolled(boolean hasRolled) {
+        this.hasRolled = hasRolled;
+    }
 }
 
