@@ -39,6 +39,17 @@ public class Board {
         }
     }
 
+    public void distributeResourcesSetupPhase(Player player, int intersection) {
+        int[] hexagonIDs = translateIntersectionToSurroundingHexagons(intersection);
+
+        for (int hexagonID : hexagonIDs) {
+            if(hexagonID != NON_EXISTING_HEXAGON){
+                Hexagon hexagon = hexagonList.get(hexagonID);
+                hexagon.distributeResources(player);
+            }
+        }
+    }
+
     public boolean addNewRoad(Player player, int connectionID){
         if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.ROAD.getCost())){
             return false;
@@ -70,7 +81,6 @@ public class Board {
             intersections[row][col] = new Building(player, BuildingType.VILLAGE, intersectionID);
             Building village = (Building) intersections[row][col];
             addBuildingToSurroundingHexagons(intersectionID,village);
-            player.increaseVictoryPoints(1);
             return true;
         }
         return false;
@@ -86,7 +96,6 @@ public class Board {
             intersections[row][col] = new Building(player, BuildingType.CITY, intersectionID);
             Building city = (Building) intersections[row][col];
             addBuildingToSurroundingHexagons(intersectionID, city);
-            player.increaseVictoryPoints(2);
             return true;
         }
         return false;
@@ -135,15 +144,9 @@ public class Board {
         return intersections[row][col].getType() == BuildingType.VILLAGE && intersections[row][col].getPlayer() == player;
     }
 
-    private void removeBuildingFromSurroundingHexagons(int intersection, Building building) {
-        int firstHexagon = surroundingHexagons[0][intersection];
-        int secondHexagon = surroundingHexagons[1][intersection];
-        int thirdHexagon = surroundingHexagons[2][intersection];
+    public void removeBuildingFromSurroundingHexagons(int intersection, Building building) {
+        int[] hexagons = translateIntersectionToSurroundingHexagons(intersection);
 
-        removeBuildingFromHexagons(new int[]{firstHexagon, secondHexagon, thirdHexagon}, building);
-    }
-
-    private void removeBuildingFromHexagons(int[] hexagons, Building building) {
         for (int hexagon : hexagons) {
             if (hexagon != NON_EXISTING_HEXAGON) {
                 hexagonList.get(hexagon).removeBuilding(building);
@@ -151,20 +154,21 @@ public class Board {
         }
     }
 
-    private void addBuildingToSurroundingHexagons(int intersection, Building building) {
-        int firstHexagon = surroundingHexagons[0][intersection];
-        int secondHexagon = surroundingHexagons[1][intersection];
-        int thirdHexagon = surroundingHexagons[2][intersection];
+    public void addBuildingToSurroundingHexagons(int intersection, Building building) {
+        int[] hexagons = translateIntersectionToSurroundingHexagons(intersection);
 
-        addBuildingToHexagons(new int[]{firstHexagon, secondHexagon, thirdHexagon}, building);
-    }
-
-    private void addBuildingToHexagons(int[] hexagons, Building building) {
         for (int hexagon : hexagons) {
             if (hexagon != NON_EXISTING_HEXAGON) {
                 hexagonList.get(hexagon).addBuilding(building);
             }
         }
+    }
+
+    private int[] translateIntersectionToSurroundingHexagons(int intersection){
+        int firstHexagon = surroundingHexagons[0][intersection];
+        int secondHexagon = surroundingHexagons[1][intersection];
+        int thirdHexagon = surroundingHexagons[2][intersection];
+        return new int[]{firstHexagon,secondHexagon,thirdHexagon};
     }
 
     public int[] translateIntersectionToMatrixCoordinates(int intersectionID) {
