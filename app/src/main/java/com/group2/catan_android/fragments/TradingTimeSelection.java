@@ -30,10 +30,10 @@ public class TradingTimeSelection extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setOnClickListeners(view);
+        setPlusAndMinusListener(view);
     }
 
-    public void setOnClickListeners(View view){
+    public void setPlusAndMinusListener(View view){
         // get used Views
         TextView count = view.findViewById(R.id.trading_popup_time);
         ImageView plus = view.findViewById(R.id.trading_popup_time_plus);
@@ -49,27 +49,42 @@ public class TradingTimeSelection extends Fragment {
             int num = getNumberofTextView(count);
             if(num==-1){return;}//Error
             num--;
-            if(num<1){Toast.makeText(getContext(), "clicked resource can not be less or equal to zero", Toast.LENGTH_SHORT).show();return;}
+            if(num<1){
+                Toast.makeText(getContext(), "clicked resource can not be less or equal to zero", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String res = num+"s";
             count.setText(res);
         });
     }
 
     /**
-     * returns the number of the given TextView and handles all errors that may occur
+     * returns the number of the given TextView and handles all errors that may occur by making a Toast
      * @param view the TextView that shows the selected time period
      * @return the number of the TextView without the "s" in the end
      *         -1 if an error occurred.
      */
     public int getNumberofTextView(TextView view){
         CharSequence content = view.getText();
-        if(content==null){Toast.makeText(getContext(), "clicked resource does not have content! ERROR!", Toast.LENGTH_SHORT).show();return -1;}
+        if(content==null){
+            Toast.makeText(getContext(), "clicked resource does not have content! ERROR!", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
         String text = content.toString();
-        if(text.length()<2){Toast.makeText(getContext(), "clicked resource increasing did not work! ERROR!", Toast.LENGTH_SHORT).show();return -1;}
+        if(text.length()<2){
+            Toast.makeText(getContext(), "clicked resource increasing did not work! ERROR!", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
         String num=text.substring(0, text.length()-1);
-        if(text.charAt(text.length()-1)!='s'){Toast.makeText(getContext(), "clicked resource does not have s at the end! ERROR!", Toast.LENGTH_SHORT).show();return -1;}
+        if(text.charAt(text.length()-1)!='s'){
+            Toast.makeText(getContext(), "clicked resource does not have s at the end! ERROR!", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
         try {
             return Integer.parseInt(num);
-        }catch(NumberFormatException e){Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();return -1;}
+        }catch(NumberFormatException e){
+            Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
     }
 }
