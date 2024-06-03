@@ -31,6 +31,7 @@ public class TradingResourceSelectionFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_trading_resource_selection, container, false);
     }
+    // fixme extract methods
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

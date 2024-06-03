@@ -14,6 +14,8 @@ import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.PlayerState;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
 import com.group2.catan_android.data.model.DisplayablePlayer;
+import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
+import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.PreferenceManager;
@@ -54,16 +56,21 @@ class ControllerRepositoryIntegrationTest {
 
     private GameController gameController;
     private PlayerRepository playerRepository;
+    private GameProgressRepository gameProgressRepository;
+    private CurrentGamestateRepository gamestateRepository;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
         this.playerRepository = PlayerRepository.getInstance();
         StompManager.initialize(stompDriver, mapper);
         TokenRepository.initialize(preferenceManager);
-        GameController.initialize(StompManager.getInstance(), TokenRepository.getInstance(), playerRepository, lobbyJoiner);
+        this.gameProgressRepository = GameProgressRepository.getInstance();
+        this.gamestateRepository = CurrentGamestateRepository.getInstance();
+        GameController.initialize(StompManager.getInstance(), TokenRepository.getInstance(), playerRepository, lobbyJoiner, gamestateRepository, gameProgressRepository);
         gameController = GameController.getInstance();
     }
 
+    // fixme extract the setup into a method
     @Test
     void testRepositoryReceivesMessagesAfterControllerJoinsGame() throws JsonProcessingException, InterruptedException {
         JoinGameRequest request = new JoinGameRequest();

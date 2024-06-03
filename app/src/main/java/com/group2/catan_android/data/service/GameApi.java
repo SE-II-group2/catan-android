@@ -30,4 +30,8 @@ public interface GameApi {
 
     @POST("gamemove")
     Completable makeMove(@Header("Authorization") String token, @Body GameMoveDto gameMoveDto);
+
+    //TODO REFACTOR!!!!
+    @POST("start")
+    Completable startGame(@Header("Authorization") String token);
 }

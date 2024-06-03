@@ -30,23 +30,28 @@ import io.reactivex.subjects.BehaviorSubject;
 public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameStateDto>, CurrentgamestateProvider {
 
     private final BehaviorSubject<CurrentGameState> currentGameStateBehaviorSubject;
-    private final BehaviorSubject<Player> activePlayerBehaviorSubject;
+    private final BehaviorSubject<Player> localPlayerBehaviorSubject;
     private final BehaviorSubject<List<Player>> playerListBehaviorSubject;
+    private final BehaviorSubject<Player> activePlayerBehaviorSubject;
     private Board board;
     private List<Player> players;
+    private Player localPlayer;
+    private Player activePlayer;
     CurrentGameState currentGameState;
     HashMap<Integer, Player> playerHashMap;
     private Flowable<CurrentGameStateDto> liveDataIn;
-
     private static CurrentGamestateRepository instance;
+    private int localPlayerIngameID;
 
     Disposable d;
 
     private CurrentGamestateRepository() {
         this.currentGameStateBehaviorSubject = BehaviorSubject.create();
-        this.activePlayerBehaviorSubject = BehaviorSubject.create();
+        this.localPlayerBehaviorSubject = BehaviorSubject.create();
         this.playerListBehaviorSubject = BehaviorSubject.create();
+        this.activePlayerBehaviorSubject = BehaviorSubject.create();
         board = new Board();
+        playerHashMap = new HashMap<>();
     }
 
     public static CurrentGamestateRepository getInstance() {
@@ -56,14 +61,23 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
         return instance;
     }
 
+    public void setLocalPlayerIngameID(int inGameID) {
+        this.localPlayerIngameID =inGameID;
+    }
+
     @Override
     public Observable<CurrentGameState> getCurrentGameStateObservable() {
         return currentGameStateBehaviorSubject;
     }
 
     @Override
-    public Observable<Player> getCurrentActivePlayerObservable() {
+    public Observable<Player> getActivePlayerObservable(){
         return activePlayerBehaviorSubject;
+    }
+
+    @Override
+    public Observable<Player> getCurrentLocalPlayerObservable() {
+        return localPlayerBehaviorSubject;
     }
 
     @Override
@@ -81,6 +95,9 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
 
     private void cleanup() {
         currentGameStateBehaviorSubject.onNext(new CurrentGameState());
+        localPlayerBehaviorSubject.onNext(new Player());
+        activePlayerBehaviorSubject.onNext(new Player());
+        playerListBehaviorSubject.onNext(new ArrayList<Player>());
         if (d != null)
             d.dispose();
     }
@@ -95,20 +112,31 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                     board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
                     board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
                     currentGameState = new CurrentGameState(players, board);
+                    localPlayer = playerHashMap.get(localPlayerIngameID);
+                    activePlayer=currentGameState.getPlayers().get(0);
+                    activePlayerBehaviorSubject.onNext(activePlayer);
+                    localPlayerBehaviorSubject.onNext(localPlayer);
+                    playerListBehaviorSubject.onNext(players);
                     currentGameStateBehaviorSubject.onNext(currentGameState);
                 });
     }
 
     private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> playerOrder) {
         ArrayList<Player> playersList = new ArrayList<>();
+        outerloop:
         for (IngamePlayerDto playerDto : playerOrder) {
+            for( Player player : playersList){
+                if(playerDto.getInGameID()==player.getInGameID())continue outerloop;
+            }
             Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
+            player.setInGameID(playerDto.getInGameID());
             playersList.add(player);
-            playerHashMap.put(playerDto.getGameID(), player);
+            playerHashMap.put(playerDto.getInGameID(), player);
         }
         return playersList;
     }
 
+    // fixme are the intersections a duplicate from the backend? could you provide set-up roads from the backend for the clients?
     private Connection[][] generateAdjacencyMatrixFromDto(List<ConnectionDto> connectionList) {
         Connection[][] connections = new Connection[54][54];
         int[][] connectedIntersections = new int[2][72];
@@ -125,8 +153,8 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                 connections[connectionIntersections[0]][connectionIntersections[1]] = con;
                 connections[connectionIntersections[1]][connectionIntersections[0]] = con;
             } else {
-                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(playerHashMap.get(connectionDto.getOwner().getGameID()), connectionDto.getId());
-                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(playerHashMap.get(connectionDto.getOwner().getGameID()), connectionDto.getId());
+                connections[connectionIntersections[0]][connectionIntersections[1]] = new Road(playerHashMap.get(connectionDto.getOwner().getInGameID()), connectionDto.getId());
+                connections[connectionIntersections[1]][connectionIntersections[0]] = new Road(playerHashMap.get(connectionDto.getOwner().getInGameID()), connectionDto.getId());
             }
         }
 
@@ -134,12 +162,12 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     }
 
     public Intersection[][] generateIntersectionsFromDto(List<IntersectionDto> intersectionDtos) {
-        Intersection[][] intersections = new Intersection[6][11];
+        Intersection[][] intersections;
         Map<Integer, Intersection> idToIntersectionMap = new HashMap<>();
         Intersection intersection;
         // Create Intersection objects and map their IDs to the objects
         for (IntersectionDto dto : intersectionDtos) {
-            if (dto.getBuildingType().equals(BuildingType.EMPTY)) {
+            if (dto.getBuildingType().equals(BuildingType.EMPTY.toString())) {
                 intersection = new Intersection();
             } else {
                 BuildingType buildingType;
@@ -154,16 +182,19 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                         buildingType = BuildingType.EMPTY;
                         break;
                 }
-                intersection = new Building(players.get(0), buildingType,dto.getId());
+                if(dto.getOwner()==null)intersection = new Building(null, buildingType,dto.getId());
+                else intersection = new Building(playerHashMap.get(dto.getOwner().getInGameID()), buildingType,dto.getId());
             }
             idToIntersectionMap.put(dto.getId(), intersection);
         }
-
+        intersections = board.getIntersections();
+        int counter=0;
         // Fill the intersections array using the ID-to-Intersection map
         for (int i = 0; i < intersections.length; i++) {
             for (int j = 0; j < intersections[i].length; j++) {
-                if (idToIntersectionMap.containsKey(intersections[i][j])) {
-                    intersections[i][j] = idToIntersectionMap.get(intersections[i][j]);
+                if(intersections[i][j]!=null) {
+                    intersections[i][j] = idToIntersectionMap.get(counter);
+                    counter++;
                 }
             }
         }
@@ -176,8 +207,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private ArrayList<Hexagon> getHexagonListFromDto(List<HexagonDto> hexagons) {
         ArrayList<Hexagon> hexagonsList = new ArrayList<>();
         for (HexagonDto hexagonDto : hexagons) {
-            //TODO add robber to DTO
-            hexagonsList.add(new Hexagon(hexagonDto.getLocation(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), false));
+            hexagonsList.add(new Hexagon(hexagonDto.getHexagonType(), hexagonDto.getResourceDistribution(), hexagonDto.getValue(), hexagonDto.getId(), hexagonDto.isHasRobber()));
         }
 
         // Custom comparator to sort by ID

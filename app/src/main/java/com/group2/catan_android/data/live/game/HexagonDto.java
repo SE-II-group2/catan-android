@@ -6,27 +6,45 @@ import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
 
 public class HexagonDto{
-    private Hexagontype hexagontype;
+    private Hexagontype hexagonType;
     private ResourceDistribution resourceDistribution;
     private int value;
     private int id;
 
-    public HexagonDto(Hexagontype hexagontype, ResourceDistribution resourceDistribution, int value, int id) {
-        this.hexagontype = hexagontype;
+    private boolean hasRobber;
+
+    public HexagonDto(Hexagontype hexagonType, ResourceDistribution resourceDistribution, int value, int id, boolean hasRobber) {
+        this.hexagonType = hexagonType;
         this.resourceDistribution = resourceDistribution;
         this.value = value;
         this.id = id;
+        this.hasRobber=hasRobber;
     }
 
+    public Hexagontype getHexagonType() {
+        return hexagonType;
+    }
+
+    public void setHexagonType(Hexagontype hexagonType) {
+        this.hexagonType = hexagonType;
+    }
+
+    public boolean isHasRobber() {
+        return hasRobber;
+    }
+
+    public void setHasRobber(boolean hasRobber) {
+        this.hasRobber = hasRobber;
+    }
     public HexagonDto() {
     }
 
     public Hexagontype getLocation() {
-        return hexagontype;
+        return hexagonType;
     }
 
     public void setLocation(Hexagontype hexagontype) {
-        this.hexagontype = hexagontype;
+        this.hexagonType = hexagontype;
     }
 
     public ResourceDistribution getResourceDistribution() {

@@ -22,6 +22,11 @@ public class PlayerScoresFragment extends Fragment {
     private TextView[] playerScoreViews;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player_scores, container, false);
 
@@ -30,13 +35,17 @@ public class PlayerScoresFragment extends Fragment {
         thirdPlayer = view.findViewById(R.id.thirdPlayerScore);
         fourthPlayer = view.findViewById(R.id.fourthPlayerScore);
 
-        playerScoreViews = new TextView[]{firstPlayer,secondPlayer,thirdPlayer,fourthPlayer};
+        playerScoreViews = new TextView[4];
+        playerScoreViews[0] = firstPlayer;
+        playerScoreViews[1] = secondPlayer;
+        playerScoreViews[2] = thirdPlayer;
+        playerScoreViews[3] = fourthPlayer;
 
         return view;
     }
 
     public void updateScores(List<Player> players){
-        for(int i = 0; i < playerScoreViews.length; i++){
+        for(int i = 0; i < players.size(); i++){
             String playerScore = players.get(i).getDisplayName() + ": " + String.valueOf(players.get(i).getVictoryPoints());
             playerScoreViews[i].setText(playerScore);
             playerScoreViews[i].setTextColor(players.get(i).getColor());

@@ -10,7 +10,8 @@ import java.util.List;
 public interface CurrentgamestateProvider {
     Observable<CurrentGameState> getCurrentGameStateObservable();
 
-    Observable<Player> getCurrentActivePlayerObservable();
+    Observable<Player> getCurrentLocalPlayerObservable();
+    Observable<Player> getActivePlayerObservable();
 
     Observable<List<Player>>getAllPlayerObservable();
 }

@@ -2,7 +2,10 @@ package com.group2.catan_android.data.live;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.group2.catan_android.data.live.game.CurrentGameStateDto;
+import com.group2.catan_android.data.live.game.GameProgressDto;
 
+// fixme see backend comments
 /**
  * Defines the Basic Structure of a Stomp Message to the client
  */
@@ -13,7 +16,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PlayersInLobbyDto.class, name = MessageType.PLAYERS_CHANGED),
-        @JsonSubTypes.Type(value = GameStartedDto.class, name = MessageType.GAME_STARTED)
+        @JsonSubTypes.Type(value = GameStartedDto.class, name = MessageType.GAME_STARTED),
+        @JsonSubTypes.Type(value = CurrentGameStateDto.class, name = MessageType.GAME_OBJECT),
+        @JsonSubTypes.Type(value = GameProgressDto.class, name = MessageType.GAME_MOVE_NOTIFIER)
 })
 
 public abstract class MessageDto {

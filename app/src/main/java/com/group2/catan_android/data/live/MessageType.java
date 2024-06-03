@@ -1,5 +1,7 @@
 package com.group2.catan_android.data.live;
 
+
+// fixme see backend comments
 /**
  * The types of Messages that can be sent.
  * No enum because easier for Jackson

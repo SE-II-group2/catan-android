@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.group2.catan_android.R;
 
+
+// fixme format code!
 public class TradingTimeSelection extends Fragment {
 
     @Override
