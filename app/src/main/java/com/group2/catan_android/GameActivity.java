@@ -37,6 +37,7 @@ import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
+import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
@@ -251,7 +252,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     }
                     currentButtonFragmentListener.onButtonEvent(type);
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    MessageBanner.showBanner(this, MessageBanner.MessageType.ERROR, e.getMessage());
                 }
             }
         });

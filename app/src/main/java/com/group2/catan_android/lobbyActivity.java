@@ -25,6 +25,7 @@ import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.model.AvailableGame;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.service.GameController;
+import com.group2.catan_android.util.MessageBanner;
 
 
 import java.util.List;
@@ -125,7 +126,7 @@ public class lobbyActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Throwable e) {
-                                Toast.makeText(lobbyActivity.this, "Faild to fetch games", Toast.LENGTH_SHORT).show();
+                                MessageBanner.showBanner(lobbyActivity.this, MessageBanner.MessageType.ERROR, "Failed to fetch games!");
                             }
                         });
     }
@@ -134,7 +135,7 @@ public class lobbyActivity extends AppCompatActivity {
         GameController gc = GameController.getInstance();
         String playerName = playerNameEditText.getText().toString().trim();
         if (playerName.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Player name is required", Toast.LENGTH_LONG).show();
+            MessageBanner.showBanner(this, MessageBanner.MessageType.ERROR, "Player Name is required", MessageBanner.LENGTH_LONG);
             return;
         }
         JoinGameRequest request = new JoinGameRequest();
@@ -165,6 +166,11 @@ public class lobbyActivity extends AppCompatActivity {
                     });
     }
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        compositeDisposable.dispose();
+    }
     private void updateButtonColors(){
         Button connectButton = findViewById(R.id.LobbyJoinButton);
         Button createButton = findViewById(R.id.LobbyCreateButton);
