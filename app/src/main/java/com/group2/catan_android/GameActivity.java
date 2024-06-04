@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
@@ -241,12 +242,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void setViewOnClickListener(View view, int correctID, ButtonType type){
         view.setOnClickListener(v -> {
-            if (lastButtonClicked == type) {
+            if (lastButtonClicked == type || lastButtonClicked == ButtonType.CITY) {
                 try {
-                    switch (type){
+                    switch (lastButtonClicked){
                         case ROAD: movemaker.makeMove(new BuildRoadMoveDto(correctID));
                         break;
                         case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID));
+                        break;
+                        case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID));
                         break;
                     }
                     currentButtonFragmentListener.onButtonEvent(type);
