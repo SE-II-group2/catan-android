@@ -68,11 +68,17 @@ public class MoveMaker {
             case "EndTurnMoveDto":
                 makeEndTurnMove(gameMove);
                 break;
+            case "TradeMoveDto":
+                makeTradeMove(gameMove);
+                break;
             default:
                 throw new Exception("Unknown Dto format");
         }
     }
 
+    private void makeTradeMove(GameMoveDto gameMove) throws Exception {
+        sendMove(gameMove);
+    }
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
         if (isSetupPhase)
             throw new Exception("End your turn during setupphase by placing a village and a road");

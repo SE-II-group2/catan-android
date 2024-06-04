@@ -16,6 +16,10 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
+import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
+import com.group2.catan_android.data.live.game.TradeMoveDto;
+import com.group2.catan_android.data.service.MoveMaker;
 
 
 public class PopUpFragmentTrading extends DialogFragment {
@@ -49,5 +53,16 @@ public class PopUpFragmentTrading extends DialogFragment {
         getChildFragmentManager().beginTransaction().add(R.id.trading_popup_bottomfragment,new PlayerResourcesFragment()).commit();
         manager.beginTransaction().add(R.id.trading_popup_topfragment, new TradingResourceSelectionFragment()).commit();
         manager.beginTransaction().add(R.id.trading_popup_middlefragment, new TradingResourceSelectionFragment()).commit();
+
+        view.findViewById(R.id.trading_popup_confirm).setOnClickListener(v -> {
+            int[] resources = {0,0,0,0,0};
+            boolean[] toPlayer = {true, true, true, true};
+            try {
+                MoveMaker.getInstance().makeMove(new TradeMoveDto(resources, toPlayer, 10));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 }
