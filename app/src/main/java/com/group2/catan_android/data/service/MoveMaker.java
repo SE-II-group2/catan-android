@@ -79,7 +79,7 @@ public class MoveMaker {
 
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
         if (isSetupPhase)
-            throw new Exception("End your turn during setupphase by placing a village and a road");
+            throw new Exception("End your turn during setup phase by placing a village and a road!");
         sendMove(gameMove);
         hasRolled = false;
     }
@@ -90,7 +90,7 @@ public class MoveMaker {
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
             throw new Exception("Not enough resources!");
         if (!board.addNewVillage(localPlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
-            throw new Exception("Can't build a Village here");
+            throw new Exception("Can't build a Village here!");
         hasPlacedVillageInSetupPhase = true;
         sendMove(gameMove);
     }
@@ -112,12 +112,12 @@ public class MoveMaker {
         if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
             throw new Exception("Not enough resources!");
         if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
-            throw new Exception("Can't build a city here");
+            throw new Exception("Can't build a city here!");
         sendMove(gameMove);
     }
 
     private void makeRollDiceMove(GameMoveDto gameMove) throws Exception {
-        if (hasRolled) throw new Exception("Has already Rolled the dice this turn");
+        if (hasRolled) throw new Exception("Has already Rolled the dice this turn!");
         sendMove(gameMove);
         hasRolled = true;
     }

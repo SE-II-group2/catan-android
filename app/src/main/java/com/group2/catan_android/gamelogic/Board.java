@@ -39,17 +39,6 @@ public class Board {
         }
     }
 
-    public void distributeResourcesSetupPhase(Player player, int intersection) {
-        int[] hexagonIDs = translateIntersectionToSurroundingHexagons(intersection);
-
-        for (int hexagonID : hexagonIDs) {
-            if(hexagonID != NON_EXISTING_HEXAGON){
-                Hexagon hexagon = hexagonList.get(hexagonID);
-                hexagon.distributeResources(player);
-            }
-        }
-    }
-
     public boolean addNewRoad(Player player, int connectionID){
         if(!isSetupPhase && !player.resourcesSufficient(ResourceCost.ROAD.getCost())){
             return false;
