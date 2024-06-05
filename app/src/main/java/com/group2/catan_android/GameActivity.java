@@ -409,7 +409,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 possibleVillages.add(intersectionView);
             }
 
-            if(board.checkPossibleCity(localPlayer, intersectionsID)){
+            if(!board.isSetupPhase() && board.checkPossibleCity(localPlayer, intersectionsID)){
                 int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
                 ImageView intersectionView = findViewById(id);
                 possibleCities.add(intersectionView);

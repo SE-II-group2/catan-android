@@ -122,10 +122,6 @@ public class Board {
     }
 
     public boolean checkPossibleCity(Player player, int intersectionID){
-        if(isSetupPhase){
-            return false;
-        }
-
         int[] intersectionCoordinates = translateIntersectionToMatrixCoordinates(intersectionID);
         int row = intersectionCoordinates[0];
         int col = intersectionCoordinates[1];
