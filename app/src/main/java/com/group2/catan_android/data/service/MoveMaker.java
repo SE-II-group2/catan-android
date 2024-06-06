@@ -88,7 +88,7 @@ public class MoveMaker {
         if(isSetupPhase && hasPlacedVillageInSetupPhase)
             throw new Exception("Already placed a village during your turn!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
-            throw new Exception("Not enough resources!");
+            throw new Exception("Not enough resources to build a Village!");
         if (!board.addNewVillage(localPlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
             throw new Exception("Can't build a Village here!");
         hasPlacedVillageInSetupPhase = true;
@@ -99,7 +99,7 @@ public class MoveMaker {
         if (isSetupPhase && !hasPlacedVillageInSetupPhase)
             throw new Exception("Place a Village first during the setup phase!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
-            throw new Exception("Not enough resources!");
+            throw new Exception("Not enough resources to build a Road!");
         if (!board.addNewRoad(localPlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
             throw new Exception("Can't build a road here!");
         hasPlacedVillageInSetupPhase=false;
@@ -110,7 +110,7 @@ public class MoveMaker {
         if(isSetupPhase)
             throw new Exception("It is not possible to place cities during setup phase!");
         if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
-            throw new Exception("Not enough resources!");
+            throw new Exception("Not enough resources to build a City!");
         if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
             throw new Exception("Can't build a city here!");
         sendMove(gameMove);
