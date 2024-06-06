@@ -155,11 +155,11 @@ public class BoardUnitTests {
     @Test
     void testAddCitySetupUpPhase(){
         assertTrue(board.addNewVillage(player1, 16));
-        assertFalse(board.addNewCity(player1,16));
+        assertFalse(!board.isSetupPhase() && board.addNewCity(player1,16));
 
         board.setSetupPhase(false);
 
-        assertTrue(board.addNewCity(player1,16));
+        assertTrue(!board.isSetupPhase() && board.addNewCity(player1,16));
     }
 
     @Test

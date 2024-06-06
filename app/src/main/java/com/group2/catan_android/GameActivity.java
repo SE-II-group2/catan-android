@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
@@ -202,7 +203,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
     }
 
-    private ImageView[] setupViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset, ButtonType type) {
+    private ImageView[] setupViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset, ButtonType button) {
         ImageView[] views = new ImageView[totalViews];
 
         for (int i = 0; i < totalViews; i++) {
@@ -214,8 +215,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             constraintLayout.addView(view, params);
             views[i] = view;
 
-            if(type != null){
-                setViewOnClickListener(view,correctID,type);
+            if(button != null){
+                setViewOnClickListener(view,correctID);
             }
         }
 
@@ -239,21 +240,22 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         return views;
     }
 
-    private void setViewOnClickListener(View view, int correctID, ButtonType type){
+    private void setViewOnClickListener(View view, int correctID){
         view.setOnClickListener(v -> {
-            if (lastButtonClicked == type) {
                 try {
-                    switch (type){
+                    switch (lastButtonClicked){
                         case ROAD: movemaker.makeMove(new BuildRoadMoveDto(correctID));
                         break;
                         case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID));
                         break;
+                        case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID));
+                        break;
+                        default: break;
                     }
-                    currentButtonFragmentListener.onButtonEvent(type);
+                    currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            }
         });
     }
 
@@ -406,7 +408,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 possibleVillages.add(intersectionView);
             }
 
-            if(board.checkPossibleCity(localPlayer, intersectionsID)){
+            if(!board.isSetupPhase() && board.checkPossibleCity(localPlayer, intersectionsID)){
                 int id = (intersectionsID + TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS + 1);
                 ImageView intersectionView = findViewById(id);
                 possibleCities.add(intersectionView);
