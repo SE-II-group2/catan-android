@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
+import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
 import java.util.List;
@@ -8,10 +9,6 @@ public class Player {
 
     private String token;
     private String gameID;
-
-
-
-
     private int inGameID;
     private String displayName;
     private int victoryPoints = 0;
@@ -85,5 +82,9 @@ public class Player {
     }
     public void setInGameID(int inGameID) {
         this.inGameID = inGameID;
+    }
+
+    public IngamePlayerDto toIngamePlayerDto(){
+        return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID);
     }
 }
