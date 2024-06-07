@@ -72,6 +72,9 @@ public class MoveMaker {
             case "EndTurnMoveDto":
                 makeEndTurnMove(gameMove);
                 break;
+            case "BuyProgressCardDto":
+                makeBuyProgressCardMove(gameMove);
+                break;
             default:
                 throw new Exception("Unknown Dto format");
         }
@@ -120,6 +123,15 @@ public class MoveMaker {
         if (hasRolled) throw new Exception("Has already Rolled the dice this turn!");
         sendMove(gameMove);
         hasRolled = true;
+    }
+
+    private void makeBuyProgressCardMove(GameMoveDto gameMove) throws Exception {
+        if (isSetupPhase)
+            throw new Exception("Can't buy progress-card during setup phase");
+        if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
+            throw new Exception("Not enough resources");
+        }
+        sendMove(gameMove);
     }
 
     void setupListeners() {
