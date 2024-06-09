@@ -26,6 +26,7 @@ import com.group2.catan_android.data.model.AvailableGame;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
 import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 
 
 import java.util.List;
@@ -126,7 +127,7 @@ public class lobbyActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Throwable e) {
-                                MessageBanner.showBanner(lobbyActivity.this, MessageBanner.MessageType.ERROR, "Failed to fetch games!");
+                                MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to fetch lobbies!: " + e.getMessage()).show();
                             }
                         });
     }
@@ -135,7 +136,7 @@ public class lobbyActivity extends AppCompatActivity {
         GameController gc = GameController.getInstance();
         String playerName = playerNameEditText.getText().toString().trim();
         if (playerName.isEmpty()) {
-            MessageBanner.showBanner(this, MessageBanner.MessageType.ERROR, "Player Name is required", MessageBanner.LENGTH_LONG);
+            MessageBanner.makeBanner(this, MessageType.ERROR, "Player Name is required").show();
             return;
         }
         JoinGameRequest request = new JoinGameRequest();
@@ -161,7 +162,7 @@ public class lobbyActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(Throwable e) {
-                            Toast.makeText(lobbyActivity.this, "Failed to join game: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to join game" + e.getMessage()).show();
                         }
                     });
     }

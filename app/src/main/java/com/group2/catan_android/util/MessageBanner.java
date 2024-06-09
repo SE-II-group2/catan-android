@@ -1,5 +1,8 @@
 package com.group2.catan_android.util;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.os.Handler;
 
@@ -13,6 +16,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.group2.catan_android.R;
@@ -21,74 +27,105 @@ import com.group2.catan_android.R;
 public class MessageBanner {
     public static final int LENGTH_SHORT = 3000;
     public static final int LENGTH_LONG = 5000;
+    private final FragmentActivity activity;
+    private final MessageType type;
+    private final String message;
+    private int durationMillis;
+    private int gravity;
+    private View mView;
+    private ViewGroup mViewGroup;
+    private boolean isShowing;
 
-    public enum MessageType {
-        ERROR,
-        INFO,
-        WARNING
+    private MessageBanner(FragmentActivity activity, MessageType type, String message) {
+        this.activity = activity;
+        this.type = type;
+        this.message = message;
+        this.durationMillis = LENGTH_SHORT;
+        this.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
     }
 
-    public static void showBanner(FragmentActivity activity, MessageType type, String message){
-        showBanner(activity, type, message, LENGTH_SHORT);
+    public static MessageBanner makeBanner(FragmentActivity activity, MessageType type, String message) {
+        return new MessageBanner(activity, type, message);
     }
-    public static void showBanner(FragmentActivity activity, MessageType type, String message, int durationMillis){
+
+    public MessageBanner setDuration(int durationMillis) {
+        this.durationMillis = durationMillis;
+        return this;
+    }
+
+    public MessageBanner setGravity(int gravity) {
+        this.gravity = gravity;
+        return this;
+    }
+
+    public void show() {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View bannerView = inflater.inflate(R.layout.notification, null);
+        mView = inflater.inflate(R.layout.notification, null);
 
-        TextView messageView = bannerView.findViewById(R.id.notification_message);
-        ImageButton closeView = bannerView.findViewById(R.id.notification_close_button);
+        TextView messageView = mView.findViewById(R.id.notification_message);
+        ImageButton closeView = mView.findViewById(R.id.notification_close_button);
 
-        colorBanner(bannerView, type);
+        colorBanner();
         messageView.setText(message);
 
-        ViewGroup rootLayout = activity.findViewById(android.R.id.content);
+        mViewGroup = activity.findViewById(android.R.id.content);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT);
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.gravity = gravity;
         params.topMargin = 20;
 
-        rootLayout.addView(bannerView, params);
+        mViewGroup.addView(mView, params);
 
         Animation slideIn = AnimationUtils.loadAnimation(activity, R.anim.slide_in_top);
-        bannerView.startAnimation(slideIn);
+        mView.startAnimation(slideIn);
 
-        new Handler().postDelayed(() -> hideBanner(rootLayout, bannerView), durationMillis);
-        closeView.setOnClickListener(v -> hideBanner(rootLayout, bannerView));
+        new Handler().postDelayed(this::hide, durationMillis);
+        closeView.setOnClickListener(v -> hide());
+        isShowing = true;
     }
 
-    private static void hideBanner(ViewGroup rootLayout, View bannerView){
-        Animation slideOut = AnimationUtils.loadAnimation(rootLayout.getContext(), R.anim.fade_away);
-        bannerView.startAnimation(slideOut);
-        slideOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                //do nothing
-            }
+    private void hide() {
+        if(isShowing) {
+            isShowing = false;
+            PropertyValuesHolder propertyValuesHolder = PropertyValuesHolder.ofFloat("alpha", 1f, 0f);
+            Animator animator = ObjectAnimator.ofPropertyValuesHolder(mView, propertyValuesHolder);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(@NonNull Animator animation) {
+                    //nothing
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                rootLayout.removeView(bannerView);
-            }
+                @Override
+                public void onAnimationEnd(@NonNull Animator animation) {
+                    mViewGroup.removeView(mView);
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                //do nothing
-            }
-        });
+                @Override
+                public void onAnimationCancel(@NonNull Animator animation) {
+                    //nothing
+                }
+
+                @Override
+                public void onAnimationRepeat(@NonNull Animator animation) {
+                    //nothing
+                }
+            });
+            animator.start();
+        }
     }
 
-    private static void colorBanner(View bannerView, MessageType type){
-        switch (type){
+    private void colorBanner() {
+        switch (type) {
             case INFO:
-                bannerView.setBackgroundColor(bannerView.getResources().getColor(R.color.GrassGreen, null));
+                mView.setBackgroundColor(mView.getResources().getColor(R.color.GrassGreen, null));
                 break;
             case ERROR:
-                bannerView.setBackgroundColor(bannerView.getResources().getColor(R.color.red, null));
+                mView.setBackgroundColor(mView.getResources().getColor(R.color.red, null));
                 break;
             case WARNING:
-                bannerView.setBackgroundColor(bannerView.getResources().getColor(R.color.yellow, null));
+                mView.setBackgroundColor(mView.getResources().getColor(R.color.yellow, null));
         }
     }
 }

@@ -1,7 +1,11 @@
 package com.group2.catan_android;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -38,6 +42,7 @@ import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
 import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
@@ -85,6 +90,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
+    private Vibrator vibrator;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +101,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
+
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         setToFullScreen();
 
@@ -192,7 +201,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
             }
             if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                Toast.makeText(getApplicationContext(), "Turn ended. New active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
+                if(((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Your Turn!").show();
+                    vibrateIfAvailable();
+                }
+                else
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Turn ended! Next Player: " + ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName()).show();
             }
         });
 
@@ -252,7 +266,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     }
                     currentButtonFragmentListener.onButtonEvent(type);
                 } catch (Exception e) {
-                    MessageBanner.showBanner(this, MessageBanner.MessageType.ERROR, e.getMessage());
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
             }
         });
@@ -634,6 +648,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         margins[2] = margins[3];
         margins[3] = temp;
         return margins;
+    }
+
+    private void vibrateIfAvailable(){
+        if(vibrator != null && vibrator.hasVibrator())
+            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
     }
 
 }

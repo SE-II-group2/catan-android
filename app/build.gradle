@@ -29,10 +29,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
-        buildTypes.each {
-            it.buildConfigField('String', 'BASE_URL', '"https://10.0.2.2:8080/catan"')
-            it.buildConfigField('String', 'SOCKET_URL', '"ws://10.0.2.2:8080/catan"')
+        emulator {
+            minifyEnabled false
+            debuggable true
+            buildConfigField('String', 'BASE_GAME_URL', '"http://10.0.2.2:8080/catan/game/"')
+            buildConfigField('String', 'SOCKET_URL', '"ws://10.0.2.2:8080/catan"')
+            signingConfig signingConfigs.debug
         }
+
+        localDevice {
+            //define your own here
+            minifyEnabled false
+            debuggable true
+            buildConfigField('String', 'BASE_GAME_URL', '"http://10.0.1.146:8080/catan/game/"')
+            buildConfigField('String', 'SOCKET_URL', '"ws://10.0.1.146:8080/catan"')
+            signingConfig signingConfigs.debug
+        }
+
+        //buildTypes.each {
+        //    it.buildConfigField('String', 'BASE_GAME_URL', '"http://10.0.2.2:8080/catan/game/"')
+        //    it.buildConfigField('String', 'SOCKET_URL', '"ws://10.0.2.2:8080/catan"')
+        //}
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
