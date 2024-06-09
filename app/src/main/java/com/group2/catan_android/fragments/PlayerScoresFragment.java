@@ -68,13 +68,13 @@ public class PlayerScoresFragment extends Fragment {
 
     public void updateScores(List<Player> playerList, Player activePlayer){
         for(int i = 0; i < playerList.size(); i++){
-            String playerScore = playerList.get(i).getDisplayName() + ": " + String.valueOf(playerList.get(i).getVictoryPoints());
+            String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
             playerScoreViews[i].setTextColor(playerList.get(i).getColor());
 
             activePlayerViews[i].setVisibility(View.INVISIBLE);
             if(playerList.get(i).getInGameID() == activePlayer.getInGameID()){
-                activePlayerViews[i].setBackgroundColor(View.VISIBLE);
+                activePlayerViews[i].setVisibility(View.VISIBLE);
             }
         }
     }

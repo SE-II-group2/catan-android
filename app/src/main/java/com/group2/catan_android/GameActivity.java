@@ -2,20 +2,15 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
@@ -35,7 +30,6 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 
-import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
@@ -43,10 +37,8 @@ import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
-// fixme avoid making this class a god class. it is also the only one implementing the OnButtonClickListener, handling events from the fragments
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
     // drawables measurements
@@ -56,13 +48,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final int INTERSECTION_SIZE = 40;
     final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
-    // number of total elements
     final int TOTAL_HEXAGONS = 19;
     final int TOTAL_CONNECTIONS = 72;
     final int TOTAL_INTERSECTIONS = 54;
-
-    // gamelogic and movemaking
-    private Player localPlayer;
     private Board board;
     private MoveMaker movemaker;
 
@@ -132,17 +120,17 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         return views;
     }
 
-    private TextView[] setupTextViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset) {
-        TextView[] views = new TextView[totalViews];
+    private TextView[] setupRollValueViews(ConstraintLayout constraintLayout) {
+        TextView[] views = new TextView[19];
 
-        for (int i = 0; i < totalViews; i++) {
+        for (int i = 0; i < 19; i++) {
             TextView view = new TextView(this);
-            view.setId(i + offset + 1);
+            view.setId(i + 19 + 1);
             view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             view.setTextColor(Color.BLACK);
             view.setGravity(Gravity.CENTER);
 
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(width, height);
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(115, 115);
             constraintLayout.addView(view, params);
             views[i] = view;
         }
@@ -151,7 +139,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void createViews(ConstraintLayout constraintLayout) {
         ImageView[] hexagonViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
-        TextView[] rollValueViews = setupTextViews(constraintLayout,TOTAL_HEXAGONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS);
+        TextView[] rollValueViews = setupRollValueViews(constraintLayout);
         ImageView[] robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2,null);
         ImageView[] connectionViews = setupViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,ButtonType.ROAD);
         ImageView[] intersectionViews = setupViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),ButtonType.VILLAGE);
@@ -196,18 +184,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void setupViewModels() {
         // viewModels
         BoardViewModel boardViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
-        ActivePlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
         PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
         GameProgressViewModel gameProgressViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
 
         boardViewModel.getBoardMutableLiveData().observe(this, board -> {
             this.board = board;
             uiDrawer.updateUiBoard(board);
-        });
-
-        localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
-            this.localPlayer = player;
-            uiDrawer.updateUiPlayerResources(playerResourcesFragment,player);
         });
 
         gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{

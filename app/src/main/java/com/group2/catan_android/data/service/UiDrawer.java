@@ -50,10 +50,7 @@ import io.reactivex.schedulers.Schedulers;
 public class UiDrawer extends AppCompatActivity {
     private Board board;
     private Player localPlayer;
-    private List<Player> players;
-    private boolean isSetupPhase = true;
     private final CurrentGamestateRepository currentGamestateRepository = CurrentGamestateRepository.getInstance();
-
     private final CompositeDisposable disposable;
 
     // drawables measurements
@@ -62,8 +59,6 @@ public class UiDrawer extends AppCompatActivity {
     final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
     final int HEXAGON_WIDTH_QUARTER = HEXAGON_WIDTH / 4;
     final int HEXAGON_HEIGHT_QUARTER = HEXAGON_HEIGHT / 4;
-    final int INTERSECTION_SIZE = 40;
-    final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
     // number of total elements
     final int TOTAL_HEXAGONS = 19;
@@ -71,9 +66,9 @@ public class UiDrawer extends AppCompatActivity {
     final int TOTAL_INTERSECTIONS = 54;
 
     // storing of possible moves
-    private List<ImageView> possibleRoads;
-    private List<ImageView> possibleVillages;
-    private List<ImageView> possibleCities;
+    private final List<ImageView> possibleRoads;
+    private final List<ImageView> possibleVillages;
+    private final List<ImageView> possibleCities;
     private boolean showingPossibleRoads = false;
     private boolean showingPossibleVillages = false;
     private boolean showingPossibleCities = false;
@@ -96,7 +91,6 @@ public class UiDrawer extends AppCompatActivity {
         disposable = new CompositeDisposable();
         this.board=board;
         this.localPlayer=localPlayer;
-        this.players=players;
         this.possibleRoads = new ArrayList<>();
         this.possibleCities = new ArrayList<>();
         this.possibleVillages = new ArrayList<>();
@@ -323,8 +317,6 @@ public class UiDrawer extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(currentGameState -> {
                     this.board = currentGameState.getBoard();
-                    this.players = currentGameState.getPlayers();
-                    this.isSetupPhase = board.isSetupPhase();
                 });
         Disposable activePlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
@@ -335,10 +327,6 @@ public class UiDrawer extends AppCompatActivity {
         disposable.add(gameStateDisposable);
         disposable.add(activePlayerDisposable);
     }
-
-
-    //TODO: move UI drawing to separate UiDrawer class and extract methods
-
 
     public void applyConstraints(ConstraintLayout constraintLayout, ImageView[] hexagonViews, ImageView[] intersectionViews, ImageView[] connectionViews, TextView[] rollValueViews, ImageView[] robberView, int layoutWidth, int layoutHeight) {
         ConstraintSet set = new ConstraintSet();
@@ -436,8 +424,7 @@ public class UiDrawer extends AppCompatActivity {
             startMargin += HEXAGON_WIDTH / 2;
             endMargin -= HEXAGON_WIDTH / 2;
 
-            //add height offset to every second intersection
-            if (i % 2 == 0) {
+            if (i % 2 == 0) { //add height offset to every second intersection
                 topMargin -= offset;
             } else {
                 topMargin += offset;
