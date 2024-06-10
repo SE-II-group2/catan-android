@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,20 +61,26 @@ public class PlayerScoresFragment extends Fragment {
         fourthPlayerActive = v.findViewById(R.id.fourthPlayerActive);
 
         activePlayerViews = new ImageView[]{firstPlayerActive,secondPlayerActive,thirdPlayerActive,fourthPlayerActive};
+        hideActivePlayerIndicators();
+    }
 
+    private void hideActivePlayerIndicators() {
         for(ImageView activePlayerView : activePlayerViews){
             activePlayerView.setVisibility(View.INVISIBLE);
         }
     }
 
     public void updateScores(List<Player> playerList, Player activePlayer){
+        hideActivePlayerIndicators();
+
         for(int i = 0; i < playerList.size(); i++){
             String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
             playerScoreViews[i].setTextColor(playerList.get(i).getColor());
 
-            activePlayerViews[i].setVisibility(View.INVISIBLE);
+
             if(playerList.get(i).getInGameID() == activePlayer.getInGameID()){
+                Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");
                 activePlayerViews[i].setVisibility(View.VISIBLE);
             }
         }

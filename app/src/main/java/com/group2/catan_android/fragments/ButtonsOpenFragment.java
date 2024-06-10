@@ -18,7 +18,7 @@ import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 
 public class ButtonsOpenFragment extends Fragment implements OnButtonEventListener {
 
-    ImageView build;
+    ImageView exit;
     ImageView road;
     ImageView village;
     ImageView city;
@@ -45,13 +45,14 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        build = getActivity().findViewById(R.id.exit);
+        exit = getActivity().findViewById(R.id.exit);
         road = getActivity().findViewById(R.id.road);
         village = getActivity().findViewById(R.id.village);
         city = getActivity().findViewById(R.id.city);
         progressCard = getActivity().findViewById(R.id.progressCard);
 
-        build.setOnClickListener(v -> {
+        exit.setOnClickListener(v -> {
+            mListener.onButtonClicked(ButtonType.EXIT);
             Fragment newFragment = new ButtonsClosedFragment();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.leftButtonsFragment, newFragment);

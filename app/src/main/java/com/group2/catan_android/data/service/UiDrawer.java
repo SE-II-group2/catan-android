@@ -84,16 +84,6 @@ public class UiDrawer extends AppCompatActivity {
         this.possibleCities = new ArrayList<>();
         this.possibleVillages = new ArrayList<>();
         this.gameActivityContext = gameActivityContext;
-
-    }
-
-    protected UiDrawer(Board board, Player localPlayer, List<Player> players){
-        disposable = new CompositeDisposable();
-        this.board=board;
-        this.localPlayer=localPlayer;
-        this.possibleRoads = new ArrayList<>();
-        this.possibleCities = new ArrayList<>();
-        this.possibleVillages = new ArrayList<>();
     }
 
     public static UiDrawer getInstance(Activity gameActivityContext) {
@@ -102,56 +92,19 @@ public class UiDrawer extends AppCompatActivity {
     }
 
     public void updateUiBoard(Board board){
-        removePossibleMovesFromUI(possibleRoads);
-        removePossibleMovesFromUI(possibleVillages);
-        removePossibleMovesFromUI(possibleCities, R.drawable.village);
-        showingPossibleRoads = showingPossibleVillages = showingPossibleCities = false;
-
+        removeAllPossibleMovesFromUI();
         updatePossibleMoves();
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
         Intersection[][] intersections = board.getIntersections();
         List<Hexagon> hexagonList = board.getHexagonList();
 
-        // update connections
-        for(int row = 0; row < adjacencyMatrix.length; row++) {
-            for (int col = 0; col < adjacencyMatrix[row].length; col++) {
+        updateConnections(adjacencyMatrix);
+        updateIntersections(intersections);
+        updateHexagons(hexagonList);
+    }
 
-                if(adjacencyMatrix[row][col] instanceof Road){
-                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS*3 + 1);
-
-                    ImageView connectionView = gameActivityContext.findViewById(id);
-                    connectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.steet_red));
-                    connectionView.setColorFilter((adjacencyMatrix[row][col]).getPlayer().getColor());
-                    connectionView.clearAnimation();
-                }
-            }
-        }
-
-        // update intersections
-        for(int row = 0; row < intersections.length; row++) {
-            for (int col = 0; col < intersections[row].length; col++) {
-                if(intersections[row][col] instanceof Building){
-
-                    int id = (((Building) intersections[row][col]).getId() + 3*TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
-                    ImageView intersectionView = gameActivityContext.findViewById(id);
-
-                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.village));
-                        intersectionView.clearAnimation();
-                    } else if(intersections[row][col].getType() == BuildingType.CITY){
-                        intersectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.city));
-                        intersectionView.setScaleX(1.5F);
-                        intersectionView.setScaleY(1.5F);
-                        intersectionView.clearAnimation();
-                    }
-                    intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
-                }
-            }
-
-        }
-
-        // update hexagons with robber
+    private void updateHexagons(List<Hexagon> hexagonList) {
         for(Hexagon hexagon : hexagonList){
             int hexagonViewID = hexagon.getId() + 1;
             int rollValueViewID = hexagon.getId() + TOTAL_HEXAGONS + 1;
@@ -161,7 +114,6 @@ public class UiDrawer extends AppCompatActivity {
             TextView rollValueView = gameActivityContext.findViewById(rollValueViewID);
             ImageView robberView = gameActivityContext.findViewById(robberViewID);
 
-            // set hexagon image
             switch(hexagon.getLocation()){
                 case HILLS:
                     hexagonView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.hexagon_hills));
@@ -183,17 +135,61 @@ public class UiDrawer extends AppCompatActivity {
                     break;
             }
 
-            // set robber image and roll values
-            rollValueView.setText(String.format(Locale.getDefault(), "%d", hexagon.getRollValue()));
-            robberView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.robber));
+            setHexagonContent(hexagon,robberView,rollValueView);
+        }
+    }
 
-            // show value or robber
-            if(hexagon.isHavingRobber()){
-                rollValueView.setVisibility(View.INVISIBLE);
-                robberView.setVisibility(View.VISIBLE);
-            } else{
-                robberView.setVisibility(View.INVISIBLE);
-                rollValueView.setVisibility(View.VISIBLE);
+    private void setHexagonContent(Hexagon hexagon, ImageView robberView, TextView rollValueView) {
+        rollValueView.setText(String.format(Locale.getDefault(), "%d", hexagon.getRollValue()));
+        robberView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.robber));
+
+        if(hexagon.isHavingRobber()){
+            rollValueView.setVisibility(View.INVISIBLE);
+            robberView.setVisibility(View.VISIBLE);
+            robberView.setClickable(true);
+        } else{
+            robberView.setVisibility(View.INVISIBLE);
+            rollValueView.setVisibility(View.VISIBLE);
+            robberView.setClickable(false);
+        }
+    }
+
+
+    private void updateIntersections(Intersection[][] intersections) {
+        for(int row = 0; row < intersections.length; row++) {
+            for (int col = 0; col < intersections[row].length; col++) {
+                if(intersections[row][col] instanceof Building){
+
+                    int id = (((Building) intersections[row][col]).getId() + 3*TOTAL_HEXAGONS + TOTAL_CONNECTIONS + 1);
+                    ImageView intersectionView = gameActivityContext.findViewById(id);
+
+                    if(intersections[row][col].getType() == BuildingType.VILLAGE){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.village));
+                        intersectionView.clearAnimation();
+                    } else if(intersections[row][col].getType() == BuildingType.CITY){
+                        intersectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.city));
+                        intersectionView.setScaleX(1.5F);
+                        intersectionView.setScaleY(1.5F);
+                        intersectionView.clearAnimation();
+                    }
+                    intersectionView.setColorFilter(intersections[row][col].getPlayer().getColor());
+                }
+            }
+        }
+    }
+
+    private void updateConnections(Connection[][] adjacencyMatrix) {
+        for(int row = 0; row < adjacencyMatrix.length; row++) {
+            for (int col = 0; col < adjacencyMatrix[row].length; col++) {
+
+                if(adjacencyMatrix[row][col] instanceof Road){
+                    int id = (((Road) adjacencyMatrix[row][col]).getId() + TOTAL_HEXAGONS*3 + 1);
+
+                    ImageView connectionView = gameActivityContext.findViewById(id);
+                    connectionView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.steet_red));
+                    connectionView.setColorFilter((adjacencyMatrix[row][col]).getPlayer().getColor());
+                    connectionView.clearAnimation();
+                }
             }
         }
     }
@@ -242,7 +238,6 @@ public class UiDrawer extends AppCompatActivity {
     }
 
     public void showPossibleMoves(ButtonType button) {
-        // remove all possible moves and then draw the ones according to pressed button
         removePossibleMovesFromUI(possibleRoads);
         removePossibleMovesFromUI(possibleVillages);
         removePossibleMovesFromUI(possibleCities,R.drawable.village);
@@ -301,6 +296,13 @@ public class UiDrawer extends AppCompatActivity {
         for (ImageView possibleMoveView : possibleMoveViews) {
             possibleMoveView.setImageDrawable(null);
         }
+    }
+
+    public void removeAllPossibleMovesFromUI(){
+        removePossibleMovesFromUI(possibleRoads);
+        removePossibleMovesFromUI(possibleVillages);
+        removePossibleMovesFromUI(possibleCities,R.drawable.village);
+        showingPossibleRoads = showingPossibleVillages = showingPossibleCities = false;
     }
 
     public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews,int drawable){

@@ -12,14 +12,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ActivePlayerViewModel extends ViewModel {
+public class LocalPlayerViewModel extends ViewModel {
     private final CurrentGamestateRepository datasource;
 
     private final MutableLiveData<Player> playerMutableLiveData;
 
     CompositeDisposable disposable;
 
-    public ActivePlayerViewModel(CurrentGamestateRepository datasource) {
+    public LocalPlayerViewModel(CurrentGamestateRepository datasource) {
         this.datasource = datasource;
         this.playerMutableLiveData = new MutableLiveData<>();
         disposable = new CompositeDisposable();
@@ -36,8 +36,8 @@ public class ActivePlayerViewModel extends ViewModel {
         disposable.add(playerDisposable);
     }
 
-    public static final ViewModelInitializer<ActivePlayerViewModel> initializer = new ViewModelInitializer<>(
-            ActivePlayerViewModel.class,
-            creationExtras -> new ActivePlayerViewModel(CurrentGamestateRepository.getInstance())
+    public static final ViewModelInitializer<LocalPlayerViewModel> initializer = new ViewModelInitializer<>(
+            LocalPlayerViewModel.class,
+            creationExtras -> new LocalPlayerViewModel(CurrentGamestateRepository.getInstance())
     );
 }
