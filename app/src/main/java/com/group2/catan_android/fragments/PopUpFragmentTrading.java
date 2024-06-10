@@ -55,10 +55,11 @@ public class PopUpFragmentTrading extends DialogFragment {
         manager.beginTransaction().add(R.id.trading_popup_middlefragment, new TradingResourceSelectionFragment()).commit();
 
         view.findViewById(R.id.trading_popup_confirm).setOnClickListener(v -> {
-            int[] resources = {0,0,0,0,0};
+            int[] giveresources = {0,0,0,0,0};
+            int[] getresources = {0,0,0,0,0};
             boolean[] toPlayer = {true, true, true, true};
             try {
-                MoveMaker.getInstance().makeMove(new TradeMoveDto(resources, toPlayer, 10));
+                MoveMaker.getInstance().makeMove(new TradeMoveDto(giveresources, getresources, toPlayer));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

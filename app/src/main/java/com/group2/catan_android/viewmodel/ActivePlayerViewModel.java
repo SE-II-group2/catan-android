@@ -32,7 +32,8 @@ public class ActivePlayerViewModel extends ViewModel {
         Disposable playerDisposable = datasource.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(playerMutableLiveData::setValue);
+                .subscribe(
+                        playerMutableLiveData::setValue);
         disposable.add(playerDisposable);
     }
 

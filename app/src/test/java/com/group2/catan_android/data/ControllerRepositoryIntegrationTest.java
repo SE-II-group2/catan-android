@@ -20,6 +20,7 @@ import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.PreferenceManager;
 import com.group2.catan_android.data.repository.token.TokenRepository;
+import com.group2.catan_android.data.repository.trading.TradeRepository;
 import com.group2.catan_android.data.service.GameController;
 
 import com.group2.catan_android.data.service.StompDriver;
@@ -58,6 +59,7 @@ class ControllerRepositoryIntegrationTest {
     private PlayerRepository playerRepository;
     private GameProgressRepository gameProgressRepository;
     private CurrentGamestateRepository gamestateRepository;
+    private TradeRepository tradeRepository;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
@@ -66,7 +68,8 @@ class ControllerRepositoryIntegrationTest {
         TokenRepository.initialize(preferenceManager);
         this.gameProgressRepository = GameProgressRepository.getInstance();
         this.gamestateRepository = CurrentGamestateRepository.getInstance();
-        GameController.initialize(StompManager.getInstance(), TokenRepository.getInstance(), playerRepository, lobbyJoiner, gamestateRepository, gameProgressRepository);
+        this.tradeRepository = TradeRepository.getInstance();
+        GameController.initialize(StompManager.getInstance(), TokenRepository.getInstance(), playerRepository, lobbyJoiner, gamestateRepository, gameProgressRepository, tradeRepository);
         gameController = GameController.getInstance();
     }
 

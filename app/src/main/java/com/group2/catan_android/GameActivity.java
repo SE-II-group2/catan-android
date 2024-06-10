@@ -20,6 +20,7 @@ import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
+import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
@@ -41,6 +42,7 @@ import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
+import com.group2.catan_android.viewmodel.TradeViewModel;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -175,6 +177,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         ActivePlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
         PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
         GameProgressViewModel gameProgressViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
+        TradeViewModel tradeViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(TradeViewModel.initializer)).get(TradeViewModel.class);
 
         boardViewModel.getBoardMutableLiveData().observe(this, board -> {
             this.board = board;
@@ -199,6 +202,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             List<Player> tempList = new ArrayList<>(data);
             tempList.sort(Comparator.comparingInt(Player::getInGameID));
             updateUiPlayerScores(tempList);
+        });
+
+        tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto ->{
+            //what shall happen when getting the TradeOfferDto:
+
+                Toast.makeText(getApplicationContext(), "Why does this apply when create game?", Toast.LENGTH_LONG).show();
+
         });
     }
 

@@ -78,6 +78,22 @@ public class MoveMaker {
 
     private void makeTradeMove(GameMoveDto gameMove) throws Exception {
         sendMove(gameMove);
+        /*
+        //TODO:
+        Baue eigenes repository im Vorbild von GameProgressRepository
+        Es braucht unbedingt ein Behavioursubject, das bei wireDatasource configuriert wird
+        und je nach übergebenen DTO (das eigene Dto) copy paste, weil des vom Backend aufgerufen wird. Diese Methode implementieren und beim GameController definieren.
+        Das onNext pingt die Methoden, die das Behaviour als Observable implementieren, wie in GameProgressViewModel.
+        Just Copy:
+        private final GameProgressRepository datasource; datasource.getspecialObservable().sub......subscribe();
+        private final MutableLiveData<GameProgressDto> gameProgressDtoMutableLiveData;
+Disposable boardDisposable = datasource.getGameProgressObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(gameProgressDtoMutableLiveData::setValue);
+        disposable.add(boardDisposable);
+        just go down the use- rabbithole
+         */
     }
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
         if (isSetupPhase)
