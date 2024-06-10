@@ -1,6 +1,7 @@
 package com.group2.catan_android;
 
 import android.graphics.Color;
+import android.icu.text.CaseMap;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -20,6 +21,7 @@ import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.HelpFragment;
+import com.group2.catan_android.fragments.enums.GameMoveType;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
@@ -30,6 +32,7 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 
+import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
@@ -52,6 +55,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     final int TOTAL_CONNECTIONS = 72;
     final int TOTAL_INTERSECTIONS = 54;
     private Board board;
+    private Player localPlayer;
+
     private MoveMaker movemaker;
 
     // fragments and button listeners
@@ -100,7 +105,21 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         currentButtonFragmentListener = buttonsClosedFragment;
     }
 
-    public ImageView[] setupViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset, ButtonType button) {
+    private void createViews(ConstraintLayout constraintLayout) {
+        ImageView[] hexagonViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
+        TextView[] rollValueViews = setupRollValueViews(constraintLayout);
+        ImageView[] robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2, GameMoveType.MOVE_ROBBER);
+        ImageView[] connectionViews = setupViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,GameMoveType.BUILD_CONNECTION);
+        ImageView[] intersectionViews = setupViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),GameMoveType.BUILD_INTERSECTION);
+
+        constraintLayout.post(() -> {
+            int layoutWidth = constraintLayout.getWidth(); //screen width and height
+            int layoutHeight = constraintLayout.getHeight();
+            uiDrawer.applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, robberViews, layoutWidth, layoutHeight);
+        });
+    }
+
+    public ImageView[] setupViews(ConstraintLayout constraintLayout, int totalViews, int width, int height, int offset, GameMoveType gameMove) {
         ImageView[] views = new ImageView[totalViews];
 
         for (int i = 0; i < totalViews; i++) {
@@ -112,12 +131,41 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             constraintLayout.addView(view, params);
             views[i] = view;
 
-            if(button != null){
-                setViewOnClickListener(view,correctID,button);
+            if(gameMove != null){
+                setViewOnClickListener(view,correctID,gameMove);
             }
         }
 
         return views;
+    }
+
+    private void setViewOnClickListener(View view, int correctID, GameMoveType gameMove){
+        view.setOnClickListener(v -> {
+            if(gameMove == GameMoveType.BUILD_CONNECTION && lastButtonClicked == ButtonType.ROAD || gameMove == GameMoveType.BUILD_INTERSECTION){
+                try {
+                    switch (lastButtonClicked){
+                        case ROAD: movemaker.makeMove(new BuildRoadMoveDto(correctID));
+                            break;
+                        case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID));
+                            break;
+                        case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID));
+                            break;
+                        default: break;
+                    }
+                    currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
+                    lastButtonClicked = null;
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            } else{
+                if(gameMove == GameMoveType.MOVE_ROBBER && view.isClickable()){
+                    //TODO: add method for moving robber
+                    //TODO: if robber is clicked uiDrawer.makeAllRobberViewsClickable so a player can pick a new position
+                    //TODO: if allAreClickable then sendMove with correctID, field correctID already has the correct ID of the Hexagon
+                    Toast.makeText(getApplicationContext(),"Robber Clicked", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private TextView[] setupRollValueViews(ConstraintLayout constraintLayout) {
@@ -135,21 +183,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             views[i] = view;
         }
         return views;
-    }
-
-    private void createViews(ConstraintLayout constraintLayout) {
-        ImageView[] hexagonViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
-        TextView[] rollValueViews = setupRollValueViews(constraintLayout);
-        ImageView[] robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2,null);
-        ImageView[] connectionViews = setupViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,ButtonType.ROAD);
-        ImageView[] intersectionViews = setupViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),ButtonType.VILLAGE);
-
-        //constrain views to the right position
-        constraintLayout.post(() -> {
-            int layoutWidth = constraintLayout.getWidth(); //screen width and height
-            int layoutHeight = constraintLayout.getHeight();
-            uiDrawer.applyConstraints(constraintLayout, hexagonViews, intersectionViews, connectionViews, rollValueViews, robberViews, layoutWidth, layoutHeight);
-        });
     }
 
     private void setupEndTurnButton() {
@@ -184,12 +217,18 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void setupViewModels() {
         // viewModels
         BoardViewModel boardViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(BoardViewModel.initializer)).get(BoardViewModel.class);
+        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
         GameProgressViewModel gameProgressViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
 
         boardViewModel.getBoardMutableLiveData().observe(this, board -> {
             this.board = board;
             uiDrawer.updateUiBoard(board);
+        });
+
+        localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
+            this.localPlayer = player;
+            uiDrawer.updateUiPlayerResources(playerResourcesFragment,localPlayer);
         });
 
         gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
@@ -209,46 +248,29 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
     }
 
-    private void setViewOnClickListener(View view, int correctID, ButtonType button){
-        view.setOnClickListener(v -> {
-            if(button == ButtonType.ROAD && button == lastButtonClicked || button == ButtonType.VILLAGE || button == ButtonType.CITY){
-            try {
-                switch (lastButtonClicked){
-                    case ROAD: movemaker.makeMove(new BuildRoadMoveDto(correctID));
-                        break;
-                    case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID));
-                        break;
-                    case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID));
-                        break;
-                    default: break;
-                }
-                currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
-                lastButtonClicked = null;
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                 }
-            }
-        });
-    }
-
     @Override
     public void onButtonClicked(ButtonType button) {
         currentButtonFragmentListener.onButtonEvent(button);
 
-        if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
-            uiDrawer.showPossibleMoves(button);
-        }
-
-        if (button == ButtonType.HELP) {
-            HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
-            if (helpFragment == null) {
-                getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
-            } else {
-                getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
-            }
+        switch (button){
+            case ROAD:
+            case VILLAGE:
+            case CITY: uiDrawer.showPossibleMoves(button);
+            break;
+            case HELP: showHelpFragment();
+            case EXIT: uiDrawer.removeAllPossibleMovesFromUI();
         }
 
         lastButtonClicked = button;
+    }
+
+    private void showHelpFragment() {
+        HelpFragment helpFragment = (HelpFragment) getSupportFragmentManager().findFragmentById(R.id.helpFragment);
+        if (helpFragment == null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.helpFragment, new HelpFragment()).commit();
+        } else {
+            getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
+        }
     }
 
     public void setCurrentButtonFragmentListener(OnButtonEventListener listener) {
