@@ -3,6 +3,7 @@ package com.group2.catan_android.data.service;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
@@ -35,11 +36,11 @@ public class MoveMaker {
         setupListeners();
     }
 
-    protected MoveMaker(Board board, Player localPlayer, List<Player> players){
+    protected MoveMaker(Board board, Player localPlayer, List<Player> players) {
         disposable = new CompositeDisposable();
-        this.board=board;
-        this.localPlayer=localPlayer;
-        this.players=players;
+        this.board = board;
+        this.localPlayer = localPlayer;
+        this.players = players;
     }
 
     public void setToken(String token) {
@@ -52,6 +53,12 @@ public class MoveMaker {
     }
 
     public void makeMove(GameMoveDto gameMove) throws Exception {
+        if (gameMove.getClass().getSimpleName().equals("MoveRobberDto")) {
+            makeMoveRobberMove((MoveRobberDto) gameMove);
+        }
+        if (gameMove.getClass().getSimpleName().equals("AccuseCheatingDto")) {
+            if (!isSetupPhase) sendMove(gameMove);
+        }
         if (players.get(0).getInGameID() != localPlayer.getInGameID()) {
             throw new Exception("Not active player!");
         }
@@ -73,6 +80,13 @@ public class MoveMaker {
         }
     }
 
+    private void makeMoveRobberMove(MoveRobberDto robberDto) throws Exception {
+        if (isSetupPhase) throw new Exception("Cant move the Robber during the setup phase!");
+        if (robberDto.isLegal() && players.get(0).getInGameID() != localPlayer.getInGameID())
+            throw new Exception("Not active player!");
+        sendMove(robberDto);
+    }
+
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
         if (isSetupPhase)
             throw new Exception("End your turn during setupphase by placing a village and a road");
@@ -81,7 +95,7 @@ public class MoveMaker {
     }
 
     private void makeBuildVillageMove(GameMoveDto gameMove) throws Exception {
-        if(isSetupPhase && hasPlacedVillageInSetupPhase)
+        if (isSetupPhase && hasPlacedVillageInSetupPhase)
             throw new Exception("Already Placed a Village during your turn!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
             throw new Exception("Not enough Resources");
@@ -98,7 +112,7 @@ public class MoveMaker {
             throw new Exception("Not enough resources!");
         if (!board.addNewRoad(localPlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
             throw new Exception("Invalid place to build a road!");
-        hasPlacedVillageInSetupPhase=false;
+        hasPlacedVillageInSetupPhase = false;
         sendMove(gameMove);
     }
 
@@ -131,11 +145,11 @@ public class MoveMaker {
         moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
-    public boolean hasRolled(){
+    public boolean hasRolled() {
         return this.hasRolled;
     }
 
-    public boolean isSetupPhase(){
+    public boolean isSetupPhase() {
         return isSetupPhase;
     }
 }
