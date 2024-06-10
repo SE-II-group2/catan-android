@@ -4,6 +4,7 @@ import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
+import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
@@ -55,16 +56,21 @@ public class MoveMaker {
     public void makeMove(GameMoveDto gameMove) throws Exception {
         if (gameMove.getClass().getSimpleName().equals("MoveRobberDto")) {
             makeMoveRobberMove((MoveRobberDto) gameMove);
+            return;
         }
         if (gameMove.getClass().getSimpleName().equals("AccuseCheatingDto")) {
-            if (!isSetupPhase) sendMove(gameMove);
+            if (isSetupPhase)
+                throw new Exception("Cant accuse someone of Cheating during the Setup Phase!");
+            sendMove(gameMove);
+            return;
+
         }
         if (players.get(0).getInGameID() != localPlayer.getInGameID()) {
             throw new Exception("Not active player!");
         }
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
-                makeRollDiceMove(gameMove);
+                makeRollDiceMove((RollDiceDto) gameMove);
                 break;
             case "BuildRoadMoveDto":
                 makeBuildRoadMove(gameMove);
@@ -84,6 +90,8 @@ public class MoveMaker {
         if (isSetupPhase) throw new Exception("Cant move the Robber during the setup phase!");
         if (robberDto.isLegal() && players.get(0).getInGameID() != localPlayer.getInGameID())
             throw new Exception("Not active player!");
+        if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
+            throw new Exception("Cant move the Robber to the same Hexagon it is currently in!");
         sendMove(robberDto);
     }
 
@@ -116,8 +124,12 @@ public class MoveMaker {
         sendMove(gameMove);
     }
 
-    private void makeRollDiceMove(GameMoveDto gameMove) throws Exception {
+    private void makeRollDiceMove(RollDiceDto gameMove) throws Exception {
         if (hasRolled) throw new Exception("Has already Rolled the dice this turn");
+        if (gameMove.getDiceRoll() == 7) {
+            if (gameMove.getMoveRobberDto() == null)
+                throw new Exception("Select field to move the Robber to!");
+        }
         sendMove(gameMove);
         hasRolled = true;
     }

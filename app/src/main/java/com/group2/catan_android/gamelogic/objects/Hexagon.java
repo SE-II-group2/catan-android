@@ -23,6 +23,8 @@ public class Hexagon {
     private final int rollValue;
     private Building[] buildings;
     private int numOfAdjacentBuildings = 0;
+
+
     private boolean hasRobber;
 
     public Hexagon(Hexagontype hexagontype, ResourceDistribution distribution, int rollValue, int id, boolean hasRobber) {
@@ -91,6 +93,9 @@ public class Hexagon {
 
     public boolean isHavingRobber(){
         return hasRobber;
+    }
+    public void setHasRobber(boolean hasRobber) {
+        this.hasRobber = hasRobber;
     }
 
 }

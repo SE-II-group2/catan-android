@@ -323,15 +323,10 @@ public class Board {
         this.intersections=intersections1;
     }
 
-    public void setValue(Board otherBoard) {
-        this.adjacencyMatrix=otherBoard.getAdjacencyMatrix();
-        this.hexagonList=otherBoard.getHexagonList();
-        this.intersections=otherBoard.getIntersections();
-        this.isSetupPhase=otherBoard.isSetupPhase;
-    }
-
     public boolean isSetupPhase() {
         return isSetupPhase;
     }
+
+
 }
 
