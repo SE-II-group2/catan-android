@@ -133,7 +133,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             >
             <Button
-                android:id="@+id/trading_popup_selection_p1"
+                android:id="@+id/trading_popup_button_p1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_default="percent"
@@ -148,12 +148,12 @@
                 style="@style/Trade_ButtonStyle"
                 />
             <Button
-                android:id="@+id/trading_popup_selection_p2"
+                android:id="@+id/trading_popup_button_p2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_percent="0.25"
-                app:layout_constraintTop_toBottomOf="@id/trading_popup_selection_p1"
+                app:layout_constraintTop_toBottomOf="@id/trading_popup_button_p1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center"
@@ -164,12 +164,12 @@
                 android:text="Player 2"
                 />
             <Button
-                android:id="@+id/trading_popup_selection_p3"
+                android:id="@+id/trading_popup_button_p3"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_percent="0.25"
-                app:layout_constraintTop_toBottomOf="@id/trading_popup_selection_p2"
+                app:layout_constraintTop_toBottomOf="@id/trading_popup_button_p2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center"
@@ -180,12 +180,12 @@
                 android:text="Player 3"
                 />
             <Button
-                android:id="@+id/trading_popup_selection_p4"
+                android:id="@+id/trading_popup_button_p4"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_percent="0.25"
-                app:layout_constraintTop_toBottomOf="@id/trading_popup_selection_p3"
+                app:layout_constraintTop_toBottomOf="@id/trading_popup_button_p3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -212,9 +212,8 @@
             android:gravity="center"
             android:text="Bank"
             app:autoSizeTextType="uniform"
-            android:backgroundTint="#FF0000"
             android:textColor="@color/black"
-            style="@style/Trade_ButtonStyle"
+            style="@style/Trade_ButtonStyle_red"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

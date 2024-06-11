@@ -1,5 +1,7 @@
 package com.group2.catan_android.fragments;
 
+import android.content.res.ColorStateList;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -7,11 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -54,6 +60,8 @@ public class PopUpFragmentTrading extends DialogFragment {
         manager.beginTransaction().add(R.id.trading_popup_topfragment, new TradingResourceSelectionFragment()).commit();
         manager.beginTransaction().add(R.id.trading_popup_middlefragment, new TradingResourceSelectionFragment()).commit();
 
+        setButtonsListeners(view);
+
         view.findViewById(R.id.trading_popup_confirm).setOnClickListener(v -> {
             int[] giveresources = {0,0,0,0,0};
             int[] getresources = {0,0,0,0,0};
@@ -65,5 +73,55 @@ public class PopUpFragmentTrading extends DialogFragment {
             }
 
         });
+    }
+    public void setButtonsListeners(View view) {
+        // get used Views
+        Button[] playerButtons = new Button[]{
+                view.findViewById(R.id.trading_popup_button_p1),
+                view.findViewById(R.id.trading_popup_button_p2),
+                view.findViewById(R.id.trading_popup_button_p3),
+                view.findViewById(R.id.trading_popup_button_p4)
+        };
+        Button bank = view.findViewById(R.id.trading_popup_bank_button);
+        Button confirm = view.findViewById(R.id.trading_popup_confirm);
+        // set OnClickListeners
+
+
+        int red = ContextCompat.getColor(view.getContext(), R.color.red);
+        int green = ContextCompat.getColor(view.getContext(), R.color.GrassGreenHighlighted);
+        for (int i = 0; i < playerButtons.length; i++) {
+            final int j = i;
+            playerButtons[j].setOnClickListener(v -> {
+                int buttonColor = playerButtons[j].getBackgroundTintList().getDefaultColor();
+                if(buttonColor==red){
+                    int bankColor = bank.getBackgroundTintList().getDefaultColor();
+                    if(bankColor==green){
+                        bank.setBackgroundTintList(ColorStateList.valueOf(red));
+                    }
+                    playerButtons[j].setBackgroundTintList(ColorStateList.valueOf(green));
+                } else if (buttonColor==green) {
+                    //maybe that if all are set red bank automatically green?
+                    playerButtons[j].setBackgroundTintList(ColorStateList.valueOf(red));
+                }else{
+                    return;
+                }
+            });
+            bank.setOnClickListener(v -> {
+                int bankColor = bank.getBackgroundTintList().getDefaultColor();
+                if(bankColor==red){
+                    setAllButtonsColor(playerButtons, red);
+                    bank.setBackgroundTintList(ColorStateList.valueOf(green));
+                } else if (bankColor==green) {
+                    setAllButtonsColor(playerButtons, green);
+                    bank.setBackgroundTintList(ColorStateList.valueOf(red));
+                }
+            });
+        }
+
+    }
+    public void setAllButtonsColor(Button[] buttons, int color){
+        for(Button b:buttons){
+            b.setBackgroundTintList(ColorStateList.valueOf(color));
+        }
     }
 }
