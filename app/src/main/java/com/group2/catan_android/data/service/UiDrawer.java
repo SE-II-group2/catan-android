@@ -74,7 +74,7 @@ public class UiDrawer extends AppCompatActivity {
     private boolean showingPossibleCities = false;
 
     private static UiDrawer uiDrawerInstance;
-    private Activity gameActivityContext;
+    private final Activity gameActivityContext;
 
     private UiDrawer(Activity gameActivityContext) {
         board = new Board();
@@ -255,6 +255,7 @@ public class UiDrawer extends AppCompatActivity {
                 showingPossibleRoads = showingPossibleVillages = false;
                 showingPossibleCities = drawPossibleMovesToUI(showingPossibleCities, possibleCities, R.drawable.city, button);
                 break;
+            default:break;
         }
     }
 
@@ -274,6 +275,7 @@ public class UiDrawer extends AppCompatActivity {
             case ROAD: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost()); break;
             case VILLAGE: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()); break;
             case CITY: resourceSufficient = localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()); break;
+            default: break;
         }
 
         drawPossibleMoves(possibleMoveViews,resourceSufficient,drawable);
@@ -386,6 +388,8 @@ public class UiDrawer extends AppCompatActivity {
                     case 17: // fifth row
                         hexStartMargin = secondRowMargin; // secondRowMargin due to bottom half being mirrored
                         break;
+
+                    default: break;
                 }
 
                 //draw first Hexagon in row and all connections and intersections for that row
