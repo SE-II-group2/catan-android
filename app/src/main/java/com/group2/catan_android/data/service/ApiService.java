@@ -1,5 +1,7 @@
 package com.group2.catan_android.data.service;
 
+import com.group2.catan_android.BuildConfig;
+
 import org.jetbrains.annotations.NotNull;
 
 import retrofit2.Retrofit;
@@ -7,7 +9,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class ApiService {
-    private static final String BASE_URL = "http://10.0.2.2:8080/catan/game/";
+    private static final String BASE_URL = BuildConfig.BASE_GAME_URL;
     private final GameApi gameApi;
     private static ApiService instance;
 

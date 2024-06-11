@@ -1,8 +1,13 @@
 package com.group2.catan_android;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.icu.text.CaseMap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -33,6 +38,16 @@ import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
+import com.group2.catan_android.gamelogic.enums.BuildingType;
+import com.group2.catan_android.gamelogic.enums.ResourceCost;
+import com.group2.catan_android.gamelogic.objects.Building;
+import com.group2.catan_android.gamelogic.objects.Connection;
+import com.group2.catan_android.gamelogic.objects.Hexagon;
+import com.group2.catan_android.gamelogic.objects.Intersection;
+import com.group2.catan_android.gamelogic.objects.Road;
+import com.group2.catan_android.util.GameEffectManager;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
@@ -66,6 +81,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
+    private GameEffectManager gameEffectManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +93,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
         uiDrawer = UiDrawer.getInstance(GameActivity.this);
+
+        gameEffectManager = new GameEffectManager(this);
+        gameEffectManager.loadSound(R.raw.pop);
+        gameEffectManager.loadSound(R.raw.small_error);
+        gameEffectManager.loadSound(R.raw.tap);
 
         setToFullScreen();
 
@@ -154,8 +176,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     }
                     currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
                     lastButtonClicked = null;
+                    gameEffectManager.playSound(R.raw.pop);
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+                    gameEffectManager.playSound(R.raw.small_error);
+                    gameEffectManager.doubleVibrate();
                 }
             } else{
                 if(gameMove == GameMoveType.MOVE_ROBBER && view.isClickable()){
@@ -236,7 +262,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
             }
             if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                Toast.makeText(getApplicationContext(), "Turn ended. New active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
+                if(((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Your Turn!").show();
+                    gameEffectManager.vibrate();
+                    gameEffectManager.playSound(R.raw.pop);
+                }
+                else {
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Turn ended! Next Player: " + ((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName()).show();
+                    gameEffectManager.vibrate();
+                }
             }
         });
 
@@ -260,7 +294,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             case HELP: showHelpFragment();
             case EXIT: uiDrawer.removeAllPossibleMovesFromUI();
         }
-
+        gameEffectManager.playSound(R.raw.tap);
         lastButtonClicked = button;
     }
 
@@ -275,6 +309,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     public void setCurrentButtonFragmentListener(OnButtonEventListener listener) {
         currentButtonFragmentListener = listener;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        gameEffectManager.release();
     }
 
 }
