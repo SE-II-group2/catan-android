@@ -8,18 +8,19 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 public class TradeRepository implements TradeProvider, LiveDataReceiver<TradeOfferDto> {
 
 
-    BehaviorSubject <TradeOfferDto> tradeOfferDtoBehaviorSubject;
+    PublishSubject<TradeOfferDto> tradeOfferDtoBehaviorSubject;
 
     private Flowable<TradeOfferDto> liveDataIn;
     private static TradeRepository instance;
     Disposable d;
 
     private TradeRepository(){
-        this.tradeOfferDtoBehaviorSubject = BehaviorSubject.create();
+        this.tradeOfferDtoBehaviorSubject = PublishSubject.create();
 
     }
 
