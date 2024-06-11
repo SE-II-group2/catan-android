@@ -292,7 +292,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             case CITY: uiDrawer.showPossibleMoves(button);
             break;
             case HELP: showHelpFragment();
+            break;
             case EXIT: uiDrawer.removeAllPossibleMovesFromUI();
+            break;
+            default: break;
         }
         gameEffectManager.playSound(R.raw.tap);
         lastButtonClicked = button;
