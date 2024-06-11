@@ -121,6 +121,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
+        //getSupportFragmentManager().beginTransaction().add(R.id.tradingOfferFragment, new TradeOfferFragment()).commit();
         currentButtonFragmentListener = buttonsClosedFragment;
     }
 

@@ -27,6 +27,27 @@
             android:layout_marginStart="95dp"
             android:layout_marginTop="0dp"></FrameLayout>
     </FrameLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/width_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <FrameLayout
+        android:id="@+id/tradingOfferFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="8:2.8"
+        app:layout_constraintEnd_toStartOf="@+id/playerResourcesFragment"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/width_button"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"/>
+
 
     <FrameLayout
         android:id="@+id/playerResourcesFragment"
@@ -34,6 +55,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintDimensionRatio="2.5:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.25"

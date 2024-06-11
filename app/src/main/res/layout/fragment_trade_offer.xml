@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.TradeOfferFragment">
+
+    <ImageView
+        android:id="@+id/trade_offer_give_arrow"
+        android:src="@drawable/arrow_up"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <TextView
+        android:id="@+id/trade_offer_give_text"
+        android:text="Give"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="30dp"
+        />
+    <FrameLayout
+        android:id="@+id/trade_offer_give_fragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.7"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+
+    <TextView
+        android:id="@+id/trade_offer_player_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        android:text="Player X"
+        android:gravity="center"
+        android:textColor="@color/black"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/trade_offer_text_2"
+        />
+    <TextView
+        android:id="@+id/trade_offer_text_2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        android:text="wants to trade"
+        android:gravity="center"
+        android:textColor="@color/black"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trade_offer_player_text"
+        />
+
+
+    <Button
+        android:id="@+id/trade_offer_accept"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintDimensionRatio="3:1"
+        app:layout_constraintTop_toBottomOf="@id/trade_offer_text_2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        app:autoSizeTextType="uniform"
+        android:backgroundTint="@color/GrassGreenHighlighted"
+        android:textColor="@color/black"
+        style="@style/Trade_ButtonStyle"
+        android:text="Accept"
+        />
+    <Button
+        android:id="@+id/trade_offer_decline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintDimensionRatio="3:1"
+        app:layout_constraintTop_toBottomOf="@id/trade_offer_accept"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        app:autoSizeTextType="uniform"
+        android:backgroundTint="@color/red"
+        android:textColor="@color/black"
+        style="@style/Trade_ButtonStyle"
+        android:text="Decline"
+        />
+
+    <ImageView
+        android:id="@+id/trade_offer_get_arrow"
+        android:src="@drawable/arrow_down"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <TextView
+        android:id="@+id/trade_offer_get_text"
+        android:text="Get"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="30dp"
+        />
+
+    <FrameLayout
+        android:id="@+id/trade_offer_get_fragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.7"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
