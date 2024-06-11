@@ -1,6 +1,5 @@
 package com.group2.catan_android.fragments;
 
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,16 +17,8 @@ import com.group2.catan_android.gamelogic.Player;
 import java.util.List;
 
 public class PlayerScoresFragment extends Fragment {
-    private TextView firstPlayer;
-    private TextView secondPlayer;
-    private TextView thirdPlayer;
-    private TextView fourthPlayer;
     private TextView[] playerScoreViews;
     private ImageView[] activePlayerViews;
-    private ImageView firstPlayerActive;
-    private ImageView secondPlayerActive;
-    private ImageView thirdPlayerActive;
-    private ImageView fourthPlayerActive;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,16 +29,12 @@ public class PlayerScoresFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player_scores, container, false);
 
-        firstPlayer = view.findViewById(R.id.firstPlayerScore);
-        secondPlayer = view.findViewById(R.id.secondPlayerScore);
-        thirdPlayer = view.findViewById(R.id.thirdPlayerScore);
-        fourthPlayer = view.findViewById(R.id.fourthPlayerScore);
+        TextView firstPlayer = view.findViewById(R.id.firstPlayerScore);
+        TextView secondPlayer = view.findViewById(R.id.secondPlayerScore);
+        TextView thirdPlayer = view.findViewById(R.id.thirdPlayerScore);
+        TextView fourthPlayer = view.findViewById(R.id.fourthPlayerScore);
 
-        playerScoreViews = new TextView[4];
-        playerScoreViews[0] = firstPlayer;
-        playerScoreViews[1] = secondPlayer;
-        playerScoreViews[2] = thirdPlayer;
-        playerScoreViews[3] = fourthPlayer;
+        playerScoreViews = new TextView[]{firstPlayer,secondPlayer,thirdPlayer,fourthPlayer};
 
         setupActivePlayerIndicators(view);
 
@@ -55,12 +42,12 @@ public class PlayerScoresFragment extends Fragment {
     }
 
     public void setupActivePlayerIndicators(View v){
-        firstPlayerActive = v.findViewById(R.id.firstPlayerActive);
-        secondPlayerActive = v.findViewById(R.id.secondPlayerActive);
-        thirdPlayerActive = v.findViewById(R.id.thirdPlayerActive);
-        fourthPlayerActive = v.findViewById(R.id.fourthPlayerActive);
+        ImageView firstPlayerActive = v.findViewById(R.id.firstPlayerActive);
+        ImageView secondPlayerActive = v.findViewById(R.id.secondPlayerActive);
+        ImageView thirdPlayerActive = v.findViewById(R.id.thirdPlayerActive);
+        ImageView fourthPlayerActive = v.findViewById(R.id.fourthPlayerActive);
 
-        activePlayerViews = new ImageView[]{firstPlayerActive,secondPlayerActive,thirdPlayerActive,fourthPlayerActive};
+        activePlayerViews = new ImageView[]{firstPlayerActive, secondPlayerActive, thirdPlayerActive, fourthPlayerActive};
         hideActivePlayerIndicators();
     }
 
@@ -77,7 +64,6 @@ public class PlayerScoresFragment extends Fragment {
             String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
             playerScoreViews[i].setTextColor(playerList.get(i).getColor());
-
 
             if(playerList.get(i).getInGameID() == activePlayer.getInGameID()){
                 Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");
