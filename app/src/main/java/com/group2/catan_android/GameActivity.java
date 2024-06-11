@@ -1,7 +1,12 @@
 package com.group2.catan_android;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -38,6 +43,9 @@ import com.group2.catan_android.gamelogic.objects.Connection;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 import com.group2.catan_android.gamelogic.objects.Intersection;
 import com.group2.catan_android.gamelogic.objects.Road;
+import com.group2.catan_android.util.GameEffectManager;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
 import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
@@ -85,6 +93,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
+    private GameEffectManager gameEffectManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +104,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
+
+        gameEffectManager = new GameEffectManager(this);
+        gameEffectManager.loadSound(R.raw.pop);
+        gameEffectManager.loadSound(R.raw.small_error);
+        gameEffectManager.loadSound(R.raw.tap);
 
         setToFullScreen();
 
@@ -192,7 +207,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 Toast.makeText(getApplicationContext(), "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll(), Toast.LENGTH_SHORT).show();
             }
             if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                Toast.makeText(getApplicationContext(), "Turn ended. New active player: "+ ((EndTurnMoveDto)gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName(), Toast.LENGTH_SHORT).show();
+                if(((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Your Turn!").show();
+                    gameEffectManager.vibrate();
+                    gameEffectManager.playSound(R.raw.pop);
+                }
+                else {
+                    MessageBanner.makeBanner(this, MessageType.INFO, "Turn ended! Next Player: " + ((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName()).show();
+                    gameEffectManager.vibrate();
+                }
             }
         });
 
@@ -252,9 +275,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                         break;
                         default: break;
                     }
+
                     currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
+                    gameEffectManager.playSound(R.raw.pop);
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+                    gameEffectManager.playSound(R.raw.small_error);
+                    gameEffectManager.doubleVibrate();
                 }
         });
     }
@@ -275,7 +302,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
-
+        gameEffectManager.playSound(R.raw.tap);
         lastButtonClicked = button;
     }
 
@@ -635,6 +662,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         margins[2] = margins[3];
         margins[3] = temp;
         return margins;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        gameEffectManager.release();
     }
 
 }
