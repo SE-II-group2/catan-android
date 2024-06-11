@@ -1,13 +1,7 @@
 package com.group2.catan_android;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.icu.text.CaseMap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -192,7 +186,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void clickOnRobber(int correctID) throws Exception {
         //TODO:
         // if(player is not allowed to move robber -> throw Exception)
-        // else if allRobbersAreClickable already...) -> send move with correctID
+        // if allRobbersAreClickable already...) -> send move with correctID
         // else make all clickable... uiDrawer.makeAllRobberViewsClickable
     }
 
