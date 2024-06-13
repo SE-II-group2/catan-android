@@ -36,7 +36,7 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
     public void onBindViewHolder(@NonNull DevelopmentCardListAdapter.DevelopmentCardViewHolder holder, int position) {
         ProgressCardType item = items.get(position);
         holder.cardImage.setImageResource(getImageResourceForCardType(item));
-        holder.cardTitle.setText(item.name());
+        holder.cardTitle.setText(getTextResourceForCardType(item));
     }
     private int getImageResourceForCardType(ProgressCardType cardType) {
         switch (cardType) {
@@ -52,6 +52,23 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
                 return R.drawable.development_card_victorypoint;
             default:
                 return R.drawable.development_card_placeholder;
+        }
+    }
+
+    private int getTextResourceForCardType(ProgressCardType cardType){
+        switch(cardType) {
+            case KNIGHT:
+                return R.string.developmentcard_text_knight;
+            case ROAD_BUILDING:
+                return R.string.developmentcard_text_roadbuilding;
+            case YEAR_OF_PLENTY:
+                return R.string.developmentcard_text_yearofplenty;
+            case MONOPOLY:
+                return R.string.developmentcard_text_monopoly;
+            case VICTORY_POINT:
+                return R.string.developmentcard_text_victorypoint;
+            default:
+                return R.string.developmentcard_text_default;
         }
     }
     @Override
