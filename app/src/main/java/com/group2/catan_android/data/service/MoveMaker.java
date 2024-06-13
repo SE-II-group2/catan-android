@@ -131,6 +131,7 @@ public class MoveMaker {
         if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
             throw new Exception("Not enough resources");
         }
+        localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
         sendMove(gameMove);
     }
 
