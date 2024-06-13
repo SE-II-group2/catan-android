@@ -27,12 +27,14 @@
         android:layout_height="48dp"
         android:layout_marginStart="25dp"
         android:layout_marginBottom="20dp"
-        android:background="#ffffff"
+        android:background="@drawable/rounded_background_text_view"
         android:ems="10"
         android:hint="@string/lobby_playerName_hint"
         android:inputType="text"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <Button
         android:id="@+id/LobbyJoinButton"
@@ -70,7 +72,8 @@
         android:contentDescription="@string/lobby_refresh_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_refresh" />
+        app:srcCompat="@drawable/baseline_refresh"
+        android:background="@drawable/rounded_background" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/LobbyGameRecyclerView"

@@ -1,5 +1,6 @@
 package com.group2.catan_android.data.service;
 
+import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
@@ -78,6 +79,9 @@ public class MoveMaker {
             case "BuildVillageMoveDto":
                 makeBuildVillageMove(gameMove);
                 break;
+            case "BuildCityMoveDto":
+                makeBuildCityMove(gameMove);
+                break;
             case "EndTurnMoveDto":
                 makeEndTurnMove(gameMove);
                 break;
@@ -97,18 +101,18 @@ public class MoveMaker {
 
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
         if (isSetupPhase)
-            throw new Exception("End your turn during setupphase by placing a village and a road");
+            throw new Exception("End your turn during setup phase by placing a village and a road!");
         sendMove(gameMove);
         hasRolled = false;
     }
 
     private void makeBuildVillageMove(GameMoveDto gameMove) throws Exception {
-        if (isSetupPhase && hasPlacedVillageInSetupPhase)
-            throw new Exception("Already Placed a Village during your turn!");
+        if(isSetupPhase && hasPlacedVillageInSetupPhase)
+            throw new Exception("Already placed a village during your turn!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
-            throw new Exception("Not enough Resources");
+            throw new Exception("Not enough resources to build a Village!");
         if (!board.addNewVillage(localPlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
-            throw new Exception("Cant build a Village here");
+            throw new Exception("Can't build a Village here!");
         hasPlacedVillageInSetupPhase = true;
         sendMove(gameMove);
     }
@@ -117,10 +121,10 @@ public class MoveMaker {
         if (isSetupPhase && !hasPlacedVillageInSetupPhase)
             throw new Exception("Place a Village first during the setup phase!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
-            throw new Exception("Not enough resources!");
+            throw new Exception("Not enough resources to build a Road!");
         if (!board.addNewRoad(localPlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
-            throw new Exception("Invalid place to build a road!");
-        hasPlacedVillageInSetupPhase = false;
+            throw new Exception("Can't build a road here!");
+        hasPlacedVillageInSetupPhase=false;
         sendMove(gameMove);
     }
 
@@ -134,6 +138,15 @@ public class MoveMaker {
         hasRolled = true;
     }
 
+    private void makeBuildCityMove(GameMoveDto gameMove) throws Exception {
+        if(isSetupPhase)
+            throw new Exception("It is not possible to place cities during setup phase!");
+        if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
+            throw new Exception("Not enough resources to build a City!");
+        if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
+            throw new Exception("Can't build a city here!");
+        sendMove(gameMove);
+    }
     void setupListeners() {
         Disposable gameStateDisposable = currentGamestateRepository.getCurrentGameStateObservable()
                 .subscribeOn(Schedulers.io())
@@ -146,9 +159,7 @@ public class MoveMaker {
         Disposable activePlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(activePlayer -> {
-                    this.localPlayer = activePlayer;
-                });
+                .subscribe(activePlayer -> this.localPlayer = activePlayer);
         disposable.add(gameStateDisposable);
         disposable.add(activePlayerDisposable);
     }
@@ -163,6 +174,10 @@ public class MoveMaker {
 
     public boolean isSetupPhase() {
         return isSetupPhase;
+    }
+
+    public void setHasRolled(boolean hasRolled) {
+        this.hasRolled = hasRolled;
     }
 }
 

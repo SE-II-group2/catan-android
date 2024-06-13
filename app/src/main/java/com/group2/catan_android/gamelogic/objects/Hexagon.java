@@ -2,6 +2,7 @@ package com.group2.catan_android.gamelogic.objects;
 
 import androidx.annotation.NonNull;
 
+import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
@@ -46,6 +47,16 @@ public class Hexagon {
             }
         }
     }
+
+    public void distributeResources(Player player) {
+        if(hasRobber)return;
+        for (Building building : buildings) {
+            if (building != null && building.getPlayer() == player) {
+                building.giveResources(distribution);
+            }
+        }
+    }
+
 
     public void addBuilding(Building building) {
         for (int i = 0; i < buildings.length; i++) {

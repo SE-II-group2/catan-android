@@ -55,15 +55,10 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         holder.setGameData(games.get(position));
         holder.bindListener(games.get(position), listener);
 
-        // TODO: maybe refactor sometime
         if (selectedPos == position){
-            holder.binding.getRoot().setBackgroundColor(Color.BLACK);
-            //holder.gameCardView.setCardBackgroundColor(ContextCompat.getColor(holder.gameCardView.getContext(), R.color.GrassGreenHighlighted));
-            //holder.gameCardView.setCardBackgroundColor(Color.BLUE);
+            holder.binding.getRoot().setBackground(holder.binding.getRoot().getContext().getResources().getDrawable(R.drawable.card_border));
         } else {
-            holder.binding.getRoot().setBackgroundColor(Color.TRANSPARENT);
-            //holder.gameCardView.setCardBackgroundColor(ContextCompat.getColor(holder.gameCardView.getContext(), R.color.GrassGreen));
-            //holder.gameCardView.setCardBackgroundColor(Color.GREEN);
+            holder.binding.getRoot().setBackground(null);
         }
     }
 

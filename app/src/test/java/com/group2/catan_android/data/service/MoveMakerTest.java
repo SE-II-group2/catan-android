@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
+import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
@@ -154,7 +155,6 @@ public class MoveMakerTest {
         playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
 
         BuildRoadMoveDto buildRoadMoveDto = new BuildRoadMoveDto(5);
-        moveMaker.makeMove(buildRoadMoveDto);
 
         assertThrows(Exception.class, () -> moveMaker.makeMove(buildRoadMoveDto));
     }
@@ -211,6 +211,32 @@ public class MoveMakerTest {
     @Test
     void testIsSetupPhaseReturnsCorrectValue() {
         assertTrue(moveMaker.isSetupPhase());
+    }
+
+    @Test
+    void testBuildCityInSetupPhase() throws Exception {
+        isSetupPhaseField.set(moveMaker, true);
+        playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
+
+        BuildCityMoveDto buildCityMoveDto = new BuildCityMoveDto(5);
+
+        assertThrows(Exception.class, () -> moveMaker.makeMove(buildCityMoveDto));
+    }
+
+    @Test
+    void testMakeBuildCityMoveSuccess() throws Exception {
+        BuildVillageMoveDto villageMove = new BuildVillageMoveDto(0);
+        moveMaker.makeMove(villageMove);
+
+        BuildRoadMoveDto roadMove = new BuildRoadMoveDto(0);
+        moveMaker.makeMove(roadMove);
+
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
+
+        BuildCityMoveDto move = new BuildCityMoveDto(0);
+        moveMaker.makeMove(move);
+        verify(moveMaker, times(1)).sendMove(move);
     }
 }
 
