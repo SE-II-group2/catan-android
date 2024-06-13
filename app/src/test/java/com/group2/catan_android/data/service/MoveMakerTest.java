@@ -1,7 +1,6 @@
 package com.group2.catan_android.data.service;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
@@ -20,7 +19,7 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
-import org.checkerframework.checker.units.qual.A;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -32,7 +31,6 @@ import java.util.List;
 public class MoveMakerTest {
     private MoveMaker moveMaker;
     private List<Player> playerList;
-    private final String token = "token";
     private Field isSetupPhaseField;
     private Board board;
 
@@ -54,6 +52,7 @@ public class MoveMakerTest {
 
         // Mock the sendMove method to do nothing
         doNothing().when(moveMaker).sendMove(any());
+        String token = "token";
         moveMaker.setToken(token);
 
         isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
@@ -70,6 +69,7 @@ public class MoveMakerTest {
 
     @Test
     void testMakeRollDiceMoveSuccess() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
         GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
         moveMaker.makeMove(move); // This should succeed
         assert (moveMaker.hasRolled());
@@ -78,8 +78,15 @@ public class MoveMakerTest {
 
     @Test
     void testMakeRollDiceMoveAlreadyRolled() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
         GameMoveDto move = new RollDiceDto(5);
         moveMaker.makeMove(move);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
+    }
+
+    @Test
+    void testRollDiceDuringSetupPhaseThrowsError(){
+        GameMoveDto move = new RollDiceDto(5);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
     }
 
@@ -90,14 +97,15 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testMakeBuildVillageMoveSuccess() throws Exception {
+    void testMakeBuildVillageMoveSuccess() {
         BuildVillageMoveDto move = new BuildVillageMoveDto(31);
         moveMaker.makeMove(move); // This should succeed
         verify(moveMaker, times(1)).sendMove(move);
     }
 
+
     @Test
-    void testMakeBuildVillageMoveAlreadyPlacedVillage() throws Exception {
+    void testMakeBuildVillageMoveAlreadyPlacedVillage() {
         BuildVillageMoveDto move = new BuildVillageMoveDto();
         moveMaker.makeMove(move);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
@@ -110,7 +118,7 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testMakeBuildRoadMoveSuccess() throws Exception {
+    void testMakeBuildRoadMoveSuccess() {
         BuildVillageMoveDto villageMove = new BuildVillageMoveDto(0);
         moveMaker.makeMove(villageMove);
 
@@ -189,7 +197,7 @@ public class MoveMakerTest {
     @Test
     void testMoveRobberToSameFieldThrowsError() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
-        //Since every field is a desert field with all robbers when the board is instantiated but hasnt been updated from the server, we can pick any field
+        //Since every field is a desert field with all robbers when the board is instantiated but hasn't been updated from the server, we can pick any field
         MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
         assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
     }
@@ -210,7 +218,7 @@ public class MoveMakerTest {
 
     @Test
     void testIsSetupPhaseReturnsCorrectValue() {
-        assertTrue(moveMaker.isSetupPhase());
+        Assertions.assertTrue(moveMaker.isSetupPhase());
     }
 
     @Test

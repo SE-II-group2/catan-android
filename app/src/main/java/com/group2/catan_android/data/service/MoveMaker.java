@@ -93,7 +93,8 @@ public class MoveMaker {
     }
 
     private void makeMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
-        if (isSetupPhase) throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
         if (robberDto.isLegal() && players.get(0).getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
@@ -131,10 +132,9 @@ public class MoveMaker {
     }
 
     private void makeRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("Cant roll the Dice during SetupPhase");
         if (hasRolled) throw new IllegalGameMoveException("Has already Rolled the dice this turn");
-        if (gameMove.getDiceRoll() == 7 && gameMove.getMoveRobberDto() == null)
-            throw new IllegalGameMoveException("Select field to move the Robber to!");
-
         sendMove(gameMove);
         hasRolled = true;
     }
