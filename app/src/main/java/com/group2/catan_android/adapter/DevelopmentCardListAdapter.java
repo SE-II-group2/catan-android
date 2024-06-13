@@ -1,5 +1,6 @@
 package com.group2.catan_android.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DevelopmentCardListAdapter extends RecyclerView.Adapter<DevelopmentCardListAdapter.DevelopmentCardViewHolder> {
-    private List<String> items; // TODO: testing purposes
+    private List<ProgressCardType> items;
 
-    public DevelopmentCardListAdapter(List<String> items) {
-        this.items = items;
+    public DevelopmentCardListAdapter() {
+        this.items = new ArrayList<>();
+    }
+    public void setItems(List<ProgressCardType> items) {
+        this.items = items != null ? items : new ArrayList<>();
+        notifyDataSetChanged();
     }
     @NonNull
     @Override
@@ -27,12 +34,26 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
     }
     @Override
     public void onBindViewHolder(@NonNull DevelopmentCardListAdapter.DevelopmentCardViewHolder holder, int position) {
-        String item = items.get(position);
-        // TODO: Add real images, not just placeholder
-        holder.cardImage.setImageResource(R.drawable.development_card_placeholder);
-        holder.cardTitle.setText(item);
+        ProgressCardType item = items.get(position);
+        holder.cardImage.setImageResource(getImageResourceForCardType(item));
+        holder.cardTitle.setText(item.name());
     }
-
+    private int getImageResourceForCardType(ProgressCardType cardType) {
+        switch (cardType) {
+            case KNIGHT:
+                return R.drawable.development_card_knight;
+            case ROAD_BUILDING:
+                return R.drawable.development_card_roadbuilding;
+            case YEAR_OF_PLENTY:
+                return R.drawable.development_card_yearofplenty;
+            case MONOPOLY:
+                return R.drawable.development_card_monopoly;
+            case VICTORY_POINT:
+                return R.drawable.development_card_victorypoint;
+            default:
+                return R.drawable.development_card_placeholder;
+        }
+    }
     @Override
     public int getItemCount() {
         return items.size();
@@ -43,8 +64,8 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
         ImageView cardImage;
         public DevelopmentCardViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardTitle = (TextView) itemView.findViewById(R.id.cardTitleText);
-            cardImage = (ImageView) itemView.findViewById(R.id.cardImageView);
+            cardTitle = itemView.findViewById(R.id.cardTitleText);
+            cardImage = itemView.findViewById(R.id.cardImageView);
         }
     }
 }
