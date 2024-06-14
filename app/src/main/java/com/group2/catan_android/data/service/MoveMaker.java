@@ -4,6 +4,7 @@ import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
@@ -75,6 +76,9 @@ public class MoveMaker {
             case "BuyProgressCardDto":
                 makeBuyProgressCardMove(gameMove);
                 break;
+            case "UseProgressCardDto":
+                makeUseProgressCardMove(gameMove);
+                break;
             default:
                 throw new Exception("Unknown Dto format");
         }
@@ -132,6 +136,18 @@ public class MoveMaker {
             throw new Exception("Not enough resources");
         }
         localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
+        sendMove(gameMove);
+    }
+
+    private void makeUseProgressCardMove(GameMoveDto gameMove) throws Exception {
+        UseProgressCardDto useProgressCardDto = (UseProgressCardDto) gameMove;
+        if (isSetupPhase){
+            throw new Exception("Can't use progress-card during setup phase");
+        }
+        if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())){
+            throw new Exception("Card type not in possession");
+        }
+        localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
         sendMove(gameMove);
     }
 
