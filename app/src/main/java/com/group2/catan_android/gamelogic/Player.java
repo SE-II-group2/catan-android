@@ -88,6 +88,9 @@ public class Player {
     public List<ProgressCardType> getProgressCards(){
         return progressCards;
     }
+    public void removeProgressCard(ProgressCardType cardType){
+        progressCards.remove(cardType);
+    }
 
     public IngamePlayerDto toIngamePlayerDto(){
         return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID, this.progressCards);
