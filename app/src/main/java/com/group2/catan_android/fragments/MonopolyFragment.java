@@ -6,11 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.databinding.FragmentMonopolyCardBinding;
@@ -27,7 +25,6 @@ public class MonopolyFragment extends PopUpFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //return inflater.inflate(R.layout.fragment_monopoly_card, container, false);
         binding = FragmentMonopolyCardBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         moveMaker = MoveMaker.getInstance();
