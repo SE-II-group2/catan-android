@@ -4,7 +4,7 @@ public class TradeMoveDto extends GameMoveDto {
         this.setEventType(GameMoveType.TRADEMOVE);
     }
 
-    public TradeMoveDto(int[] giveResources, int[] getResources, boolean[] toPlayer) {
+    public TradeMoveDto(int[] giveResources, int[] getResources, int[] toPlayer) {
         this.giveResources = giveResources;
         this.getResources = getResources;
         this.toPlayer = toPlayer;
@@ -13,7 +13,7 @@ public class TradeMoveDto extends GameMoveDto {
 
     private int[] giveResources;
     private int[] getResources;
-    private boolean[] toPlayer;
+    private int[] toPlayer;
 
     public int[] getGiveResources() {
         return giveResources;
@@ -31,11 +31,11 @@ public class TradeMoveDto extends GameMoveDto {
         this.getResources = getResources;
     }
 
-    public boolean[] getToPlayer() {
+    public int[] getToPlayer() {
         return toPlayer;
     }
 
-    public void setToPlayer(boolean[] toPlayer) {
+    public void setToPlayer(int[] toPlayer) {
         this.toPlayer = toPlayer;
     }
 }

@@ -2,6 +2,8 @@ package com.group2.catan_android.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,7 +15,8 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.Player;
 
 public class PlayerResourcesFragment extends Fragment {
-
+    private Player localPlayer;
+    private boolean isInitialized = false;
     private TextView woodCount;
     private TextView brickCount;
     private TextView sheepCount;
@@ -36,6 +39,20 @@ public class PlayerResourcesFragment extends Fragment {
         stoneCount = view.findViewById(R.id.stoneCount);
 
         return view;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (isInitialized) {
+            updateResources(localPlayer);
+        }
+    }
+    public void setPlayer(Player player) {
+        this.localPlayer = player;
+        this.isInitialized = true;
+        if (getView() != null) {
+            updateResources(localPlayer);
+        }
     }
 
     public void updateResources(Player player) {

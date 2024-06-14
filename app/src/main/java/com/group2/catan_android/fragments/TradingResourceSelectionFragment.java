@@ -18,7 +18,6 @@ import com.group2.catan_android.R;
 
 
 public class TradingResourceSelectionFragment extends Fragment {
-    ImageView[] plus;
     TextView[] count;
 
     @Override
@@ -40,7 +39,7 @@ public class TradingResourceSelectionFragment extends Fragment {
 
     public void setPlusAndMinusListener(View view){
         // get used Views
-        plus = new ImageView[]{
+        ImageView[] plus = new ImageView[]{
                 view.findViewById(R.id.resource_selection_wood_plus),
                 view.findViewById(R.id.resource_selection_brick_plus),
                 view.findViewById(R.id.resource_selection_sheep_plus),
@@ -103,5 +102,14 @@ public class TradingResourceSelectionFragment extends Fragment {
             Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();
             return -1;
         }
+    }
+    public int[] getSetResources(){
+        int[] resources = new int[5];
+        resources[2]=getNumberofTextView(count[0]);
+        resources[3]=getNumberofTextView(count[1]);
+        resources[1]=getNumberofTextView(count[2]);
+        resources[0]=getNumberofTextView(count[3]);
+        resources[4]=getNumberofTextView(count[4]);
+        return resources;
     }
 }
