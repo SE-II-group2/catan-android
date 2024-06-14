@@ -1,6 +1,5 @@
 package com.group2.catan_android.adapter;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,10 @@ import java.util.List;
 
 public class DevelopmentCardListAdapter extends RecyclerView.Adapter<DevelopmentCardListAdapter.DevelopmentCardViewHolder> {
     private List<ProgressCardType> items;
-
-    public DevelopmentCardListAdapter() {
+    private OnDevelopmentCardClickListener listener;
+    public DevelopmentCardListAdapter(OnDevelopmentCardClickListener listener) {
         this.items = new ArrayList<>();
+        this.listener = listener;
     }
     public void setItems(List<ProgressCardType> items) {
         this.items = items != null ? items : new ArrayList<>();
@@ -37,6 +37,7 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
         ProgressCardType item = items.get(position);
         holder.cardImage.setImageResource(getImageResourceForCardType(item));
         holder.cardTitle.setText(getTextResourceForCardType(item));
+        holder.itemView.setOnClickListener(v -> listener.onDevelopmentCardClick(item));
     }
     private int getImageResourceForCardType(ProgressCardType cardType) {
         switch (cardType) {
