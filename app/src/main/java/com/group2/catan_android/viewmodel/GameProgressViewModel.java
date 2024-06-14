@@ -8,6 +8,7 @@ import com.group2.catan_android.data.live.game.GameProgressDto;
 import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.gamelogic.Board;
+import com.group2.catan_android.gamelogic.Player;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -16,7 +17,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class GameProgressViewModel extends ViewModel {
     private final GameProgressRepository datasource;
-
     private final MutableLiveData<GameProgressDto> gameProgressDtoMutableLiveData;
 
     CompositeDisposable disposable;

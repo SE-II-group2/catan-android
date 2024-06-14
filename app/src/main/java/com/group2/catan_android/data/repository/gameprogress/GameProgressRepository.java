@@ -71,6 +71,7 @@ public class GameProgressRepository implements GameProgressProvider, LiveDataRec
                 });
     }
 
+
     @Override
     public Observable<GameProgressDto> getGameProgressObservable() {
         return gameProgressDtoBehaviorSubject;
