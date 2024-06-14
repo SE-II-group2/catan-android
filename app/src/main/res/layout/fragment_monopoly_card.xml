@@ -1,0 +1,81 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/monopolyFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wood_texture"
+    tools:context=".fragments.ButtonsClosedFragment">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Choose a Resource!"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonBricks"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonBricks"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="20dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonWood"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/count_brick" />
+
+    <ImageButton
+        android:id="@+id/buttonWood"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toStartOf="@+id/buttonWheat"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonBricks"
+        app:layout_constraintTop_toTopOf="@+id/buttonBricks"
+        app:srcCompat="@drawable/count_wood" />
+
+    <ImageButton
+        android:id="@+id/buttonWheat"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toStartOf="@+id/buttonStone"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonWood"
+        app:layout_constraintTop_toTopOf="@+id/buttonWood"
+        app:srcCompat="@drawable/count_wheat" />
+
+    <ImageButton
+        android:id="@+id/buttonStone"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSheep"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonWheat"
+        app:layout_constraintTop_toTopOf="@+id/buttonWheat"
+        app:srcCompat="@drawable/count_stone" />
+
+    <ImageButton
+        android:id="@+id/buttonSheep"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="20dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonStone"
+        app:layout_constraintTop_toTopOf="@+id/buttonStone"
+        app:srcCompat="@drawable/count_sheep" />
+</androidx.constraintlayout.widget.ConstraintLayout>
