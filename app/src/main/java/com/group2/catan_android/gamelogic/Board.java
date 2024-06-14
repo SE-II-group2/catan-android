@@ -269,5 +269,4 @@ public class Board {
         if(intersections1.length!=6 || intersections1[0].length!=11)return;
         this.intersections=intersections1;
     }
-
 }

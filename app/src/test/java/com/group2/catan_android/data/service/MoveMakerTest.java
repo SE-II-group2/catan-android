@@ -1,22 +1,25 @@
 package com.group2.catan_android.data.service;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.objects.Hexagon;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -27,13 +30,13 @@ import java.util.List;
 
 public class MoveMakerTest {
     private MoveMaker moveMaker;
-    List<Player> playerList;
-    private final String token = "token";
-    Field isSetupPhaseField;
+    private List<Player> playerList;
+    private Field isSetupPhaseField;
+    private Board board;
 
     @BeforeEach
     void setup() throws Exception {
-        Board board = new Board();
+        board = new Board();
         Player localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1);
         localPlayer.setInGameID(1);
         Player otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2);
@@ -49,6 +52,7 @@ public class MoveMakerTest {
 
         // Mock the sendMove method to do nothing
         doNothing().when(moveMaker).sendMove(any());
+        String token = "token";
         moveMaker.setToken(token);
 
         isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
@@ -65,6 +69,7 @@ public class MoveMakerTest {
 
     @Test
     void testMakeRollDiceMoveSuccess() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
         GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
         moveMaker.makeMove(move); // This should succeed
         assert (moveMaker.hasRolled());
@@ -73,8 +78,15 @@ public class MoveMakerTest {
 
     @Test
     void testMakeRollDiceMoveAlreadyRolled() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
         GameMoveDto move = new RollDiceDto(5);
         moveMaker.makeMove(move);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
+    }
+
+    @Test
+    void testRollDiceDuringSetupPhaseThrowsError(){
+        GameMoveDto move = new RollDiceDto(5);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
     }
 
@@ -85,14 +97,15 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testMakeBuildVillageMoveSuccess() throws Exception {
+    void testMakeBuildVillageMoveSuccess() {
         BuildVillageMoveDto move = new BuildVillageMoveDto(31);
         moveMaker.makeMove(move); // This should succeed
         verify(moveMaker, times(1)).sendMove(move);
     }
 
+
     @Test
-    void testMakeBuildVillageMoveAlreadyPlacedVillage() throws Exception {
+    void testMakeBuildVillageMoveAlreadyPlacedVillage() {
         BuildVillageMoveDto move = new BuildVillageMoveDto();
         moveMaker.makeMove(move);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move));
@@ -105,7 +118,7 @@ public class MoveMakerTest {
     }
 
     @Test
-    void testMakeBuildRoadMoveSuccess() throws Exception {
+    void testMakeBuildRoadMoveSuccess() {
         BuildVillageMoveDto villageMove = new BuildVillageMoveDto(0);
         moveMaker.makeMove(villageMove);
 
@@ -155,8 +168,57 @@ public class MoveMakerTest {
     }
 
     @Test
+    void testMoveRobberDuringSetupPhaseThrowsError() {
+        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
+    }
+
+    @Test
+    void testMoveRobberThrowsErrorIfNotActivePlayer() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.remove(0);
+        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
+    }
+
+    @Test
+    void testMoveRobberSendsMovesCorrectly() throws Exception {
+        for (Hexagon hexagon : board.getHexagonList()) {
+            hexagon.setHasRobber(false);
+        }
+        isSetupPhaseField.set(moveMaker, false);
+        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
+        moveMaker.makeMove(moveRobberMove);
+        moveRobberMove = new MoveRobberDto(15, false);
+        moveMaker.makeMove(moveRobberMove);
+        verify(moveMaker, times(2)).sendMove(any());
+    }
+
+    @Test
+    void testMoveRobberToSameFieldThrowsError() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        //Since every field is a desert field with all robbers when the board is instantiated but hasn't been updated from the server, we can pick any field
+        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
+        assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
+    }
+
+    @Test
+    void testAccuseCheatingDtoSendsCorrectly() throws Exception{
+        isSetupPhaseField.set(moveMaker, false);
+        AccuseCheatingDto accuseCheatingDto = new AccuseCheatingDto();
+        moveMaker.makeMove(accuseCheatingDto);
+        verify(moveMaker, times(1)).sendMove(accuseCheatingDto);
+    }
+
+    @Test
+    void testAccuseCheatingThrowsErrorDuringSetupPhase(){
+        AccuseCheatingDto accuseCheatingDto = new AccuseCheatingDto();
+        assertThrows(Exception.class, () -> moveMaker.makeMove(accuseCheatingDto));
+    }
+
+    @Test
     void testIsSetupPhaseReturnsCorrectValue() {
-        assertTrue(moveMaker.isSetupPhase());
+        Assertions.assertTrue(moveMaker.isSetupPhase());
     }
 
     @Test
