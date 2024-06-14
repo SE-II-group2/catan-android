@@ -2,7 +2,6 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -252,10 +251,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                         break;
                         case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID));
                         break;
-                        case PROGRESS_CARD:
-                            Log.d("ProgressCard", "PG Button pressed");
-                            movemaker.makeMove(new BuyProgressCardDto());
-                        break;
                         default: break;
                     }
                     currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
@@ -268,7 +263,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     @Override
     public void onButtonClicked(ButtonType button) {
         currentButtonFragmentListener.onButtonEvent(button);
-        Log.d("ProgressCard", "Button clicked: "+ button.toString());
         if (button == ButtonType.ROAD || button == ButtonType.VILLAGE || button == ButtonType.CITY) {
             showPossibleMoves(button);
         }
@@ -281,13 +275,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 getSupportFragmentManager().beginTransaction().remove(helpFragment).commit();
             }
         }
-        // TODO: Temporary placed here
         if (button == ButtonType.PROGRESS_CARD) {
             try {
-                Log.d("ProgressCard", "going to make move"+ button.toString());
                 movemaker.makeMove(new BuyProgressCardDto());
             } catch (Exception e) {
-                Log.d("ProgressCard", "Issue: " + e.toString());
+                Toast.makeText(getApplicationContext(), "Can't do that right now!" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
         lastButtonClicked = button;
