@@ -272,10 +272,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
-            Player activePlayer = playerList.get(0);
-            List<Player> tempList = new ArrayList<>(playerList);
-            tempList.sort(Comparator.comparingInt(Player::getInGameID));
-            uiDrawer.updateUiPlayerScores(playerScoresFragment,tempList,activePlayer);
+            if(!playerList.isEmpty()) {
+                Player activePlayer = playerList.get(0);
+                List<Player> tempList = new ArrayList<>(playerList);
+                tempList.sort(Comparator.comparingInt(Player::getInGameID));
+                uiDrawer.updateUiPlayerScores(playerScoresFragment, tempList, activePlayer);
+            }
         });
     }
 
