@@ -15,7 +15,7 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.adapter.DevelopmentCardListAdapter;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.ProgressCardType;
-import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
+import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class PopUpFragment extends DialogFragment {
 
     private RecyclerView recyclerView;
     private DevelopmentCardListAdapter devCardAdapter;
-    ActivePlayerViewModel localPlayerViewModel;
+    LocalPlayerViewModel localPlayerViewModel;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class PopUpFragment extends DialogFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         devCardAdapter = new DevelopmentCardListAdapter();
         recyclerView.setAdapter(devCardAdapter);
-        localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
+        localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), player -> {
             if(player != null){
                 updateAdapterWithPlayerData(player);
