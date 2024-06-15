@@ -17,6 +17,7 @@ import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
 import org.junit.jupiter.api.Assertions;
@@ -37,9 +38,10 @@ public class MoveMakerTest {
     @BeforeEach
     void setup() throws Exception {
         board = new Board();
-        Player localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1);
+        List<ProgressCardType> progressCards = new ArrayList<>();
+        Player localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1, progressCards);
         localPlayer.setInGameID(1);
-        Player otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2);
+        Player otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2, progressCards);
         otherPlayer.setInGameID(2);
         playerList = new ArrayList<>();
         playerList.add(localPlayer);
