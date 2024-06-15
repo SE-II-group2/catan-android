@@ -4,6 +4,7 @@
     android:id="@+id/yearofplentyFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/wood_texture"
     tools:context=".fragments.ButtonsClosedFragment">
 
     <TextView
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Choose two resources!"
+        android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,11 +74,13 @@
 
     <ImageButton
         android:id="@+id/downWood"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/upWood"
         app:layout_constraintStart_toStartOf="@+id/upWood"
         app:layout_constraintTop_toBottomOf="@+id/woodText"
@@ -84,8 +88,8 @@
 
     <ImageButton
         android:id="@+id/upWood"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
@@ -100,15 +104,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="0"
-        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/upWood"
         app:layout_constraintStart_toStartOf="@+id/upWood"
         app:layout_constraintTop_toBottomOf="@+id/upWood" />
 
     <ImageButton
         android:id="@+id/upSheep"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
@@ -119,8 +125,8 @@
 
     <ImageButton
         android:id="@+id/upStone"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
@@ -131,8 +137,8 @@
 
     <ImageButton
         android:id="@+id/upBrick"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
@@ -143,8 +149,8 @@
 
     <ImageButton
         android:id="@+id/upWheat"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginTop="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
@@ -155,51 +161,47 @@
 
     <ImageButton
         android:id="@+id/downSheep"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:rotation="90"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/downWood"
         app:layout_constraintEnd_toEndOf="@+id/upSheep"
         app:layout_constraintStart_toStartOf="@+id/upSheep"
-        app:layout_constraintTop_toBottomOf="@+id/sheepText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/downStone"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:rotation="90"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/downWood"
         app:layout_constraintEnd_toEndOf="@+id/upStone"
         app:layout_constraintStart_toStartOf="@+id/upStone"
-        app:layout_constraintTop_toBottomOf="@+id/stoneText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/downBrick"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:rotation="90"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/downWood"
         app:layout_constraintEnd_toEndOf="@+id/upBrick"
         app:layout_constraintStart_toStartOf="@+id/upBrick"
-        app:layout_constraintTop_toBottomOf="@+id/brickText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/doneWheat"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:rotation="90"
         android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/downWood"
         app:layout_constraintEnd_toEndOf="@+id/upWheat"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/upWheat"
-        app:layout_constraintTop_toBottomOf="@+id/wheatText"
         app:srcCompat="@drawable/arrow_right" />
 
     <TextView
@@ -208,7 +210,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="0"
-        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/upSheep"
         app:layout_constraintStart_toStartOf="@+id/upSheep"
         app:layout_constraintTop_toBottomOf="@+id/upSheep" />
@@ -219,7 +223,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="0"
-        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/upStone"
         app:layout_constraintStart_toStartOf="@+id/upStone"
         app:layout_constraintTop_toBottomOf="@+id/upStone" />
@@ -230,7 +236,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="0"
-        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/upBrick"
         app:layout_constraintStart_toStartOf="@+id/upBrick"
         app:layout_constraintTop_toBottomOf="@+id/upBrick" />
@@ -241,7 +249,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="0"
-        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/upWheat"
         app:layout_constraintStart_toStartOf="@+id/upWheat"
         app:layout_constraintTop_toBottomOf="@+id/upWheat" />

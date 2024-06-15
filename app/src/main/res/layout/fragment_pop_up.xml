@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/progressCardFragment"
+    android:background="@drawable/wood_texture"
     tools:context=".fragments.ButtonsClosedFragment">
 
     <androidx.recyclerview.widget.RecyclerView
