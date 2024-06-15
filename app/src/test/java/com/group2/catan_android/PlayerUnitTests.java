@@ -28,10 +28,11 @@ public class PlayerUnitTests {
     private final String displayName = "player1";
     private final String gameID = "player1";
     static int playerColor = Color.RED;
+    private List<ProgressCardType> progressCards;
 
     @BeforeEach
     void setUp() {
-        List<ProgressCardType> progressCards = new ArrayList<>();
+         progressCards = new ArrayList<>();
         player1 = new Player(displayName, 0, new int[]{0, 0, 0, 0, 0}, playerColor, progressCards);
     }
 
@@ -97,5 +98,16 @@ public class PlayerUnitTests {
         Assertions.assertEquals(displayName, player1.getDisplayName());
         Assertions.assertEquals(playerColor, player1.getColor());
     }
+    @Test
+    void testGetProgressCards() {
+        List<ProgressCardType> cards = player1.getProgressCards();
+        assertEquals(progressCards, cards);
+    }
 
+    @Test
+    void testRemoveProgressCard() {
+        progressCards.add(ProgressCardType.VICTORY_POINT);
+        player1.removeProgressCard(ProgressCardType.VICTORY_POINT);
+        assertFalse(player1.getProgressCards().contains(ProgressCardType.VICTORY_POINT));
+    }
 }
