@@ -33,6 +33,7 @@ public class MoveMaker {
     private boolean hasPlacedVillageInSetupPhase = false;
     private String token;
     private static MoveMaker moveMakerInstance;
+    private Player activePlayer;
 
     private MoveMaker() {
         board = new Board();
@@ -40,11 +41,12 @@ public class MoveMaker {
         setupListeners();
     }
 
-    protected MoveMaker(Board board, Player localPlayer, List<Player> players) {
+    protected MoveMaker(Board board, Player localPlayer, List<Player> players, Player activePlayer) {
         disposable = new CompositeDisposable();
         this.board = board;
         this.localPlayer = localPlayer;
         this.players = players;
+        this.activePlayer = activePlayer;
     }
 
     public void setToken(String token) {
@@ -68,7 +70,7 @@ public class MoveMaker {
             return;
 
         }
-        if (players.get(0).getInGameID() != localPlayer.getInGameID()) {
+        if (activePlayer.getInGameID() != localPlayer.getInGameID()) {
             throw new IllegalGameMoveException("Not active player!");
         }
         switch (gameMove.getClass().getSimpleName()) {
@@ -95,7 +97,7 @@ public class MoveMaker {
     private void makeMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
-        if (robberDto.isLegal() && players.get(0).getInGameID() != localPlayer.getInGameID())
+        if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
             throw new IllegalGameMoveException("Cant move the Robber to the same Hexagon it is currently in!");
@@ -157,13 +159,15 @@ public class MoveMaker {
                     this.board = currentGameState.getBoard();
                     this.players = currentGameState.getPlayers();
                     this.isSetupPhase = board.isSetupPhase();
+                    this.activePlayer = currentGameState.getActivePlayer();
                 });
-        Disposable activePlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
+        Disposable localPlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(activePlayer -> this.localPlayer = activePlayer);
+                .subscribe(localPlayer -> this.localPlayer = localPlayer);
+
         disposable.add(gameStateDisposable);
-        disposable.add(activePlayerDisposable);
+        disposable.add(localPlayerDisposable);
     }
 
     protected void sendMove(GameMoveDto gameMoveDto) {

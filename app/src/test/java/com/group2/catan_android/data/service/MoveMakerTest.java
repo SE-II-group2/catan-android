@@ -19,6 +19,8 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
 
+import net.bytebuddy.description.field.FieldList;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +34,17 @@ public class MoveMakerTest {
     private MoveMaker moveMaker;
     private List<Player> playerList;
     private Field isSetupPhaseField;
+    private Field activePlayerField;
     private Board board;
 
+    private Player localPlayer;
+    private Player otherPlayer;
     @BeforeEach
     void setup() throws Exception {
         board = new Board();
-        Player localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1);
+        localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1);
         localPlayer.setInGameID(1);
-        Player otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2);
+        otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2);
         otherPlayer.setInGameID(2);
         playerList = new ArrayList<>();
         playerList.add(localPlayer);
@@ -48,7 +53,7 @@ public class MoveMakerTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a spy of MoveMaker with mock dependencies
-        moveMaker = spy(new MoveMaker(board, localPlayer, playerList));
+        moveMaker = spy(new MoveMaker(board, localPlayer, playerList, localPlayer));
 
         // Mock the sendMove method to do nothing
         doNothing().when(moveMaker).sendMove(any());
@@ -57,11 +62,13 @@ public class MoveMakerTest {
 
         isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
         isSetupPhaseField.setAccessible(true);
+        activePlayerField = MoveMaker.class.getDeclaredField("activePlayer");
+        activePlayerField.setAccessible(true);
     }
 
     @Test
-    void testMakeMoveNotActivePlayer() {
-        playerList.remove(0);
+    void testMakeMoveNotActivePlayer() throws Exception{
+        activePlayerField.set(moveMaker, otherPlayer);
         GameMoveDto move = new BuildVillageMoveDto(2);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
     }
@@ -176,7 +183,7 @@ public class MoveMakerTest {
     @Test
     void testMoveRobberThrowsErrorIfNotActivePlayer() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
-        playerList.remove(0);
+        activePlayerField.set(moveMaker, otherPlayer);
         MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
         assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
     }

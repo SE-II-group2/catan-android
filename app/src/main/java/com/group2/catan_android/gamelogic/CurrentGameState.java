@@ -22,9 +22,20 @@ public class CurrentGameState {
 
     private List<Player> players;
 
-    public CurrentGameState(List<Player> players, Board board) {
+    public Player getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void setActivePlayer(Player activePlayer) {
+        this.activePlayer = activePlayer;
+    }
+
+    private Player activePlayer;
+
+    public CurrentGameState(List<Player> players, Board board, Player activePlayer) {
         this.players = players;
         this.board = board;
+        this.activePlayer = activePlayer;
     }
     public CurrentGameState(){
         this.board=new Board();

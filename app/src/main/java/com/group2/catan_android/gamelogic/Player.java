@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
+import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
@@ -15,6 +16,8 @@ public class Player {
     private int[] resources = new int[]{0,0,0,0,0};
     private int color;
 
+    private boolean isActive = false;
+
     private List<ProgressCard> progressCards;
 
     public Player(String token, String displayName, String gameID, int color) {
@@ -23,7 +26,11 @@ public class Player {
         this.gameID = gameID;
         this.color = color;
     }
-
+    public static Player fromPlayerDto(IngamePlayerDto dto){
+        Player player = new Player(dto.getDisplayName(), dto.getVictoryPoints(), dto.getResources(), dto.getColor());
+        player.setInGameID(dto.getInGameID());
+        return player;
+    }
     public Player (){}
     public Player( String displayName, int victoryPoints, int[] resources,  int color) {
         this.displayName = displayName;
@@ -86,5 +93,12 @@ public class Player {
 
     public IngamePlayerDto toIngamePlayerDto(){
         return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID);
+    }
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

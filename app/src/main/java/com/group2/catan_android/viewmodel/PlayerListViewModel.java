@@ -18,23 +18,34 @@ public class PlayerListViewModel extends ViewModel {
     private final CurrentGamestateRepository datasource;
 
     private final MutableLiveData<List<Player>> playerMutableLiveData;
+    private final MutableLiveData<Player> activePlayerMutableLiveData;
 
     CompositeDisposable disposable;
 
     public PlayerListViewModel(CurrentGamestateRepository datasource) {
         this.datasource = datasource;
         this.playerMutableLiveData = new MutableLiveData<>();
+        this.activePlayerMutableLiveData = new MutableLiveData<>();
         disposable = new CompositeDisposable();
         setupListeners();
     }
     public MutableLiveData<List<Player>> getPlayerMutableLiveData() {
         return playerMutableLiveData;
     }
+    public MutableLiveData<Player> getActivePlayerMutableLiveData(){
+        return activePlayerMutableLiveData;
+    }
     private void setupListeners() {
         Disposable playerDisposable = datasource.getAllPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(playerMutableLiveData::setValue);
+
+        Disposable activePlayerDisposable = datasource.getActivePlayerObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(activePlayerMutableLiveData::setValue);
+        disposable.add(activePlayerDisposable);
         disposable.add(playerDisposable);
     }
 

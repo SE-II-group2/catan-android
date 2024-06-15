@@ -207,7 +207,7 @@ public class CurrentGamestateRepositoryTest {
 
         List<IntersectionDto> intersectionDtoList = createPreSetupIntersectionList(board);
         List<ConnectionDto> connectionDtoList = createPreSetupConnectionList(board);
-        currentGameStateDto = new CurrentGameStateDto(hexagonDtoList, intersectionDtoList, connectionDtoList, playerDtos, false);
+        currentGameStateDto = new CurrentGameStateDto(hexagonDtoList, intersectionDtoList, connectionDtoList, playerDtos, otherPlayer.toIngamePlayerDto(),  false);
     }
 
     private List<ConnectionDto> createPreSetupConnectionList(Board board) {

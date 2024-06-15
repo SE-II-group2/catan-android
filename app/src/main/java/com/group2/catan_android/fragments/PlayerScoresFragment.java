@@ -57,7 +57,7 @@ public class PlayerScoresFragment extends Fragment {
         }
     }
 
-    public void updateScores(List<Player> playerList, Player activePlayer){
+    public void updateScores(List<Player> playerList){
         hideActivePlayerIndicators();
 
         for(int i = 0; i < playerList.size(); i++){
@@ -65,7 +65,7 @@ public class PlayerScoresFragment extends Fragment {
             playerScoreViews[i].setText(playerScore);
             playerScoreViews[i].setTextColor(playerList.get(i).getColor());
 
-            if(playerList.get(i).getInGameID() == activePlayer.getInGameID()){
+            if(playerList.get(i).isActive()){
                 Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");
                 activePlayerViews[i].setVisibility(View.VISIBLE);
             }
