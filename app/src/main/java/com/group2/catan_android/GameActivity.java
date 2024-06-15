@@ -79,7 +79,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
-        uiDrawer = UiDrawer.getInstance(GameActivity.this);
+        uiDrawer = new UiDrawer(GameActivity.this);
 
         gameEffectManager = new GameEffectManager(this);
         gameEffectManager.loadSound(R.raw.pop);
@@ -271,10 +271,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
-            Player activePlayer = playerList.get(0);
-            List<Player> tempList = new ArrayList<>(playerList);
-            tempList.sort(Comparator.comparingInt(Player::getInGameID));
-            uiDrawer.updateUiPlayerScores(playerScoresFragment,tempList,activePlayer);
+            if(!playerList.isEmpty()) {
+                uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
+            }
         });
     }
 
