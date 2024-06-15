@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.group2.catan_android.GameActivity;
 import com.group2.catan_android.R;
 import com.group2.catan_android.adapter.DevelopmentCardListAdapter;
 import com.group2.catan_android.adapter.OnDevelopmentCardClickListener;
@@ -58,7 +59,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
     public void onDevelopmentCardClick(ProgressCardType cardType){
         switch(cardType) {
             case KNIGHT:
-                Log.d("ProgressCards", "Card clicked: Knight");
+                makeAllRobbersVisible();
                 break;
             case ROAD_BUILDING:
                 try {
@@ -103,6 +104,14 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
         assert  getActivity() != null;
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragment.show(fragmentManager, "popup_fragment");
+        closeFragment();
+    }
+
+    private void makeAllRobbersVisible(){
+        GameActivity gameActivity = (GameActivity) getActivity();
+        assert gameActivity != null;
+        gameActivity.makeAllRobberViewsClickable();
+        MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Choose the robber position!").show();
         closeFragment();
     }
 }

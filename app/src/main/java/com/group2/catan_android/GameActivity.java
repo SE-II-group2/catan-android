@@ -2,6 +2,7 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.BuyProgressCardDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
+import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.HelpFragment;
@@ -71,6 +73,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private GameEffectManager gameEffectManager;
 
+    // List of views
+    ImageView[] robberViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +122,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void createViews(ConstraintLayout constraintLayout) {
         ImageView[] hexagonViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
         TextView[] rollValueViews = setupRollValueViews(constraintLayout);
-        ImageView[] robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2, ClickableElement.ROBBER);
+        robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2, ClickableElement.ROBBER);
         ImageView[] connectionViews = setupViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,ClickableElement.CONNECTION);
         ImageView[] intersectionViews = setupViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),ClickableElement.INTERSECTION);
 
@@ -324,6 +328,27 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     public void onDestroy(){
         super.onDestroy();
         gameEffectManager.release();
+    }
+
+    public void makeAllRobberViewsClickable() {
+        for (ImageView robberView: robberViews){
+            robberView.setVisibility(View.VISIBLE);
+            robberView.setOnClickListener(v->{
+                int hexagonID = robberView.getId() - TOTAL_HEXAGONS * 2 - 1;
+                moveRobber(hexagonID);
+            });
+        }
+    }
+
+    private void moveRobber(int hexagonID) {
+        try {
+            // TODO: temporary always true
+            MoveRobberDto moveRobberDto = new MoveRobberDto(hexagonID, true);
+            movemaker.makeMove(moveRobberDto);
+        } catch (Exception e) {
+            Log.d("Robber", "Fehler: " + e);
+            MessageBanner.makeBanner(this, MessageType.ERROR, "An error occurred!" + e.getMessage()).show();
+        }
     }
 
 }
