@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import android.graphics.Color;
 
@@ -12,7 +11,6 @@ import com.group2.catan_android.gamelogic.Player;
 
 import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
-import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +43,7 @@ public class PlayerUnitTests {
 
     @Test
     void testConstructor(){
-        List<ProgressCardType> progressCards = new ArrayList<>();
+        progressCards = new ArrayList<>();
         Player p = new Player("Player", 0, null, 0, progressCards);
         assertEquals("Player", p.getDisplayName());
         assertNull(p.getResources());
