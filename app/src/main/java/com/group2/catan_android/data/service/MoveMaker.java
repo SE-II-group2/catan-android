@@ -1,10 +1,14 @@
 package com.group2.catan_android.data.service;
 
+import com.group2.catan_android.data.exception.IllegalGameMoveException;
+import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
+import com.group2.catan_android.data.live.game.MoveRobberDto;
+import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
@@ -37,11 +41,11 @@ public class MoveMaker {
         setupListeners();
     }
 
-    protected MoveMaker(Board board, Player localPlayer, List<Player> players){
+    protected MoveMaker(Board board, Player localPlayer, List<Player> players) {
         disposable = new CompositeDisposable();
-        this.board=board;
-        this.localPlayer=localPlayer;
-        this.players=players;
+        this.board = board;
+        this.localPlayer = localPlayer;
+        this.players = players;
     }
 
     public void setToken(String token) {
@@ -53,13 +57,24 @@ public class MoveMaker {
         return moveMakerInstance;
     }
 
-    public void makeMove(GameMoveDto gameMove) throws Exception {
+    public void makeMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        if (gameMove instanceof MoveRobberDto) {
+            makeMoveRobberMove((MoveRobberDto) gameMove);
+            return;
+        }
+        if (gameMove instanceof AccuseCheatingDto) {
+            if (isSetupPhase)
+                throw new IllegalGameMoveException("Cant accuse someone of Cheating during the Setup Phase!");
+            sendMove(gameMove);
+            return;
+
+        }
         if (players.get(0).getInGameID() != localPlayer.getInGameID()) {
-            throw new Exception("Not active player!");
+            throw new IllegalGameMoveException("Not active player!");
         }
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
-                makeRollDiceMove(gameMove);
+                makeRollDiceMove((RollDiceDto) gameMove);
                 break;
             case "BuildRoadMoveDto":
                 makeBuildRoadMove(gameMove);
@@ -80,74 +95,85 @@ public class MoveMaker {
                 makeUseProgressCardMove(gameMove);
                 break;
             default:
-                throw new Exception("Unknown Dto format");
+                throw new IllegalGameMoveException("Unknown Dto format");
         }
     }
 
-    private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {
+    private void makeMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new Exception("End your turn during setup phase by placing a village and a road!");
+            throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
+        if (robberDto.isLegal() && players.get(0).getInGameID() != localPlayer.getInGameID())
+            throw new IllegalGameMoveException("Not active player!");
+        if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
+            throw new IllegalGameMoveException("Cant move the Robber to the same Hexagon it is currently in!");
+        sendMove(robberDto);
+    }
+
+    private void makeEndTurnMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("End your turn during setup phase by placing a village and a road!");
         sendMove(gameMove);
         hasRolled = false;
     }
 
-    private void makeBuildVillageMove(GameMoveDto gameMove) throws Exception {
-        if(isSetupPhase && hasPlacedVillageInSetupPhase)
-            throw new Exception("Already placed a village during your turn!");
+    private void makeBuildVillageMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase && hasPlacedVillageInSetupPhase)
+            throw new IllegalGameMoveException("Already placed a village during your turn!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
-            throw new Exception("Not enough resources to build a Village!");
+            throw new IllegalGameMoveException("Not enough resources to build a Village!");
         if (!board.addNewVillage(localPlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
-            throw new Exception("Can't build a Village here!");
+            throw new IllegalGameMoveException("Can't build a Village here!");
         hasPlacedVillageInSetupPhase = true;
         sendMove(gameMove);
     }
 
-    private void makeBuildRoadMove(GameMoveDto gameMove) throws Exception {
+    private void makeBuildRoadMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase && !hasPlacedVillageInSetupPhase)
-            throw new Exception("Place a Village first during the setup phase!");
+            throw new IllegalGameMoveException("Place a Village first during the setup phase!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
-            throw new Exception("Not enough resources to build a Road!");
+            throw new IllegalGameMoveException("Not enough resources to build a Road!");
         if (!board.addNewRoad(localPlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
-            throw new Exception("Can't build a road here!");
-        hasPlacedVillageInSetupPhase=false;
+            throw new IllegalGameMoveException("Can't build a road here!");
+        hasPlacedVillageInSetupPhase = false;
         sendMove(gameMove);
     }
 
-    private void makeBuildCityMove(GameMoveDto gameMove) throws Exception {
-        if(isSetupPhase)
-            throw new Exception("It is not possible to place cities during setup phase!");
-        if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
-            throw new Exception("Not enough resources to build a City!");
-        if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
-            throw new Exception("Can't build a city here!");
-        sendMove(gameMove);
-    }
-
-    private void makeRollDiceMove(GameMoveDto gameMove) throws Exception {
-        if (hasRolled) throw new Exception("Has already Rolled the dice this turn!");
+    private void makeRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("Cant roll the Dice during SetupPhase");
+        if (hasRolled) throw new IllegalGameMoveException("Has already Rolled the dice this turn");
         sendMove(gameMove);
         hasRolled = true;
     }
 
-    private void makeBuyProgressCardMove(GameMoveDto gameMove) throws Exception {
+    private void makeBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new Exception("Can't buy progress-card during setup phase");
+            throw new IllegalGameMoveException("Can't buy progress-card during setup phase");
         if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
-            throw new Exception("Not enough resources");
+            throw new IllegalGameMoveException("Not enough resources");
         }
         localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
         sendMove(gameMove);
     }
 
-    private void makeUseProgressCardMove(GameMoveDto gameMove) throws Exception {
+    private void makeUseProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         UseProgressCardDto useProgressCardDto = (UseProgressCardDto) gameMove;
-        if (isSetupPhase){
-            throw new Exception("Can't use progress-card during setup phase");
+        if (isSetupPhase) {
+            throw new IllegalGameMoveException("Can't use progress-card during setup phase");
         }
-        if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())){
-            throw new Exception("Card type not in possession");
+        if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())) {
+            throw new IllegalGameMoveException("Card type not in possession");
         }
         localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
+        sendMove(gameMove);
+    }
+    private void makeBuildCityMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("It is not possible to place cities during setup phase!");
+        if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
+            throw new IllegalGameMoveException("Not enough resources to build a City!");
+        if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
+            throw new IllegalGameMoveException("Can't build a city here!");
         sendMove(gameMove);
     }
 
@@ -163,9 +189,7 @@ public class MoveMaker {
         Disposable activePlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(activePlayer -> {
-                    this.localPlayer = activePlayer;
-                });
+                .subscribe(activePlayer -> this.localPlayer = activePlayer);
         disposable.add(gameStateDisposable);
         disposable.add(activePlayerDisposable);
     }
@@ -174,11 +198,11 @@ public class MoveMaker {
         moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
     }
 
-    public boolean hasRolled(){
+    public boolean hasRolled() {
         return this.hasRolled;
     }
 
-    public boolean isSetupPhase(){
+    public boolean isSetupPhase() {
         return isSetupPhase;
     }
 
