@@ -21,6 +21,7 @@ import com.group2.catan_android.data.live.game.BuyProgressCardDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
+import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.enums.ClickableElement;
@@ -34,6 +35,7 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.util.GameEffectManager;
 import com.group2.catan_android.util.MessageBanner;
@@ -330,21 +332,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         gameEffectManager.release();
     }
 
-    public void makeAllRobberViewsClickable() {
+    public void makeAllRobberViewsClickableComingFromProgressCard() {
         for (ImageView robberView: robberViews){
             robberView.setVisibility(View.VISIBLE);
             robberView.setOnClickListener(v->{
                 int hexagonID = robberView.getId() - TOTAL_HEXAGONS * 2 - 1;
-                moveRobber(hexagonID);
+                moveRobberComingFromProgressCard(hexagonID);
             });
         }
     }
 
-    private void moveRobber(int hexagonID) {
+    private void moveRobberComingFromProgressCard(int hexagonID) {
         try {
             // TODO: temporary always true
             MoveRobberDto moveRobberDto = new MoveRobberDto(hexagonID, true);
+            UseProgressCardDto useProgressCardDto = new UseProgressCardDto(ProgressCardType.KNIGHT, null, null);
             movemaker.makeMove(moveRobberDto);
+            movemaker.makeMove(useProgressCardDto);
         } catch (Exception e) {
             Log.d("Robber", "Fehler: " + e);
             MessageBanner.makeBanner(this, MessageType.ERROR, "An error occurred!" + e.getMessage()).show();

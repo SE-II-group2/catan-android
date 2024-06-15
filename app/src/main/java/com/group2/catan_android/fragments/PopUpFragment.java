@@ -108,7 +108,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
     private void makeAllRobbersVisible(){
         GameActivity gameActivity = (GameActivity) getActivity();
         assert gameActivity != null;
-        gameActivity.makeAllRobberViewsClickable();
+        gameActivity.makeAllRobberViewsClickableComingFromProgressCard();
         MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Choose the robber position!").show();
         closeFragment();
     }
