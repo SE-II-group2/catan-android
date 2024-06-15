@@ -30,19 +30,17 @@ import java.util.List;
 
 public class PopUpFragment extends DialogFragment implements OnDevelopmentCardClickListener {
 
-    private RecyclerView recyclerView;
     private DevelopmentCardListAdapter devCardAdapter;
-    private LocalPlayerViewModel localPlayerViewModel;
     private MoveMaker moveMaker;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pop_up, container, false);
-        recyclerView = view.findViewById(R.id.devCardRecycler);
+        RecyclerView recyclerView = view.findViewById(R.id.devCardRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
         devCardAdapter = new DevelopmentCardListAdapter(this);
         recyclerView.setAdapter(devCardAdapter);
-        localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
+        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), player -> {
             if(player != null){
                 updateAdapterWithPlayerData(player);

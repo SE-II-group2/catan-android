@@ -99,9 +99,9 @@ public class YearOfPlentyFragment extends PopUpFragment {
             Log.d("ProgressCards", e.toString());
         }
         MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Resources received!").show();
-        closeFragment();
+        closeYearOfPlentyFragment();
     }
-    private void closeFragment(){
+    private void closeYearOfPlentyFragment(){
         assert getActivity() != null;
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

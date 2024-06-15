@@ -20,12 +20,11 @@ import com.group2.catan_android.util.MessageType;
 import javax.annotation.Nullable;
 
 public class MonopolyFragment extends PopUpFragment {
-    private FragmentMonopolyCardBinding binding;
     private MoveMaker moveMaker;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentMonopolyCardBinding.inflate(inflater, container, false);
+        com.group2.catan_android.databinding.FragmentMonopolyCardBinding binding = FragmentMonopolyCardBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         moveMaker = MoveMaker.getInstance();
         binding.buttonBricks.setOnClickListener(v -> useProgressCard(ResourceDistribution.HILLS));
@@ -44,9 +43,9 @@ public class MonopolyFragment extends PopUpFragment {
             Log.d("ProgressCards", e.toString());
         }
         MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Resources stolen!").show();
-        closeFragment();
+        closeMonopolyFragment();
     }
-    private void closeFragment(){
+    private void closeMonopolyFragment(){
         assert getActivity() != null;
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
