@@ -4,17 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import android.graphics.Color;
 
 import com.group2.catan_android.gamelogic.Player;
 
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerUnitTests {
 
@@ -23,10 +26,12 @@ public class PlayerUnitTests {
     private final String displayName = "player1";
     private final String gameID = "player1";
     static int playerColor = Color.RED;
+    private List<ProgressCardType> progressCards;
 
     @BeforeEach
     void setUp() {
-        player1 = new Player(playerToken,displayName,gameID, playerColor);
+         progressCards = new ArrayList<>();
+        player1 = new Player(displayName, 0, new int[]{0, 0, 0, 0, 0}, playerColor, progressCards);
     }
 
     @Test
@@ -38,7 +43,8 @@ public class PlayerUnitTests {
 
     @Test
     void testConstructor(){
-        Player p = new Player("Player", 0, null, 0);
+        progressCards = new ArrayList<>();
+        Player p = new Player("Player", 0, null, 0, progressCards);
         assertEquals("Player", p.getDisplayName());
         assertNull(p.getResources());
         p.setInGameID(1);
@@ -90,5 +96,16 @@ public class PlayerUnitTests {
         Assertions.assertEquals(displayName, player1.getDisplayName());
         Assertions.assertEquals(playerColor, player1.getColor());
     }
+    @Test
+    void testGetProgressCards() {
+        List<ProgressCardType> cards = player1.getProgressCards();
+        assertEquals(progressCards, cards);
+    }
 
+    @Test
+    void testRemoveProgressCard() {
+        progressCards.add(ProgressCardType.VICTORY_POINT);
+        player1.removeProgressCard(ProgressCardType.VICTORY_POINT);
+        assertFalse(player1.getProgressCards().contains(ProgressCardType.VICTORY_POINT));
+    }
 }

@@ -9,8 +9,8 @@
     <color name="red">#de2121</color>
     <color name="green">#00FF00</color>
     <color name="grey">#a0a0a0</color>
+    <color name="devCardColor">#FFf4eee0</color>
     <color name="blue">#009dc4</color>
     <color name="popup_background">#009dc4</color>
     <color name="yellow">#FFDB00</color>
-
 </resources>

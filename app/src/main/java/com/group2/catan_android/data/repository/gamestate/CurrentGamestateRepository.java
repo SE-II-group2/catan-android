@@ -128,7 +128,7 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
             for( Player player : playersList){
                 if(playerDto.getInGameID()==player.getInGameID())continue outerloop;
             }
-            Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor());
+            Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor(), playerDto.getProgressCards());
             player.setInGameID(playerDto.getInGameID());
             playersList.add(player);
             playerHashMap.put(playerDto.getInGameID(), player);
