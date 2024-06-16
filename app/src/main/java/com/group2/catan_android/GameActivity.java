@@ -74,6 +74,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
     private GameEffectManager gameEffectManager;
+    private boolean allRobbersAreClickable = false;
+    private boolean hasRolledSeven = false;
 
     // List of views
     ImageView[] robberViews;
@@ -190,11 +192,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
     }
 
-    private void clickOnRobber(int correctID) throws Exception {
+    private void clickOnRobber(int correctID) {
+        if(hasRolledSeven){
+            movemaker.makeMove(new MoveRobberDto(correctID, true));
+            hasRolledSeven = false;
+            allRobbersAreClickable=false;
+            uiDrawer.setAllRobbersClickable(false);
+            return;
+        }
+        if(!allRobbersAreClickable) {
+            allRobbersAreClickable = true;
+            uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+            Toast.makeText(getApplicationContext(), "First click "+correctID, Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(getApplicationContext(), "Second click "+correctID, Toast.LENGTH_SHORT).show();
+            movemaker.makeMove(new MoveRobberDto(correctID, false));
+            allRobbersAreClickable = false;
+            uiDrawer.setAllRobbersClickable(false);
+        }
+
         //TODO:
         // if(player is not allowed to move robber -> throw Exception)
         // if allRobbersAreClickable already...) -> send move with correctID
         // else make all clickable... uiDrawer.makeAllRobberViewsClickable
+
     }
 
     private TextView[] setupRollValueViews(ConstraintLayout constraintLayout) {
@@ -233,6 +254,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     Random random = new Random();
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
+                    if(diceRoll==7){
+                        hasRolledSeven = true;
+                        allRobbersAreClickable=true;
+                        uiDrawer.setAllRobbersClickable(true);
+                    }
                     movemaker.makeMove(new RollDiceDto(diceRoll));
                     movemaker.setHasRolled(true);
 
