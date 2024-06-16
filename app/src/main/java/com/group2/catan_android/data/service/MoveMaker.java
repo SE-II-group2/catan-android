@@ -52,31 +52,47 @@ public class MoveMaker {
     }
 
     public void makeMove(GameMoveDto gameMove) throws Exception {
-        if (players.get(0).getInGameID() != localPlayer.getInGameID()) {
-            throw new Exception("Not active player!");
-        }
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
+                if (players.get(0).getInGameID() != localPlayer.getInGameID())
+                    throw new Exception("Not active player!");
                 makeRollDiceMove(gameMove);
                 break;
             case "BuildRoadMoveDto":
+                if (players.get(0).getInGameID() != localPlayer.getInGameID())
+                    throw new Exception("Not active player!");
                 makeBuildRoadMove(gameMove);
                 break;
             case "BuildVillageMoveDto":
+                if (players.get(0).getInGameID() != localPlayer.getInGameID())
+                    throw new Exception("Not active player!");
                 makeBuildVillageMove(gameMove);
                 break;
             case "EndTurnMoveDto":
+                if (players.get(0).getInGameID() != localPlayer.getInGameID())
+                    throw new Exception("Not active player!");
                 makeEndTurnMove(gameMove);
                 break;
             case "TradeMoveDto":
+                if (players.get(0).getInGameID() != localPlayer.getInGameID())
+                    throw new Exception("Not active player!");
                 makeTradeMove(gameMove);
+                break;
+            case "AcceptMoveDto":
+                makeAcceptMove(gameMove);
                 break;
             default:
                 throw new Exception("Unknown Dto format");
         }
     }
-
+    private void makeAcceptMove(GameMoveDto gameMove)throws Exception{
+        if (isSetupPhase)
+            throw new Exception("Cant trade during setupphase");
+        sendMove(gameMove);
+    }
     private void makeTradeMove(GameMoveDto gameMove) throws Exception {
+        if (isSetupPhase)
+            throw new Exception("Cant trade during setupphase");
         sendMove(gameMove);
     }
     private void makeEndTurnMove(GameMoveDto gameMove) throws Exception {

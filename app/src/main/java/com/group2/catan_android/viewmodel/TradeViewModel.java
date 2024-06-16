@@ -43,8 +43,6 @@ public class TradeViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(TradeOfferDtoMutableLiveData::setValue);
-                        //TradeOfferDtoMutableLiveData::setValue);
-
         disposable.add(boardDisposable);
     }
 

@@ -16,7 +16,6 @@ import com.group2.catan_android.gamelogic.Player;
 
 public class PlayerResourcesFragment extends Fragment {
     private Player localPlayer;
-    private boolean isInitialized = false;
     private TextView woodCount;
     private TextView brickCount;
     private TextView sheepCount;
@@ -43,13 +42,12 @@ public class PlayerResourcesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (isInitialized) {
+        if (localPlayer!=null) {
             updateResources(localPlayer);
         }
     }
     public void setPlayer(Player player) {
         this.localPlayer = player;
-        this.isInitialized = true;
         if (getView() != null) {
             updateResources(localPlayer);
         }

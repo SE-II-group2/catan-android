@@ -22,6 +22,7 @@ import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.fragments.HelpFragment;
+import com.group2.catan_android.fragments.TradeOfferFragment;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
@@ -83,6 +84,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
     private PlayerScoresFragment playerScoresFragment;
+    private TradeOfferFragment tradeOfferFragment;
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
@@ -206,10 +208,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
 
         tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto ->{
-            //what shall happen when getting the TradeOfferDto:
-
-                Toast.makeText(getApplicationContext(), "Why does this apply when create game?", Toast.LENGTH_LONG).show();
-
+            tradeOfferFragment = new TradeOfferFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.tradeOfferFragment,tradeOfferFragment).commitNow();
+            tradeOfferFragment.setTradeOfferDto(tradeOfferDto);
         });
     }
 

@@ -167,6 +167,7 @@ public class PopUpFragmentTrading extends DialogFragment {
                 //could check bank-trade, but it is server duty
                 try {
                     MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayer));
+                    //close Tradingpopup?
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }

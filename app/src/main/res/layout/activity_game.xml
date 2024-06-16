@@ -38,7 +38,7 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <FrameLayout
-        android:id="@+id/tradingOfferFragment"
+        android:id="@+id/tradeOfferFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="8:2.8"
