@@ -2,6 +2,8 @@ package com.group2.catan_android.data.service;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,6 +30,7 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.processors.PublishProcessor;
 
 class GameControllerTests {
@@ -184,6 +187,42 @@ class GameControllerTests {
                 t -> Assertions.fail()
         );
         d.dispose();
+    }
+
+    @Test
+    void testReconnectGame(){
+        when(tokenRepository.fullDataAvailable()).thenReturn(true);
+        when(tokenRepository.getToken()).thenReturn("Token");
+        when(tokenRepository.getGameID()).thenReturn("GameID");
+        when(tokenRepository.getInGameID()).thenReturn(0);
+        when(stompManager.connect(any())).thenReturn(Completable.complete());
+
+        Completable reconnectCompletable = gameController.reconnectGame();
+        TestObserver<Void> testObserver = new TestObserver<>();
+
+        reconnectCompletable.subscribe(testObserver);
+        testObserver.assertNoErrors();
+        verify(tokenRepository).storeToken("Token");
+        verify(tokenRepository).storeInGameID(0);
+        verify(tokenRepository).storeGameID("GameID");
+    }
+
+    @Test
+    void testReconnectGameDeletesTokenOnConnectionFailure(){
+        Throwable toThrow = new Throwable();
+        when(tokenRepository.fullDataAvailable()).thenReturn(true);
+        when(tokenRepository.getToken()).thenReturn(null);
+        when(tokenRepository.getGameID()).thenReturn(null);
+        when(tokenRepository.getInGameID()).thenReturn(-1);
+        when(stompManager.connect(any())).thenReturn(Completable.error(toThrow));
+
+        Completable reconnectCompletable = gameController.reconnectGame();
+        TestObserver<Void> testObserver = new TestObserver<>();
+
+        reconnectCompletable.subscribe(testObserver);
+        testObserver.assertError(toThrow);
+
+        verify(tokenRepository).clear();
     }
 
     @Test

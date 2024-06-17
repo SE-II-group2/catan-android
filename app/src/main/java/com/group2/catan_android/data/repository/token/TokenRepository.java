@@ -42,4 +42,13 @@ public class TokenRepository {
     public int getInGameID(){
         return preferenceManager.getInt(KEY_IN_GAME_ID, NO_IN_GAME_ID);
     }
+    public void clear(){
+        storeGameID(null);
+        storeToken(null);
+        storeInGameID(NO_IN_GAME_ID);
+    }
+
+    public boolean fullDataAvailable(){
+        return getToken() != null && getGameID() != null && getInGameID() != NO_IN_GAME_ID;
+    }
 }

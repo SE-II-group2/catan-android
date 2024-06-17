@@ -36,15 +36,18 @@ public class MoveMakerTest {
     private MoveMaker moveMaker;
     private List<Player> playerList;
     private Field isSetupPhaseField;
+    private Field activePlayerField;
     private Board board;
 
+    private Player localPlayer;
+    private Player otherPlayer;
     @BeforeEach
     void setup() throws Exception {
         board = new Board();
         List<ProgressCardType> progressCards = new ArrayList<>();
-        Player localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1, progressCards);
+        localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1, progressCards);
         localPlayer.setInGameID(1);
-        Player otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2, progressCards);
+        otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2, progressCards);
         otherPlayer.setInGameID(2);
         playerList = new ArrayList<>();
         playerList.add(localPlayer);
@@ -53,7 +56,7 @@ public class MoveMakerTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a spy of MoveMaker with mock dependencies
-        moveMaker = spy(new MoveMaker(board, localPlayer, playerList));
+        moveMaker = spy(new MoveMaker(board, localPlayer, playerList, localPlayer));
 
         // Mock the sendMove method to do nothing
         doNothing().when(moveMaker).sendMove(any());
@@ -62,11 +65,13 @@ public class MoveMakerTest {
 
         isSetupPhaseField = MoveMaker.class.getDeclaredField("isSetupPhase");
         isSetupPhaseField.setAccessible(true);
+        activePlayerField = MoveMaker.class.getDeclaredField("activePlayer");
+        activePlayerField.setAccessible(true);
     }
 
     @Test
-    void testMakeMoveNotActivePlayer() {
-        playerList.remove(0);
+    void testMakeMoveNotActivePlayer() throws Exception{
+        activePlayerField.set(moveMaker, otherPlayer);
         GameMoveDto move = new BuildVillageMoveDto(2);
         assertThrows(Exception.class, () -> moveMaker.makeMove(move)); // This should throw an exception
     }
@@ -181,7 +186,7 @@ public class MoveMakerTest {
     @Test
     void testMoveRobberThrowsErrorIfNotActivePlayer() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
-        playerList.remove(0);
+        activePlayerField.set(moveMaker, otherPlayer);
         MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
         assertThrows(Exception.class, () -> moveMaker.makeMove(moveRobberMove));
     }

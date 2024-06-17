@@ -91,6 +91,7 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
                 case VILLAGE: village.setBackgroundResource(R.drawable.button_clicked_border); break;
                 case CITY: city.setBackgroundResource(R.drawable.button_clicked_border);break;
                 case PROGRESS_CARD: progressCard.setBackgroundResource(R.drawable.button_clicked_border); break;
+                default: //do nothing
             }
 
             activeButton = button;

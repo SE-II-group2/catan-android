@@ -30,8 +30,7 @@ public class PlayerRepository implements LiveDataReceiver<PlayersInLobbyDto>, Ad
     private final BehaviorSubject<List<DisplayablePlayer>> playerSubject;
     private final BehaviorSubject<Boolean> adminSubject;
     private Flowable<PlayersInLobbyDto> liveDataIn;
-    private int currentPlayerID = -1; //The id of the Player who is playing the game;
-    private boolean playerIsAdmin;
+    private int currentPlayerID = -1;
     Disposable d;
     @Override
     public void setLiveData(Flowable<PlayersInLobbyDto> liveDataIn){

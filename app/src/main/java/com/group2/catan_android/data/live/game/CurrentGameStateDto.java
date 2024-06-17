@@ -3,18 +3,18 @@ package com.group2.catan_android.data.live.game;
 
 import com.group2.catan_android.data.live.MessageDto;
 import com.group2.catan_android.data.live.MessageType;
-import com.group2.catan_android.data.live.PlayerDto;
 
 import java.util.List;
 
 public class CurrentGameStateDto extends MessageDto {
-    public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<IngamePlayerDto> playerOrder, boolean isSetupPhase) {
+    public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<IngamePlayerDto> players, IngamePlayerDto activePlayer,  boolean isSetupPhase) {
         this.hexagons = hexagons;
         this.intersections=intersections;
         this.connections = connections;
-        this.playerOrder=playerOrder;
-        this.isSetupPhase=isSetupPhase;
+        this.players=players;
         this.setEventType(MessageType.GAME_OBJECT);
+        this.isSetupPhase=isSetupPhase;
+        this.activePlayer = activePlayer;
     }
 
     public CurrentGameStateDto() {
@@ -45,18 +45,27 @@ public class CurrentGameStateDto extends MessageDto {
         this.connections = connections;
     }
 
-    public List<IngamePlayerDto> getPlayerOrder() {
-        return playerOrder;
+    public List<IngamePlayerDto> getPlayers() {
+        return players;
     }
 
-    public void setPlayerOrder(List<IngamePlayerDto> playerOrder) {
-        this.playerOrder = playerOrder;
+    public void setPlayers(List<IngamePlayerDto> players) {
+        this.players = players;
     }
 
     private List<HexagonDto> hexagons;
     private List<IntersectionDto> intersections;
     private List<ConnectionDto> connections;
-    private List<IngamePlayerDto> playerOrder;
+    private List<IngamePlayerDto> players;
+    private IngamePlayerDto activePlayer;
+
+    public IngamePlayerDto getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void setActivePlayer(IngamePlayerDto activePlayer) {
+        this.activePlayer = activePlayer;
+    }
 
     public boolean isSetupPhase() {
         return isSetupPhase;

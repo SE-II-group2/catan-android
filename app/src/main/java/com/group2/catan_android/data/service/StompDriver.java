@@ -35,7 +35,9 @@ public class StompDriver {
             client.disconnect();
         }
         Map<String, String> auth = Map.of("Authorization", token);
-        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SOCKET_URL, auth);
+        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SOCKET_URL, auth)
+                .withClientHeartbeat(10000)
+                .withServerHeartbeat(10000);
         client.connect();
         return Completable.create(emitter -> {
             Disposable d = lifecycle()

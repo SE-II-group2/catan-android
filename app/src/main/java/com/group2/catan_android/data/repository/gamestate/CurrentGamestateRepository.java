@@ -105,15 +105,14 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private void wireDataSources() {
         d = liveDataIn
                 .doOnComplete(this::cleanup)
-                .subscribe(CurrentGameStateDto -> {
-                    players = getPlayersFromDto(CurrentGameStateDto.getPlayerOrder());
-                    board.setHexagonList(getHexagonListFromDto(CurrentGameStateDto.getHexagons()));
-                    board.setIntersections(generateIntersectionsFromDto(CurrentGameStateDto.getIntersections()));
-                    board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
-                    board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
-                    currentGameState = new CurrentGameState(players, board);
+                .subscribe(currentGameStateDto -> {
+                    players = getPlayersFromDto(currentGameStateDto.getPlayers(), currentGameStateDto.getActivePlayer());
+                    board.setHexagonList(getHexagonListFromDto(currentGameStateDto.getHexagons()));
+                    board.setIntersections(generateIntersectionsFromDto(currentGameStateDto.getIntersections()));
+                    board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(currentGameStateDto.getConnections()));
+                    board.setSetupPhase(currentGameStateDto.isSetupPhase());
+                    currentGameState = new CurrentGameState(players, board, activePlayer);
                     localPlayer = playerHashMap.get(localPlayerIngameID);
-                    activePlayer=currentGameState.getPlayers().get(0);
                     activePlayerBehaviorSubject.onNext(activePlayer);
                     localPlayerBehaviorSubject.onNext(localPlayer);
                     playerListBehaviorSubject.onNext(players);
@@ -121,17 +120,17 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                 });
     }
 
-    private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> playerOrder) {
+    private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> players, IngamePlayerDto activePlayer) {
         ArrayList<Player> playersList = new ArrayList<>();
-        outerloop:
-        for (IngamePlayerDto playerDto : playerOrder) {
-            for( Player player : playersList){
-                if(playerDto.getInGameID()==player.getInGameID())continue outerloop;
+
+        for(IngamePlayerDto playerDto: players){
+            Player p = Player.fromPlayerDto(playerDto);
+            if(activePlayer.getInGameID() == p.getInGameID()){
+                p.setActive(true);
+                this.activePlayer = p;
             }
-            Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor(), playerDto.getProgressCards());
-            player.setInGameID(playerDto.getInGameID());
-            playersList.add(player);
-            playerHashMap.put(playerDto.getInGameID(), player);
+            playersList.add(p);
+            playerHashMap.put(p.getInGameID(), p);
         }
         return playersList;
     }

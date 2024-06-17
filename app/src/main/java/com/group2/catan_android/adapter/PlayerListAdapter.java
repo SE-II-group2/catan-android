@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.data.live.PlayerState;
 import com.group2.catan_android.data.model.DisplayablePlayer;
 import com.group2.catan_android.databinding.GameItemBinding;
 import com.group2.catan_android.databinding.PlayerInLobbyItemBinding;
@@ -61,12 +62,12 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
             binding.playerName.setText(player.getDisplayName());
             binding.admin.setVisibility(player.isAdmin() ? View.VISIBLE : View.INVISIBLE);
             int color = 0;
-            switch (player.getState()){
-                case SOFT_JOINED:
-                    color = ContextCompat.getColor(context, R.color.grey); break;
-                case CONNECTED:
-                    color = ContextCompat.getColor(context, R.color.green); break;
-            }
+
+            if(player.getState() == PlayerState.CONNECTED)
+                color = ContextCompat.getColor(context, R.color.green);
+            else
+                color = ContextCompat.getColor(context, R.color.grey);
+
             binding.connection.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
     }

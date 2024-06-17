@@ -47,6 +47,18 @@ public class IngamePlayerDto {
     public List<ProgressCardType> getProgressCards(){
         return progressCards;
     }
+    public void setProgressCards(List<ProgressCardType> progressCards) {
+        this.progressCards = progressCards;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
 
     public IngamePlayerDto(String displayName, int[] resources, int victoryPoints, int color, int inGameID, List<ProgressCardType> progressCards) {
         this.displayName = displayName;
@@ -66,5 +78,6 @@ public class IngamePlayerDto {
     private int color;
     private int inGameID;
     private List<ProgressCardType> progressCards;
+    private boolean connected;
 }
 

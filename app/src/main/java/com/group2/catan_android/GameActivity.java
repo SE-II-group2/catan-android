@@ -52,15 +52,15 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
     // drawables measurements
-    final int HEXAGON_HEIGHT = 230;
-    final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
-    final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
-    final int INTERSECTION_SIZE = 40;
-    final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
+    private static final int HEXAGON_HEIGHT = 230;
+    private static final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
+    private static final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
+    private static final int INTERSECTION_SIZE = 40;
+    private static final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
-    final int TOTAL_HEXAGONS = 19;
-    final int TOTAL_CONNECTIONS = 72;
-    final int TOTAL_INTERSECTIONS = 54;
+    private static final int TOTAL_HEXAGONS = 19;
+    private static final int TOTAL_CONNECTIONS = 72;
+    private static final int TOTAL_INTERSECTIONS = 54;
     private Board board;
     private Player localPlayer;
 
@@ -86,7 +86,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
-        uiDrawer = UiDrawer.getInstance(GameActivity.this);
+        uiDrawer = new UiDrawer(GameActivity.this);
 
         gameEffectManager = new GameEffectManager(this);
         gameEffectManager.loadSound(R.raw.pop);
@@ -279,10 +279,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
             if(!playerList.isEmpty()) {
-                Player activePlayer = playerList.get(0);
-                List<Player> tempList = new ArrayList<>(playerList);
-                tempList.sort(Comparator.comparingInt(Player::getInGameID));
-                uiDrawer.updateUiPlayerScores(playerScoresFragment, tempList, activePlayer);
+                uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
             }
         });
     }
