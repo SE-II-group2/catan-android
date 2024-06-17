@@ -6,6 +6,7 @@ import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
@@ -89,6 +90,12 @@ public class MoveMaker {
             case "EndTurnMoveDto":
                 makeEndTurnMove(gameMove);
                 break;
+            case "BuyProgressCardDto":
+                makeBuyProgressCardMove(gameMove);
+                break;
+            case "UseProgressCardDto":
+                makeUseProgressCardMove(gameMove);
+                break;
             default:
                 throw new IllegalGameMoveException("Unknown Dto format");
         }
@@ -141,6 +148,27 @@ public class MoveMaker {
         hasRolled = true;
     }
 
+    private void makeBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        if (isSetupPhase)
+            throw new IllegalGameMoveException("Can't buy progress-card during setup phase");
+        if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
+            throw new IllegalGameMoveException("Not enough resources");
+        }
+        localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
+        sendMove(gameMove);
+    }
+
+    private void makeUseProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+        UseProgressCardDto useProgressCardDto = (UseProgressCardDto) gameMove;
+        if (isSetupPhase) {
+            throw new IllegalGameMoveException("Can't use progress-card during setup phase");
+        }
+        if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())) {
+            throw new IllegalGameMoveException("Card type not in possession");
+        }
+        localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
+        sendMove(gameMove);
+    }
     private void makeBuildCityMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("It is not possible to place cities during setup phase!");

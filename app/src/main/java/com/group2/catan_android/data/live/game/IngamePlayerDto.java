@@ -1,5 +1,9 @@
 package com.group2.catan_android.data.live.game;
 
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
+
+import java.util.List;
+
 public class IngamePlayerDto {
     public String getDisplayName() {
         return displayName;
@@ -40,12 +44,17 @@ public class IngamePlayerDto {
         this.inGameID = inGameID;
     }
 
-    public IngamePlayerDto(String displayName, int[] resources, int victoryPoints, int color, int inGameID) {
+    public List<ProgressCardType> getProgressCards(){
+        return progressCards;
+    }
+
+    public IngamePlayerDto(String displayName, int[] resources, int victoryPoints, int color, int inGameID, List<ProgressCardType> progressCards) {
         this.displayName = displayName;
         this.resources = resources;
         this.victoryPoints = victoryPoints;
         this.color = color;
         this.inGameID = inGameID;
+        this.progressCards = progressCards;
     }
 
     public IngamePlayerDto() {
@@ -56,5 +65,6 @@ public class IngamePlayerDto {
     private int victoryPoints;
     private int color;
     private int inGameID;
+    private List<ProgressCardType> progressCards;
 }
 

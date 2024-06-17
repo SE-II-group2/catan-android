@@ -9,12 +9,16 @@ import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.observers.TestObserver;
 import io.reactivex.processors.PublishProcessor;
@@ -57,8 +61,9 @@ public class GameProgressRepositoryTest {
     @Test
     void testEndTurnMoveDtoEmitsCorrectValue(){
         TestObserver<EndTurnMoveDto> testObserver = gameProgressRepository.getEndTurnMoveObservable().test();
+        List<ProgressCardType> progressCards = new ArrayList<>();
 
-        GameProgressDto dto = new GameProgressDto(new EndTurnMoveDto(new IngamePlayerDto("test", new int[]{0,0,0,0,0}, 0,0,0)));
+        GameProgressDto dto = new GameProgressDto(new EndTurnMoveDto(new IngamePlayerDto("test", new int[]{0, 0, 0, 0, 0}, 0, 0, 0, progressCards)));
         liveIn.onNext(dto);
         EndTurnMoveDto endTurnMoveDto = testObserver.values().get(testObserver.values().size() - 1);
 

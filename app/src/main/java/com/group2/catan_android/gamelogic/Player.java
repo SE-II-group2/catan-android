@@ -2,6 +2,7 @@ package com.group2.catan_android.gamelogic;
 
 import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.game.IngamePlayerDto;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
 import java.util.List;
@@ -16,27 +17,27 @@ public class Player {
     private int[] resources = new int[]{0,0,0,0,0};
     private int color;
 
+    private List<ProgressCardType> progressCards;
     private boolean isActive = false;
 
-    private List<ProgressCard> progressCards;
-
-    public Player(String token, String displayName, String gameID, int color) {
+    public Player(String token, String displayName, String gameID, int color)  {
         this.token = token;
         this.displayName = displayName;
         this.gameID = gameID;
         this.color = color;
     }
     public static Player fromPlayerDto(IngamePlayerDto dto){
-        Player player = new Player(dto.getDisplayName(), dto.getVictoryPoints(), dto.getResources(), dto.getColor());
+        Player player = new Player(dto.getDisplayName(), dto.getVictoryPoints(), dto.getResources(), dto.getColor(), dto.getProgressCards());
         player.setInGameID(dto.getInGameID());
         return player;
     }
     public Player (){}
-    public Player( String displayName, int victoryPoints, int[] resources,  int color) {
+    public Player( String displayName, int victoryPoints, int[] resources,  int color, List<ProgressCardType> progressCards) {
         this.displayName = displayName;
         this.victoryPoints=victoryPoints;
         this.resources=resources;
         this.color = color;
+        this.progressCards = progressCards;
     }
 
     public void adjustResources(int[] resources) {
@@ -90,9 +91,15 @@ public class Player {
     public void setInGameID(int inGameID) {
         this.inGameID = inGameID;
     }
+    public List<ProgressCardType> getProgressCards(){
+        return progressCards;
+    }
+    public void removeProgressCard(ProgressCardType cardType){
+        progressCards.remove(cardType);
+    }
 
     public IngamePlayerDto toIngamePlayerDto(){
-        return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID);
+        return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID, this.progressCards);
     }
     public boolean isActive() {
         return isActive;

@@ -7,19 +7,21 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.group2.catan_android.data.exception.IllegalGameMoveException;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
+import com.group2.catan_android.data.live.game.BuyProgressCardDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
+import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.objects.Hexagon;
-
-import net.bytebuddy.description.field.FieldList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,9 +44,10 @@ public class MoveMakerTest {
     @BeforeEach
     void setup() throws Exception {
         board = new Board();
-        localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1);
+        List<ProgressCardType> progressCards = new ArrayList<>();
+        localPlayer = new Player("Local", 0, new int[]{0, 0, 0, 0, 0}, -1, progressCards);
         localPlayer.setInGameID(1);
-        otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2);
+        otherPlayer = new Player("other", 0, new int[]{0, 0, 0, 0, 0}, -2, progressCards);
         otherPlayer.setInGameID(2);
         playerList = new ArrayList<>();
         playerList.add(localPlayer);
@@ -250,6 +253,45 @@ public class MoveMakerTest {
         playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
 
         BuildCityMoveDto move = new BuildCityMoveDto(0);
+        moveMaker.makeMove(move);
+        verify(moveMaker, times(1)).sendMove(move);
+    }
+    @Test
+    void testMakeBuyProgressCardMoveDuringSetupPhaseThrowsError() {
+        GameMoveDto move = new BuyProgressCardDto();
+        assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
+    }
+    @Test
+    void testMakeBuyProgressCardMoveNotEnoughResourcesThrowsError() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        GameMoveDto move = new BuyProgressCardDto();
+        assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
+    }
+    @Test
+    void testMakeBuyProgressCardMoveSuccess() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
+        GameMoveDto move = new BuyProgressCardDto();
+        moveMaker.makeMove(move);
+        verify(moveMaker, times(1)).sendMove(move);
+    }
+    @Test
+    void testMakeUseProgressCardMoveDuringSetupPhase() {
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
+        assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
+    }
+    @Test
+    void testMakeUseProgressCardMoveCardNotInPossession() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
+        assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
+    }
+
+    @Test
+    void testMakeUseProgressCardMoveSuccess() throws Exception {
+        isSetupPhaseField.set(moveMaker, false);
+        playerList.get(0).getProgressCards().add(ProgressCardType.VICTORY_POINT);
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
         moveMaker.makeMove(move);
         verify(moveMaker, times(1)).sendMove(move);
     }
