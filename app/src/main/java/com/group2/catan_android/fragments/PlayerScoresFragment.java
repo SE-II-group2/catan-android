@@ -63,7 +63,7 @@ public class PlayerScoresFragment extends Fragment {
         for(int i = 0; i < playerList.size(); i++){
             String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
-            playerScoreViews[i].setTextColor(playerList.get(i).getColor());
+            playerScoreViews[i].setTextColor(playerList.get(i).isConnected() ? playerList.get(i).getColor() : 0xFF606060); //grey
 
             if(playerList.get(i).isActive()){
                 Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");

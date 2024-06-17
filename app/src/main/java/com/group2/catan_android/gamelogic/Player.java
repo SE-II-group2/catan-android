@@ -16,8 +16,10 @@ public class Player {
     private int victoryPoints = 0;
     private int[] resources = new int[]{0,0,0,0,0};
     private int color;
+    private boolean connected;
 
     private List<ProgressCardType> progressCards;
+
     private boolean isActive = false;
 
     public Player(String token, String displayName, String gameID, int color)  {
@@ -29,6 +31,7 @@ public class Player {
     public static Player fromPlayerDto(IngamePlayerDto dto){
         Player player = new Player(dto.getDisplayName(), dto.getVictoryPoints(), dto.getResources(), dto.getColor(), dto.getProgressCards());
         player.setInGameID(dto.getInGameID());
+        player.setConnected(dto.isConnected());
         return player;
     }
     public Player (){}
@@ -107,5 +110,12 @@ public class Player {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }
