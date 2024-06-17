@@ -182,7 +182,6 @@ public class MoveMaker {
     void setupListeners() {
         Disposable gameStateDisposable = currentGamestateRepository.getCurrentGameStateObservable()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(currentGameState -> {
                     this.board = currentGameState.getBoard();
                     this.players = currentGameState.getPlayers();
@@ -191,7 +190,6 @@ public class MoveMaker {
                 });
         Disposable localPlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(localPlayer -> this.localPlayer = localPlayer);
 
         disposable.add(gameStateDisposable);
