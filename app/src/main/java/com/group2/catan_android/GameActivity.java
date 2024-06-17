@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
@@ -106,7 +107,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         setupEndTurnButton();
 
         setupDiceRollButton();
+
+        setupAccuseCheatingButton();
     }
+
+
 
     private void setToFullScreen() {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
@@ -268,6 +273,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
+        });
+    }
+
+    private void setupAccuseCheatingButton() {
+        findViewById(R.id.accuseCheatingButton).setOnClickListener(v ->{
+            movemaker.makeMove(new AccuseCheatingDto());
         });
     }
 

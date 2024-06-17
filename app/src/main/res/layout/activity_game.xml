@@ -81,6 +81,17 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <ImageView
+        android:id="@+id/accuseCheatingButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/endTurnButton"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/endTurnButton"
+        app:srcCompat="@drawable/robber" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
     <!--android:name="com.group2.catan_android.buttonsOpenFragmentagment"-->
