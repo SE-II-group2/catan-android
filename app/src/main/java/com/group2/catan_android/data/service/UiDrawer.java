@@ -58,12 +58,13 @@ public class UiDrawer extends AppCompatActivity {
     private final List<ImageView> possibleRoads;
     private final List<ImageView> possibleVillages;
     private final List<ImageView> possibleCities;
-    private final List<TextView> possibleRobberMoveRollValues;
-    private final List<ImageView> possibleRobberMoveRobberImage;
+    private final List<ImageView> possibleRobberMoves;
     private boolean showingPossibleRoads = false;
     private boolean showingPossibleVillages = false;
     private boolean showingPossibleCities = false;
-    private boolean showingAllRobbers = false;
+    private boolean showingPossibleRobberMoves = false;
+
+    private boolean hasRolledSeven=false;
 
     private static UiDrawer uiDrawerInstance;
     private final Activity gameActivityContext;
@@ -75,8 +76,7 @@ public class UiDrawer extends AppCompatActivity {
         this.possibleRoads = new ArrayList<>();
         this.possibleCities = new ArrayList<>();
         this.possibleVillages = new ArrayList<>();
-        this.possibleRobberMoveRollValues = new ArrayList<>();
-        this.possibleRobberMoveRobberImage = new ArrayList<>();
+        this.possibleRobberMoves = new ArrayList<>();
         this.gameActivityContext = gameActivityContext;
     }
 
@@ -96,6 +96,11 @@ public class UiDrawer extends AppCompatActivity {
         updateConnections(adjacencyMatrix);
         updateIntersections(intersections);
         updateHexagons(hexagonList);
+        if(hasRolledSeven)showPossibleMoves(ButtonType.ROBBER);
+    }
+
+    public void setHasRolledSeven(boolean hasRolledSeven){
+        this.hasRolledSeven=hasRolledSeven;
     }
 
     private void updateHexagons(List<Hexagon> hexagonList) {
@@ -138,20 +143,17 @@ public class UiDrawer extends AppCompatActivity {
         robberView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.robber));
 
         if (hexagon.isHavingRobber()) {
+            robberView.setColorFilter(Color.BLACK);
             rollValueView.setVisibility(View.INVISIBLE);
             robberView.setVisibility(View.VISIBLE);
             robberView.setClickable(true);
         } else {
+            robberView.setColorFilter(Color.WHITE);
             robberView.setVisibility(View.INVISIBLE);
             rollValueView.setVisibility(View.VISIBLE);
             robberView.setClickable(false);
 
         }
-    }
-
-    public void setAllRobbersClickable(boolean robbersAreClickable) {
-        showingAllRobbers = robbersAreClickable;
-        updateUiBoard(board);
     }
 
     private void updateIntersections(Intersection[][] intersections) {
@@ -205,7 +207,7 @@ public class UiDrawer extends AppCompatActivity {
         possibleRoads.clear();
         possibleVillages.clear();
         possibleCities.clear();
-        possibleRobberMoveRobberImage.clear();
+        possibleRobberMoves.clear();
 
         updatePossibleRoads();
         updatePossibleVillagesOrCities();
@@ -218,7 +220,7 @@ public class UiDrawer extends AppCompatActivity {
             if (hexagon.isHasRobber()) continue;
             int robberViewID = hexagon.getId() + TOTAL_HEXAGONS + 1 + TOTAL_HEXAGONS;
             ImageView robberView = gameActivityContext.findViewById(robberViewID);
-            possibleRobberMoveRobberImage.add(robberView);
+            possibleRobberMoves.add(robberView);
         }
     }
 
@@ -252,25 +254,25 @@ public class UiDrawer extends AppCompatActivity {
         removePossibleMovesFromUI(possibleRoads);
         removePossibleMovesFromUI(possibleVillages);
         removePossibleMovesFromUI(possibleCities, R.drawable.village);
-        removePossibleRobberMovesFromUi(possibleRobberMoveRobberImage);
+        removePossibleRobberMovesFromUi(possibleRobberMoves);
 
 
         switch (button) {
             case ROAD:
-                showingPossibleVillages = showingPossibleCities = showingAllRobbers = false;
+                showingPossibleVillages = showingPossibleCities = showingPossibleRobberMoves = false;
                 showingPossibleRoads = drawPossibleMovesToUI(showingPossibleRoads, possibleRoads, R.drawable.possible_street, button);
                 break;
             case VILLAGE:
-                showingPossibleRoads = showingPossibleCities = showingAllRobbers = false;
+                showingPossibleRoads = showingPossibleCities = showingPossibleRobberMoves = false;
                 showingPossibleVillages = drawPossibleMovesToUI(showingPossibleVillages, possibleVillages, R.drawable.village, button);
                 break;
             case CITY:
-                showingPossibleRoads = showingPossibleVillages = showingAllRobbers = false;
+                showingPossibleRoads = showingPossibleVillages = showingPossibleRobberMoves = false;
                 showingPossibleCities = drawPossibleMovesToUI(showingPossibleCities, possibleCities, R.drawable.city, button);
                 break;
             case ROBBER:
                 showingPossibleRoads = showingPossibleVillages = showingPossibleCities = false;
-                showingAllRobbers = drawPossibleMovesToUI(showingAllRobbers, possibleRobberMoveRobberImage, R.drawable.robber, button);
+                showingPossibleRobberMoves = drawPossibleMovesToUI(showingPossibleRobberMoves, possibleRobberMoves, R.drawable.robber, button);
                 break;
             default:
                 break;
@@ -332,8 +334,8 @@ public class UiDrawer extends AppCompatActivity {
         removePossibleMovesFromUI(possibleRoads);
         removePossibleMovesFromUI(possibleVillages);
         removePossibleMovesFromUI(possibleCities, R.drawable.village);
-        removePossibleRobberMovesFromUi(possibleRobberMoveRobberImage);
-        showingPossibleRoads = showingPossibleVillages = showingPossibleCities = showingAllRobbers =  false;
+        removePossibleRobberMovesFromUi(possibleRobberMoves);
+        showingPossibleRoads = showingPossibleVillages = showingPossibleCities = showingPossibleRobberMoves =  false;
     }
 
     public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews, int drawable) {

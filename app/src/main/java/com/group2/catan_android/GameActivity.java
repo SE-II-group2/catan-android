@@ -197,7 +197,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             movemaker.makeMove(new MoveRobberDto(correctID, true));
             hasRolledSeven = false;
             allRobbersAreClickable=false;
-            uiDrawer.setAllRobbersClickable(false);
+            uiDrawer.setHasRolledSeven(false);
+            uiDrawer.showPossibleMoves(ButtonType.EXIT);
             return;
         }
         if(!allRobbersAreClickable) {
@@ -208,7 +209,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             Toast.makeText(getApplicationContext(), "Second click "+correctID, Toast.LENGTH_SHORT).show();
             movemaker.makeMove(new MoveRobberDto(correctID, false));
             allRobbersAreClickable = false;
-            uiDrawer.setAllRobbersClickable(false);
+            uiDrawer.showPossibleMoves(ButtonType.EXIT);
         }
 
         //TODO:
@@ -257,7 +258,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     if(diceRoll==7){
                         hasRolledSeven = true;
                         allRobbersAreClickable=true;
-                        uiDrawer.setAllRobbersClickable(true);
+                        uiDrawer.setHasRolledSeven(true);
+                        uiDrawer.showPossibleMoves(ButtonType.ROBBER);
                     }
                     movemaker.makeMove(new RollDiceDto(diceRoll));
                     movemaker.setHasRolled(true);
