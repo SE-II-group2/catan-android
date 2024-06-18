@@ -7,7 +7,6 @@ import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
 public class Building extends Intersection {
     int id;
-    BuildingType type;
 
     public Building(Player player, BuildingType type, int id) {
         this.player = player;
@@ -25,9 +24,6 @@ public class Building extends Intersection {
         player.adjustResources(resources);
     }
 
-    public BuildingType getType() {
-        return type;
-    }
     public int getId() {
         return id;
     }
