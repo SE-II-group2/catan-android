@@ -191,19 +191,24 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void clickOnIntersection(int correctID) throws IllegalGameMoveException {
-        if(lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY){
+        if (lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY) {
             throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
 
-        switch (lastButtonClicked){
-            case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID)); break;
-            case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID)); break;
-            default: throw new IllegalGameMoveException("Select the correct button to build a village or city!");
+        switch (lastButtonClicked) {
+            case VILLAGE:
+                movemaker.makeMove(new BuildVillageMoveDto(correctID));
+                break;
+            case CITY:
+                movemaker.makeMove(new BuildCityMoveDto(correctID));
+                break;
+            default:
+                throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
     }
 
     private void clickOnConnection(int correctID) throws IllegalGameMoveException {
-        if(lastButtonClicked != ButtonType.ROAD){
+        if (lastButtonClicked != ButtonType.ROAD) {
             throw new IllegalGameMoveException("Select the correct button to build a road!");
         }
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
@@ -224,11 +229,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             try {
                 movemaker.makeMove(new MoveRobberDto(correctID, false));
             } catch (Exception e) {
-                lastButtonClicked = null;
                 uiDrawer.removeAllPossibleMovesFromUI();
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
             }
-            lastButtonClicked = null;
+            lastButtonClicked=ButtonType.EXIT;
             uiDrawer.removeAllPossibleMovesFromUI();
         }
     }
@@ -285,7 +289,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void setupAccuseCheatingButton() {
         findViewById(R.id.accuseCheatingButton).setOnClickListener(v -> {
-            movemaker.makeMove(new AccuseCheatingDto());
+            movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()));
             uiDrawer.removeAllPossibleMovesFromUI();
             lastButtonClicked = null;
         });
@@ -322,10 +326,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     gameEffectManager.vibrate();
                 }
             }
+            if (gameProgressDto.getGameMoveDto() instanceof AccuseCheatingDto) {
+                MessageBanner.makeBanner(this, MessageType.INFO, "Player " + ((AccuseCheatingDto) gameProgressDto.getGameMoveDto()).getSender().getDisplayName() + " Accused somebody of cheating!").show();
+            }
         });
 
-        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
-            if(!playerList.isEmpty()) {
+        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList -> {
+            if (!playerList.isEmpty()) {
                 uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
             }
         });
