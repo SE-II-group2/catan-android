@@ -15,6 +15,7 @@ import com.group2.catan_android.gamelogic.CurrentGameState;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
+import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 import com.group2.catan_android.gamelogic.objects.Building;
 import com.group2.catan_android.gamelogic.objects.Connection;
@@ -49,9 +50,10 @@ public class CurrentGamestateRepositoryTest {
     @BeforeEach
     void setUp() {
         currentGamestateRepository = CurrentGamestateRepository.getInstance();
-        localPlayer = new Player("displayName", 0, new int[]{0, 0, 1, 1, 1}, -1);
+        List<ProgressCardType> progressCards = new ArrayList<>();
+        localPlayer = new Player("displayName", 0, new int[]{0, 0, 1, 1, 1}, -1, progressCards);
         localPlayer.setInGameID(1);
-        otherPlayer = new Player("Other displayName", 0, new int[]{0, 0, 1, 1, 1}, -1000);
+        otherPlayer = new Player("Other displayName", 0, new int[]{0, 0, 1, 1, 1}, -1000, progressCards);
         otherPlayer.setInGameID(2);
         playerDtos = new ArrayList<>();
         playerDtos.add(otherPlayer.toIngamePlayerDto());
@@ -207,7 +209,7 @@ public class CurrentGamestateRepositoryTest {
 
         List<IntersectionDto> intersectionDtoList = createPreSetupIntersectionList(board);
         List<ConnectionDto> connectionDtoList = createPreSetupConnectionList(board);
-        currentGameStateDto = new CurrentGameStateDto(hexagonDtoList, intersectionDtoList, connectionDtoList, playerDtos, false);
+        currentGameStateDto = new CurrentGameStateDto(hexagonDtoList, intersectionDtoList, connectionDtoList, playerDtos, otherPlayer.toIngamePlayerDto(),  false);
     }
 
     private List<ConnectionDto> createPreSetupConnectionList(Board board) {

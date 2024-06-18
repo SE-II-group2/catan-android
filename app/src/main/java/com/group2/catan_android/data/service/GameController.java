@@ -64,10 +64,22 @@ public class GameController implements GameJoiner, GameLeaver{
         String token = tokenRepository.getToken();
         if(token == null)
             return Completable.error(new IllegalStateException("No Token in Repository"));
+        tokenRepository.clear();
         return lobbyJoiner.leaveGame(token)
                 .andThen(Completable.fromAction(stompManager::shutdown))
                 .subscribeOn(Schedulers.io());
     }
+
+    public Completable reconnectGame(){
+        if(!tokenRepository.fullDataAvailable())
+            return Completable.error(new Throwable("No token Available"));
+        JoinGameResponse mockedResponse = new JoinGameResponse();
+        mockedResponse.setInGameID(tokenRepository.getInGameID());
+        mockedResponse.setGameID(tokenRepository.getGameID());
+        mockedResponse.setToken(tokenRepository.getToken());
+        return processJoinGameResponse(mockedResponse).doOnError(throwable -> tokenRepository.clear());
+    }
+
     private Completable processGameRequest(JoinGameRequest request, Function<JoinGameRequest, Single<JoinGameResponse>> gameAction){
         return Single.defer(() -> gameAction.apply(request))
                 .flatMapCompletable(this::processJoinGameResponse)

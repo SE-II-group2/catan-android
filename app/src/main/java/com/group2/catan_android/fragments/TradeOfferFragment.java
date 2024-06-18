@@ -26,7 +26,7 @@ import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
-import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
+import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class TradeOfferFragment extends Fragment {
             playerText.setText("Player "+findPlayerByID(tradeOfferDto.getPlayerID(), playerList).getDisplayName());
         });
 
-        ActivePlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
+        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         accept.setOnClickListener(v -> {
             localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), player -> {
                 if(!player.resourcesSufficient(tradeOfferDto.getGiveResources())){
@@ -100,8 +100,8 @@ public class TradeOfferFragment extends Fragment {
 
     }
     public void updateResources(TradeOfferDto tradeOfferDto){
-        getResourcesFragment.setPlayer(new Player("", 0, tradeOfferDto.getGetResources(), 0));
-        giveResourcesFragment.setPlayer(new Player("", 0, negateAllValues(tradeOfferDto.getGiveResources()), 0));// or just make them positive?
+        getResourcesFragment.setResources(tradeOfferDto.getGetResources());
+        giveResourcesFragment.setResources(negateAllValues(tradeOfferDto.getGiveResources()));// or just make them positive?
     }
     public void setTradeOfferDto(TradeOfferDto tradeOfferDto){
         this.tradeOfferDto=tradeOfferDto;

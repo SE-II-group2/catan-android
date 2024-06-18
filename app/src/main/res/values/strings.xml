@@ -10,6 +10,11 @@
     <string name="lobby_game_entry_idLabel">Game ID: </string>
     <string name="lobby_game_entry_playersLabel">Players: </string>
     <string name="lobby_refresh_button">refresh active games</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="try_reconnect">Try reconnect</string>
+    <string name="developmentcard_text_default">No name for card</string>
+    <string name="developmentcard_text_knight">Knight</string>
+    <string name="developmentcard_text_roadbuilding">Road Building</string>
+    <string name="developmentcard_text_yearofplenty">Year of Plenty</string>
+    <string name="developmentcard_text_monopoly">Monopoly</string>
+    <string name="developmentcard_text_victorypoint">Victory Point</string>
 </resources>

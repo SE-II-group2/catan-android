@@ -36,7 +36,7 @@ public class PreferenceManager {
 
     public void save(String key, int value){
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("key", value);
+        editor.putInt(key, value);
         editor.apply();
     }
 

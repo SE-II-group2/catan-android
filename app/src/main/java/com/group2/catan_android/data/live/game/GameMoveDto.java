@@ -3,7 +3,6 @@ package com.group2.catan_android.data.live.game;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-// fixme see backend comments
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -14,9 +13,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = BuildVillageMoveDto.class, name = GameMoveType.BUILDVILLAGEMOVE),
         @JsonSubTypes.Type(value = EndTurnMoveDto.class, name = GameMoveType.ENTTURNMOVE),
         @JsonSubTypes.Type(value = RollDiceDto.class, name = GameMoveType.ROLLDICEMOVE),
+        @JsonSubTypes.Type(value= MoveRobberDto.class, name = GameMoveType.MOVEROBBERMOVE),
+        @JsonSubTypes.Type(value = AccuseCheatingDto.class, name = GameMoveType.ACCUSECHEATINGMOVE),
         @JsonSubTypes.Type(value = TradeMoveDto.class, name = GameMoveType.TRADEMOVE),
         @JsonSubTypes.Type(value = AcceptMoveDto.class, name = GameMoveType.ACCEPTMOVE)
-
 })
 
 //no longer abstract because this causes issues with serialization and deserialization

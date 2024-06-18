@@ -6,8 +6,6 @@ import com.group2.catan_android.gamelogic.enums.BuildingType;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 
 public class Building extends Intersection {
-
-    Player player;
     int id;
     BuildingType type;
 
@@ -30,11 +28,6 @@ public class Building extends Intersection {
     public BuildingType getType() {
         return type;
     }
-
-    public Player getPlayer() {
-        return player;
-    }
-
     public int getId() {
         return id;
     }

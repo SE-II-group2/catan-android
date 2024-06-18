@@ -1,6 +1,8 @@
 package com.group2.catan_android.data.service;
 
 
+import com.group2.catan_android.BuildConfig;
+
 import java.util.Map;
 
 import io.reactivex.Completable;
@@ -14,7 +16,7 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class StompDriver {
-    private static final String SOCKET_URL = "ws://10.0.2.2:8080/catan";
+    private static final String SOCKET_URL = BuildConfig.SOCKET_URL;
     private static StompDriver instance;
 
     private StompClient client;
@@ -33,7 +35,9 @@ public class StompDriver {
             client.disconnect();
         }
         Map<String, String> auth = Map.of("Authorization", token);
-        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SOCKET_URL, auth);
+        client = Stomp.over(Stomp.ConnectionProvider.OKHTTP, SOCKET_URL, auth)
+                .withClientHeartbeat(10000)
+                .withServerHeartbeat(10000);
         client.connect();
         return Completable.create(emitter -> {
             Disposable d = lifecycle()

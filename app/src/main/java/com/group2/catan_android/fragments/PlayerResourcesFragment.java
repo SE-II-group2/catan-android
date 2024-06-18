@@ -15,7 +15,7 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.Player;
 
 public class PlayerResourcesFragment extends Fragment {
-    private Player localPlayer;
+    private int[] resources;
     private TextView woodCount;
     private TextView brickCount;
     private TextView sheepCount;
@@ -42,14 +42,14 @@ public class PlayerResourcesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (localPlayer!=null) {
-            updateResources(localPlayer);
+        if (resources!=null) {
+            updateResources(resources);
         }
     }
-    public void setPlayer(Player player) {
-        this.localPlayer = player;
+    public void setResources(int[] resources) {
+        this.resources = resources;
         if (getView() != null) {
-            updateResources(localPlayer);
+            updateResources(resources);
         }
     }
 
@@ -59,6 +59,14 @@ public class PlayerResourcesFragment extends Fragment {
         woodCount.setText(String.valueOf(player.getResources()[2]));
         brickCount.setText(String.valueOf(player.getResources()[3]));
         stoneCount.setText(String.valueOf(player.getResources()[4]));
+    }
+
+    public void updateResources(int[] resources) {
+        wheatCount.setText(String.valueOf(resources[0]));
+        sheepCount.setText(String.valueOf(resources[1]));
+        woodCount.setText(String.valueOf(resources[2]));
+        brickCount.setText(String.valueOf(resources[3]));
+        stoneCount.setText(String.valueOf(resources[4]));
     }
 
 }

@@ -25,7 +25,7 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
-import com.group2.catan_android.viewmodel.ActivePlayerViewModel;
+import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
 import java.util.ArrayList;
@@ -69,10 +69,10 @@ public class PopUpFragmentTrading extends DialogFragment {
     private PlayerResourcesFragment playerResources;
     public void setUp(View view){
         setFragments();
-        ActivePlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(ActivePlayerViewModel.initializer)).get(ActivePlayerViewModel.class);
+        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
             this.localPlayer = player;
-            playerResources.setPlayer(localPlayer);
+            playerResources.setResources(localPlayer.getResources());
         });
 
         PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
