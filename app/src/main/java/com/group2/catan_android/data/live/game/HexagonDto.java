@@ -39,14 +39,6 @@ public class HexagonDto{
     public HexagonDto() {
     }
 
-    public Hexagontype getLocation() {
-        return hexagonType;
-    }
-
-    public void setLocation(Hexagontype hexagontype) {
-        this.hexagonType = hexagontype;
-    }
-
     public ResourceDistribution getResourceDistribution() {
         return resourceDistribution;
     }

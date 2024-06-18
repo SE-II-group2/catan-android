@@ -113,7 +113,7 @@ public class UiDrawer extends AppCompatActivity {
             TextView rollValueView = gameActivityContext.findViewById(rollValueViewID);
             ImageView robberView = gameActivityContext.findViewById(robberViewID);
 
-            switch (hexagon.getLocation()) {
+            switch (hexagon.getHexagontype()) {
                 case HILLS:
                     hexagonView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.hexagon_hills));
                     break;
@@ -142,7 +142,7 @@ public class UiDrawer extends AppCompatActivity {
         rollValueView.setText(String.format(Locale.getDefault(), "%d", hexagon.getRollValue()));
         robberView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.robber));
 
-        if (hexagon.isHavingRobber()) {
+        if (hexagon.isHasRobber()) {
             robberView.setColorFilter(Color.BLACK);
             rollValueView.setVisibility(View.INVISIBLE);
             robberView.setVisibility(View.VISIBLE);

@@ -78,10 +78,6 @@ public class Hexagon {
         }
     }
 
-    public Hexagontype getLocation() {
-        return hexagontype;
-    }
-
     public ResourceDistribution getDistribution() {
         return distribution;
     }
@@ -100,10 +96,6 @@ public class Hexagon {
 
     public int getId() {
         return id;
-    }
-
-    public boolean isHavingRobber(){
-        return hasRobber;
     }
     public void setHasRobber(boolean hasRobber) {
         this.hasRobber = hasRobber;
