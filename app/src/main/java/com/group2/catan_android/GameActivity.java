@@ -6,6 +6,9 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +70,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private Player localPlayer;
 
     private MoveMaker movemaker;
+
 
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
