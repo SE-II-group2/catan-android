@@ -32,33 +32,26 @@ public class Intersection {
 
     public boolean notNextToBuilding(Board board, int row, int col){
         Intersection[][] intersections = board.getIntersections();
-
         boolean evenCol = col % 2 == 0;
         boolean evenRow = row % 2 == 0;
-        boolean nextToBuilding;
 
-        if(col == 0){
-            nextToBuilding = (intersections[row][col + 1] instanceof Building);
-        } else if (col == intersections[0].length-1) {
-            nextToBuilding = (intersections[row][col - 1] instanceof Building);
-        }else nextToBuilding = (intersections[row][col - 1] instanceof Building || intersections[row][col + 1] instanceof Building);
-
-        if(nextToBuilding) {
+        if (col > 0 && intersections[row][col - 1] instanceof Building) {
+            return false;
+        }
+        if (col < 11 - 1 && intersections[row][col + 1] instanceof Building) {
             return false;
         }
 
-        //if even even or uneven uneven check below, else above if there is a building
-        if((evenRow && evenCol) || (!evenRow && !evenCol)){
-            if(row != intersections.length-1 && intersections[row + 1][col] instanceof Building){
-                nextToBuilding = true;
-            }
-        } else{
-            if(row != 0 && intersections[row - 1][col] instanceof Building) {
-                nextToBuilding = true;
-            }
-        }
+        return !verticalCheckForBuilding(row, col, intersections, evenRow, evenCol);
+    }
 
-        return !nextToBuilding;
+    private boolean verticalCheckForBuilding(int row, int col, Intersection[][] intersections, boolean evenRow, boolean evenCol) {
+
+        if ((evenRow && evenCol) || (!evenRow && !evenCol)) {
+            return row != 5 && intersections[row + 1][col] instanceof Building;
+        } else {
+            return row != 0 && intersections[row - 1][col] instanceof Building;
+        }
     }
 
 }

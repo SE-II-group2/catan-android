@@ -41,7 +41,6 @@ public class StompManager {
     private HashMap<String, Flowable<MessageDto>> originTopics;
     private CompositeDisposable originDisposables;
     private Disposable lifecycleDisposable;
-    private HashMap<Class<? super MessageDto>, Flowable<? super MessageDto>> filteredMessages;
 
     private StompManager(StompDriver stompDriver, ObjectMapper objectMapper){
         this.driver = stompDriver;
@@ -107,7 +106,7 @@ public class StompManager {
 
         Flowable<MessageDto> originTopic = originTopics.get(topic);
         if(originTopic != null)
-            return; //the dispatcher is already receiving events;
+            return;
 
         originTopic = driver.getTopic(topic).map(message -> objectMapper.readValue(message.getPayload(), MessageDto.class));
         originTopics.put(topic, originTopic);

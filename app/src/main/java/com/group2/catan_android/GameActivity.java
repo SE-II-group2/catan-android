@@ -6,9 +6,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.exception.IllegalGameMoveException;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
@@ -57,15 +55,15 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
     // drawables measurements
-    final int HEXAGON_HEIGHT = 230;
-    final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
-    final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
-    final int INTERSECTION_SIZE = 40;
-    final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
+    private static final int HEXAGON_HEIGHT = 230;
+    private static final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
+    private static final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
+    private static final int INTERSECTION_SIZE = 40;
+    private static final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
-    final int TOTAL_HEXAGONS = 19;
-    final int TOTAL_CONNECTIONS = 72;
-    final int TOTAL_INTERSECTIONS = 54;
+    private static final int TOTAL_HEXAGONS = 19;
+    private static final int TOTAL_CONNECTIONS = 72;
+    private static final int TOTAL_INTERSECTIONS = 54;
     private Board board;
     private Player localPlayer;
 
@@ -93,7 +91,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
-        uiDrawer = UiDrawer.getInstance(GameActivity.this);
+        uiDrawer = new UiDrawer(GameActivity.this);
 
         gameEffectManager = new GameEffectManager(this);
         gameEffectManager.loadSound(R.raw.pop);
@@ -192,22 +190,21 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
     }
 
-    private void clickOnIntersection(int correctID) throws Exception {
-        switch (lastButtonClicked) {
-            case VILLAGE:
-                movemaker.makeMove(new BuildVillageMoveDto(correctID));
-                break;
-            case CITY:
-                movemaker.makeMove(new BuildCityMoveDto(correctID));
-                break;
-            default:
-                throw new Exception("Select the correct button to build a village or city!");
+    private void clickOnIntersection(int correctID) throws IllegalGameMoveException {
+        if(lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY){
+            throw new IllegalGameMoveException("Select the correct button to build a village or city!");
+        }
+
+        switch (lastButtonClicked){
+            case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID)); break;
+            case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID)); break;
+            default: throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
     }
 
-    private void clickOnConnection(int correctID) throws Exception {
-        if (lastButtonClicked != ButtonType.ROAD) {
-            throw new Exception("Select the correct button to build a road!");
+    private void clickOnConnection(int correctID) throws IllegalGameMoveException {
+        if(lastButtonClicked != ButtonType.ROAD){
+            throw new IllegalGameMoveException("Select the correct button to build a road!");
         }
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
     }
@@ -220,17 +217,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             uiDrawer.removeAllPossibleMovesFromUI();
             return;
         }
-        if (lastButtonClicked != null && lastButtonClicked !=ButtonType.ROBBER) {
+        if (lastButtonClicked != ButtonType.ROBBER) {
             uiDrawer.showPossibleMoves(ButtonType.ROBBER);
             lastButtonClicked = ButtonType.ROBBER;
         } else {
-            Toast.makeText(getApplicationContext(), "AAAAAA", Toast.LENGTH_SHORT).show();
             try {
                 movemaker.makeMove(new MoveRobberDto(correctID, false));
             } catch (Exception e) {
                 lastButtonClicked = null;
                 uiDrawer.removeAllPossibleMovesFromUI();
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
             }
             lastButtonClicked = null;
             uiDrawer.removeAllPossibleMovesFromUI();
@@ -328,12 +324,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         });
 
-        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList -> {
-            if (!playerList.isEmpty()) {
-                Player activePlayer = playerList.get(0);
-                List<Player> tempList = new ArrayList<>(playerList);
-                tempList.sort(Comparator.comparingInt(Player::getInGameID));
-                uiDrawer.updateUiPlayerScores(playerScoresFragment, tempList, activePlayer);
+        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
+            if(!playerList.isEmpty()) {
+                uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
             }
         });
     }

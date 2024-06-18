@@ -66,10 +66,9 @@ public class UiDrawer extends AppCompatActivity {
 
     private boolean hasRolledSeven=false;
 
-    private static UiDrawer uiDrawerInstance;
     private final Activity gameActivityContext;
 
-    private UiDrawer(Activity gameActivityContext) {
+    public UiDrawer(Activity gameActivityContext) {
         board = new Board();
         disposable = new CompositeDisposable();
         setupListeners();
@@ -80,10 +79,6 @@ public class UiDrawer extends AppCompatActivity {
         this.gameActivityContext = gameActivityContext;
     }
 
-    public static UiDrawer getInstance(Activity gameActivityContext) {
-        if (uiDrawerInstance == null) uiDrawerInstance = new UiDrawer(gameActivityContext);
-        return uiDrawerInstance;
-    }
 
     public void updateUiBoard(Board board) {
         removeAllPossibleMovesFromUI();
@@ -199,8 +194,8 @@ public class UiDrawer extends AppCompatActivity {
         playerResourcesFragment.updateResources(player);
     }
 
-    public void updateUiPlayerScores(PlayerScoresFragment playerScoresFragment, List<Player> players, Player activePlayer) {
-        playerScoresFragment.updateScores(players, activePlayer);
+    public void updateUiPlayerScores(PlayerScoresFragment playerScoresFragment, List<Player> players){
+        playerScoresFragment.updateScores(players);
     }
 
     public void updatePossibleMoves() {

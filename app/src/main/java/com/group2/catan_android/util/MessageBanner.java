@@ -71,8 +71,8 @@ public class MessageBanner {
         mViewGroup = activity.findViewById(android.R.id.content);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = gravity;
         params.topMargin = 20;
 

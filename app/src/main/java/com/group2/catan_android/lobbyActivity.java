@@ -24,6 +24,7 @@ import com.group2.catan_android.adapter.GameListAdapter;
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.model.AvailableGame;
 import com.group2.catan_android.data.repository.lobby.LobbyRepository;
+import com.group2.catan_android.data.repository.token.TokenRepository;
 import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
@@ -47,6 +48,8 @@ public class lobbyActivity extends AppCompatActivity {
     private GameListAdapter gameListAdapter;
     private CompositeDisposable compositeDisposable;
 
+    private Button tryReconnectButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,7 @@ public class lobbyActivity extends AppCompatActivity {
         Button connectButton = findViewById(R.id.LobbyJoinButton);
         Button createButton = findViewById(R.id.LobbyCreateButton);
         ImageButton refreshButton = findViewById(R.id.LobbyRefreshButton);
+        tryReconnectButton = findViewById(R.id.try_reconnect_button);
 
         GameListAdapter.ItemClickListener listener = game -> {
             selectedGameID = game.getGameID().equals(selectedGameID) ? null : game.getGameID();
@@ -103,6 +107,9 @@ public class lobbyActivity extends AppCompatActivity {
                 requestActiveGames();
             }
         });
+
+        updateTryReconnect();
+        tryReconnectButton.setOnClickListener(v -> tryReconnect());
 
     }
 
@@ -186,6 +193,42 @@ public class lobbyActivity extends AppCompatActivity {
             createButton.setBackgroundColor(getResources().getColor(R.color.button_available));
             createButton.setEnabled(true);
             connectButton.setEnabled(false);
+        }
+    }
+
+    private void tryReconnect(){
+        GameController gameController = GameController.getInstance();
+        gameController.reconnectGame()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        compositeDisposable.add(d);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Intent i = new Intent(getApplicationContext(), GameActivity.class);
+                        finish();
+                        startActivity(i);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to reconnect: " + e.getMessage()).show();
+                        updateTryReconnect();
+                    }
+        });
+    }
+
+    private void updateTryReconnect(){
+        TokenRepository t = TokenRepository.getInstance();
+
+        if(t.fullDataAvailable()){
+            tryReconnectButton.setVisibility(View.VISIBLE);
+        } else {
+            tryReconnectButton.setVisibility(View.INVISIBLE);
         }
     }
 
