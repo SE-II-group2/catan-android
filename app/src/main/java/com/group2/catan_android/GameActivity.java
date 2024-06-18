@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.exception.IllegalGameMoveException;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
@@ -175,17 +176,21 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         });
     }
 
-    private void clickOnIntersection(int correctID) throws Exception {
+    private void clickOnIntersection(int correctID) throws IllegalGameMoveException {
+        if(lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY){
+            throw new IllegalGameMoveException("Select the correct button to build a village or city!");
+        }
+
         switch (lastButtonClicked){
             case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID)); break;
             case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID)); break;
-            default: throw new Exception("Select the correct button to build a village or city!");
+            default: throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
     }
 
-    private void clickOnConnection(int correctID) throws Exception {
+    private void clickOnConnection(int correctID) throws IllegalGameMoveException {
         if(lastButtonClicked != ButtonType.ROAD){
-            throw new Exception("Select the correct button to build a road!");
+            throw new IllegalGameMoveException("Select the correct button to build a road!");
         }
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
     }
