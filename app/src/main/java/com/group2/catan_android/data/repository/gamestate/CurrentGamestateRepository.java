@@ -105,15 +105,14 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     private void wireDataSources() {
         d = liveDataIn
                 .doOnComplete(this::cleanup)
-                .subscribe(CurrentGameStateDto -> {
-                    players = getPlayersFromDto(CurrentGameStateDto.getPlayerOrder());
-                    board.setHexagonList(getHexagonListFromDto(CurrentGameStateDto.getHexagons()));
-                    board.setIntersections(generateIntersectionsFromDto(CurrentGameStateDto.getIntersections()));
-                    board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(CurrentGameStateDto.getConnections()));
-                    board.setSetupPhase(CurrentGameStateDto.isSetupPhase());
-                    currentGameState = new CurrentGameState(players, board);
+                .subscribe(currentGameStateDto -> {
+                    players = getPlayersFromDto(currentGameStateDto.getPlayers(), currentGameStateDto.getActivePlayer());
+                    board.setHexagonList(getHexagonListFromDto(currentGameStateDto.getHexagons()));
+                    board.setIntersections(generateIntersectionsFromDto(currentGameStateDto.getIntersections()));
+                    board.setAdjacencyMatrix(generateAdjacencyMatrixFromDto(currentGameStateDto.getConnections()));
+                    board.setSetupPhase(currentGameStateDto.isSetupPhase());
+                    currentGameState = new CurrentGameState(players, board, activePlayer);
                     localPlayer = playerHashMap.get(localPlayerIngameID);
-                    activePlayer=currentGameState.getPlayers().get(0);
                     activePlayerBehaviorSubject.onNext(activePlayer);
                     localPlayerBehaviorSubject.onNext(localPlayer);
                     playerListBehaviorSubject.onNext(players);
@@ -121,17 +120,17 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
                 });
     }
 
-    private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> playerOrder) {
+    private ArrayList<Player> getPlayersFromDto(List<IngamePlayerDto> players, IngamePlayerDto activePlayer) {
         ArrayList<Player> playersList = new ArrayList<>();
-        outerloop:
-        for (IngamePlayerDto playerDto : playerOrder) {
-            for( Player player : playersList){
-                if(playerDto.getInGameID()==player.getInGameID())continue outerloop;
+
+        for(IngamePlayerDto playerDto: players){
+            Player p = Player.fromPlayerDto(playerDto);
+            if(activePlayer.getInGameID() == p.getInGameID()){
+                p.setActive(true);
+                this.activePlayer = p;
             }
-            Player player = new Player(playerDto.getDisplayName(), playerDto.getVictoryPoints(), playerDto.getResources(), playerDto.getColor(), playerDto.getProgressCards());
-            player.setInGameID(playerDto.getInGameID());
-            playersList.add(player);
-            playerHashMap.put(playerDto.getInGameID(), player);
+            playersList.add(p);
+            playerHashMap.put(p.getInGameID(), p);
         }
         return playersList;
     }
@@ -162,46 +161,55 @@ public class CurrentGamestateRepository implements LiveDataReceiver<CurrentGameS
     }
 
     public Intersection[][] generateIntersectionsFromDto(List<IntersectionDto> intersectionDtos) {
-        Intersection[][] intersections;
+        Map<Integer, Intersection> idToIntersectionMap = createIntersectionMap(intersectionDtos);
+        Intersection[][] intersections = board.getIntersections();
+        fillIntersectionsArray(intersections, idToIntersectionMap);
+        return intersections;
+    }
+
+    private Map<Integer, Intersection> createIntersectionMap(List<IntersectionDto> intersectionDtos) {
         Map<Integer, Intersection> idToIntersectionMap = new HashMap<>();
-        Intersection intersection;
-        // Create Intersection objects and map their IDs to the objects
         for (IntersectionDto dto : intersectionDtos) {
-            if (dto.getBuildingType().equals(BuildingType.EMPTY.toString())) {
-                intersection = new Intersection();
-            } else {
-                BuildingType buildingType;
-                switch (dto.getBuildingType()) {
-                    case "CITY":
-                        buildingType = BuildingType.CITY;
-                        break;
-                    case "VILLAGE":
-                        buildingType = BuildingType.VILLAGE;
-                        break;
-                    default:
-                        buildingType = BuildingType.EMPTY;
-                        break;
-                }
-                if(dto.getOwner()==null)intersection = new Building(null, buildingType,dto.getId());
-                else intersection = new Building(playerHashMap.get(dto.getOwner().getInGameID()), buildingType,dto.getId());
-            }
+            Intersection intersection = createIntersectionFromDto(dto);
             idToIntersectionMap.put(dto.getId(), intersection);
         }
-        intersections = board.getIntersections();
-        int counter=0;
-        // Fill the intersections array using the ID-to-Intersection map
+        return idToIntersectionMap;
+    }
+
+    private Intersection createIntersectionFromDto(IntersectionDto dto) {
+        if (dto.getBuildingType().equals(BuildingType.EMPTY.toString())) {
+            return new Intersection();
+        } else {
+            BuildingType buildingType = getBuildingTypeFromString(dto.getBuildingType());
+            return dto.getOwner() == null ?
+                    new Building(null, buildingType, dto.getId()) :
+                    new Building(playerHashMap.get(dto.getOwner().getInGameID()), buildingType, dto.getId());
+        }
+    }
+
+    private BuildingType getBuildingTypeFromString(String buildingTypeStr) {
+        switch (buildingTypeStr) {
+            case "CITY":
+                return BuildingType.CITY;
+            case "VILLAGE":
+                return BuildingType.VILLAGE;
+            default:
+                return BuildingType.EMPTY;
+        }
+    }
+
+    private void fillIntersectionsArray(Intersection[][] intersections, Map<Integer, Intersection> idToIntersectionMap) {
+        int counter = 0;
         for (int i = 0; i < intersections.length; i++) {
             for (int j = 0; j < intersections[i].length; j++) {
-                if(intersections[i][j]!=null) {
+                if (intersections[i][j] != null) {
                     intersections[i][j] = idToIntersectionMap.get(counter);
                     counter++;
                 }
             }
         }
-
-        // Update the board's intersections with the translated array
-        return intersections;
     }
+
 
 
     private ArrayList<Hexagon> getHexagonListFromDto(List<HexagonDto> hexagons) {

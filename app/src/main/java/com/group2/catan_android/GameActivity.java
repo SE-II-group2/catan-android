@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.group2.catan_android.data.exception.IllegalGameMoveException;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
@@ -26,7 +27,6 @@ import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.HelpFragment;
-import com.group2.catan_android.fragments.RobberConfirmationFragment;
 import com.group2.catan_android.fragments.enums.ClickableElement;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.PlayerResourcesFragment;
@@ -55,30 +55,29 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
     // drawables measurements
-    final int HEXAGON_HEIGHT = 230;
-    final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
-    final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
-    final int INTERSECTION_SIZE = 40;
-    final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
+    private static final int HEXAGON_HEIGHT = 230;
+    private static final int HEXAGON_WIDTH = (int) ((float) HEXAGON_HEIGHT / 99 * 86); // 99:86 is the aspect ratio of a hexagon with equal sites
+    private static final int HEXAGON_WIDTH_HALF = HEXAGON_HEIGHT / 2;
+    private static final int INTERSECTION_SIZE = 40;
+    private static final int CONNECTION_SIZE = HEXAGON_WIDTH_HALF;
 
-    final int TOTAL_HEXAGONS = 19;
-    final int TOTAL_CONNECTIONS = 72;
-    final int TOTAL_INTERSECTIONS = 54;
+    private static final int TOTAL_HEXAGONS = 19;
+    private static final int TOTAL_CONNECTIONS = 72;
+    private static final int TOTAL_INTERSECTIONS = 54;
     private Board board;
     private Player localPlayer;
 
     private MoveMaker movemaker;
 
+
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
-    private RobberConfirmationFragment robberConfirmationFragment;
     private PlayerScoresFragment playerScoresFragment;
     private UiDrawer uiDrawer;
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
     private GameEffectManager gameEffectManager;
-    private boolean allRobbersAreClickable = false;
     private boolean hasRolledSeven = false;
 
     // List of views
@@ -92,7 +91,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
-        uiDrawer = UiDrawer.getInstance(GameActivity.this);
+        uiDrawer = new UiDrawer(GameActivity.this);
 
         gameEffectManager = new GameEffectManager(this);
         gameEffectManager.loadSound(R.raw.pop);
@@ -123,12 +122,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void createFragments() {
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
-        robberConfirmationFragment = new RobberConfirmationFragment();
         ButtonsClosedFragment buttonsClosedFragment = new ButtonsClosedFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.robberConfirmationFragment, robberConfirmationFragment).commit();
         currentButtonFragmentListener = buttonsClosedFragment;
     }
 
@@ -183,18 +180,21 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                         break;
                 }
                 currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
-                lastButtonClicked = null;
+                if (clickableElement != ClickableElement.ROBBER) lastButtonClicked = null;
                 gameEffectManager.playSound(R.raw.pop);
             } catch (Exception e) {
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 gameEffectManager.playSound(R.raw.small_error);
                 gameEffectManager.doubleVibrate();
-                allRobbersAreClickable = false;
             }
         });
     }
 
-    private void clickOnIntersection(int correctID) throws Exception {
+    private void clickOnIntersection(int correctID) throws IllegalGameMoveException {
+        if (lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY) {
+            throw new IllegalGameMoveException("Select the correct button to build a village or city!");
+        }
+
         switch (lastButtonClicked) {
             case VILLAGE:
                 movemaker.makeMove(new BuildVillageMoveDto(correctID));
@@ -203,13 +203,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 movemaker.makeMove(new BuildCityMoveDto(correctID));
                 break;
             default:
-                throw new Exception("Select the correct button to build a village or city!");
+                throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
     }
 
-    private void clickOnConnection(int correctID) throws Exception {
+    private void clickOnConnection(int correctID) throws IllegalGameMoveException {
         if (lastButtonClicked != ButtonType.ROAD) {
-            throw new Exception("Select the correct button to build a road!");
+            throw new IllegalGameMoveException("Select the correct button to build a road!");
         }
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
     }
@@ -218,25 +218,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         if (hasRolledSeven) {
             movemaker.makeMove(new MoveRobberDto(correctID, true));
             hasRolledSeven = false;
-            allRobbersAreClickable = false;
             uiDrawer.setHasRolledSeven(false);
-            uiDrawer.showPossibleMoves(ButtonType.EXIT);
+            uiDrawer.removeAllPossibleMovesFromUI();
             return;
         }
-        if (!allRobbersAreClickable) {
-            allRobbersAreClickable = true;
+        if (lastButtonClicked != ButtonType.ROBBER) {
             uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+            lastButtonClicked = ButtonType.ROBBER;
         } else {
-            movemaker.makeMove(new MoveRobberDto(correctID, false));
-            allRobbersAreClickable = false;
-            uiDrawer.showPossibleMoves(ButtonType.EXIT);
+            try {
+                movemaker.makeMove(new MoveRobberDto(correctID, false));
+            } catch (Exception e) {
+                uiDrawer.removeAllPossibleMovesFromUI();
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+            }
+            lastButtonClicked=ButtonType.EXIT;
+            uiDrawer.removeAllPossibleMovesFromUI();
         }
-
-        //TODO:
-        // if(player is not allowed to move robber -> throw Exception)
-        // if allRobbersAreClickable already...) -> send move with correctID
-        // else make all clickable... uiDrawer.makeAllRobberViewsClickable
-
     }
 
     private TextView[] setupRollValueViews(ConstraintLayout constraintLayout) {
@@ -262,7 +260,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     movemaker.makeMove(new EndTurnMoveDto());
                     movemaker.setHasRolled(false);
-                    allRobbersAreClickable = false;
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -278,13 +275,11 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
                     if (diceRoll == 7) {
                         hasRolledSeven = true;
-                        allRobbersAreClickable = true;
                         uiDrawer.setHasRolledSeven(true);
                         uiDrawer.showPossibleMoves(ButtonType.ROBBER);
-                    } else allRobbersAreClickable = false;
+                    }
                     movemaker.makeMove(new RollDiceDto(diceRoll));
                     movemaker.setHasRolled(true);
-
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -294,8 +289,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void setupAccuseCheatingButton() {
         findViewById(R.id.accuseCheatingButton).setOnClickListener(v -> {
-            movemaker.makeMove(new AccuseCheatingDto());
-            allRobbersAreClickable = false;
+            movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()));
+            uiDrawer.removeAllPossibleMovesFromUI();
+            lastButtonClicked = null;
         });
     }
 
@@ -330,14 +326,14 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     gameEffectManager.vibrate();
                 }
             }
+            if (gameProgressDto.getGameMoveDto() instanceof AccuseCheatingDto) {
+                MessageBanner.makeBanner(this, MessageType.INFO, "Player " + ((AccuseCheatingDto) gameProgressDto.getGameMoveDto()).getSender().getDisplayName() + " Accused somebody of cheating!").show();
+            }
         });
 
         playerListViewModel.getPlayerMutableLiveData().observe(this, playerList -> {
             if (!playerList.isEmpty()) {
-                Player activePlayer = playerList.get(0);
-                List<Player> tempList = new ArrayList<>(playerList);
-                tempList.sort(Comparator.comparingInt(Player::getInGameID));
-                uiDrawer.updateUiPlayerScores(playerScoresFragment, tempList, activePlayer);
+                uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
             }
         });
     }

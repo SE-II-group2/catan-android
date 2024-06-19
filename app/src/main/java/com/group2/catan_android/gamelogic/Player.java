@@ -1,5 +1,6 @@
 package com.group2.catan_android.gamelogic;
 
+import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.gamelogic.enums.ProgressCardType;
 import com.group2.catan_android.gamelogic.objects.ProgressCard;
@@ -15,8 +16,11 @@ public class Player {
     private int victoryPoints = 0;
     private int[] resources = new int[]{0,0,0,0,0};
     private int color;
+    private boolean connected;
 
     private List<ProgressCardType> progressCards;
+
+    private boolean isActive = false;
 
     public Player(String token, String displayName, String gameID, int color)  {
         this.token = token;
@@ -24,7 +28,12 @@ public class Player {
         this.gameID = gameID;
         this.color = color;
     }
-
+    public static Player fromPlayerDto(IngamePlayerDto dto){
+        Player player = new Player(dto.getDisplayName(), dto.getVictoryPoints(), dto.getResources(), dto.getColor(), dto.getProgressCards());
+        player.setInGameID(dto.getInGameID());
+        player.setConnected(dto.isConnected());
+        return player;
+    }
     public Player (){}
     public Player( String displayName, int victoryPoints, int[] resources,  int color, List<ProgressCardType> progressCards) {
         this.displayName = displayName;
@@ -94,5 +103,19 @@ public class Player {
 
     public IngamePlayerDto toIngamePlayerDto(){
         return new IngamePlayerDto(this.displayName, this.resources, this.victoryPoints, this.color, this.inGameID, this.progressCards);
+    }
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }
