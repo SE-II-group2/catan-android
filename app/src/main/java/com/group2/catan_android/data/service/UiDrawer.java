@@ -137,7 +137,7 @@ public class UiDrawer extends AppCompatActivity {
         rollValueView.setText(String.format(Locale.getDefault(), "%d", hexagon.getRollValue()));
         robberView.setImageDrawable(ContextCompat.getDrawable(gameActivityContext, R.drawable.robber));
 
-        if (hexagon.isHasRobber()) {
+        if (hexagon.isHavingRobber()) {
             robberView.setColorFilter(Color.BLACK);
             rollValueView.setVisibility(View.INVISIBLE);
             robberView.setVisibility(View.VISIBLE);
@@ -212,7 +212,7 @@ public class UiDrawer extends AppCompatActivity {
     private void updatePossibleRobberMoves() {
 
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.isHasRobber()) continue;
+            if (hexagon.isHavingRobber()) continue;
             int robberViewID = hexagon.getId() + TOTAL_HEXAGONS + 1 + TOTAL_HEXAGONS;
             ImageView robberView = gameActivityContext.findViewById(robberViewID);
             possibleRobberMoves.add(robberView);
@@ -246,11 +246,7 @@ public class UiDrawer extends AppCompatActivity {
     }
 
     public void showPossibleMoves(ButtonType button) {
-        removePossibleMovesFromUI(possibleRoads);
-        removePossibleMovesFromUI(possibleVillages);
-        removePossibleMovesFromUI(possibleCities, R.drawable.village);
-        removePossibleRobberMovesFromUi(possibleRobberMoves);
-
+        hideAllPossibleMovesFromUI();
 
         switch (button) {
             case ROAD:
@@ -331,6 +327,13 @@ public class UiDrawer extends AppCompatActivity {
         removePossibleMovesFromUI(possibleCities, R.drawable.village);
         removePossibleRobberMovesFromUi(possibleRobberMoves);
         showingPossibleRoads = showingPossibleVillages = showingPossibleCities = showingPossibleRobberMoves =  false;
+    }
+
+    public void hideAllPossibleMovesFromUI() {
+        removePossibleMovesFromUI(possibleRoads);
+        removePossibleMovesFromUI(possibleVillages);
+        removePossibleMovesFromUI(possibleCities, R.drawable.village);
+        removePossibleRobberMovesFromUi(possibleRobberMoves);
     }
 
     public void removePossibleMovesFromUI(List<ImageView> possibleMoveViews, int drawable) {
