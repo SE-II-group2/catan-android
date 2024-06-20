@@ -17,4 +17,7 @@
     <string name="developmentcard_text_yearofplenty">Year of Plenty</string>
     <string name="developmentcard_text_monopoly">Monopoly</string>
     <string name="developmentcard_text_victorypoint">Victory Point</string>
+    <string name="confirmationFieldText">Are you sure!?!?!?</string>
+    <string name="robberAcceptText">Accept</string>
+    <string name="robberDenyText">Deny</string>
 </resources>

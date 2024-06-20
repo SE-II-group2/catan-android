@@ -16,8 +16,9 @@ public class IntersectionUnitTest {
     }
 
     @Test
-    void testInterSectionGetter(){
+    void testInterSectionGetterAndSetter(){
         Assertions.assertNull(intersection.getPlayer());
+        intersection.setBuildingType(BuildingType.EMPTY);
         Assertions.assertEquals(BuildingType.EMPTY, intersection.getType());
     }
 }

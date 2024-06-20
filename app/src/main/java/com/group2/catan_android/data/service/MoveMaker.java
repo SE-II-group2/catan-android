@@ -106,7 +106,7 @@ public class MoveMaker {
             throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
         if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
-        if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
+        if (board.getHexagonList().get(robberDto.getHexagonID()).isHavingRobber())
             throw new IllegalGameMoveException("Cant move the Robber to the same Hexagon it is currently in!");
         sendMove(robberDto);
     }

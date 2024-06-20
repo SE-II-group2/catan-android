@@ -15,6 +15,9 @@ public class Intersection {
     public BuildingType getType() {
         return type;
     }
+    public void setBuildingType(BuildingType type) {
+        this.type=type;
+    }
 
     public boolean isNextToOwnRoad(Board board, Player player, int intersectionID){
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();

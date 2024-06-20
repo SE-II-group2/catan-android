@@ -73,7 +73,6 @@ public class InLobby extends AppCompatActivity {
     private void doStart() {
         MoveSenderRepository.getInstance().startGame(TokenRepository.getInstance().getToken()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe();
-        //navigateToGameActivity();
     }
 
     private void setGameID(){

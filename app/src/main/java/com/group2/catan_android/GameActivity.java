@@ -9,12 +9,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.data.exception.IllegalGameMoveException;
+import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
@@ -67,6 +69,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private MoveMaker movemaker;
 
+
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
     private PlayerScoresFragment playerScoresFragment;
@@ -75,6 +78,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
     private GameEffectManager gameEffectManager;
+    private boolean hasRolledSeven = false;
 
     // List of views
     ImageView[] robberViews;
@@ -105,10 +109,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         setupEndTurnButton();
 
         setupDiceRollButton();
+
+        setupAccuseCheatingButton();
     }
 
+
     private void setToFullScreen() {
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
     }
 
@@ -116,18 +123,18 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
         ButtonsClosedFragment buttonsClosedFragment = new ButtonsClosedFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment,playerResourcesFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
         currentButtonFragmentListener = buttonsClosedFragment;
     }
 
     private void createViews(ConstraintLayout constraintLayout) {
-        ImageView[] hexagonViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_WIDTH,HEXAGON_HEIGHT,0,null);
+        ImageView[] hexagonViews = setupViews(constraintLayout, TOTAL_HEXAGONS, HEXAGON_WIDTH, HEXAGON_HEIGHT, 0, null);
         TextView[] rollValueViews = setupRollValueViews(constraintLayout);
-        robberViews = setupViews(constraintLayout,TOTAL_HEXAGONS,HEXAGON_HEIGHT/3,HEXAGON_HEIGHT/3,TOTAL_HEXAGONS*2, ClickableElement.ROBBER);
-        ImageView[] connectionViews = setupViews(constraintLayout,TOTAL_CONNECTIONS,CONNECTION_SIZE,CONNECTION_SIZE,TOTAL_HEXAGONS*3,ClickableElement.CONNECTION);
-        ImageView[] intersectionViews = setupViews(constraintLayout,TOTAL_INTERSECTIONS,INTERSECTION_SIZE,INTERSECTION_SIZE,(TOTAL_HEXAGONS*3 + TOTAL_CONNECTIONS),ClickableElement.INTERSECTION);
+        robberViews = setupViews(constraintLayout, TOTAL_HEXAGONS, HEXAGON_HEIGHT / 3, HEXAGON_HEIGHT / 3, TOTAL_HEXAGONS * 2, ClickableElement.ROBBER);
+        ImageView[] connectionViews = setupViews(constraintLayout, TOTAL_CONNECTIONS, CONNECTION_SIZE, CONNECTION_SIZE, TOTAL_HEXAGONS * 3, ClickableElement.CONNECTION);
+        ImageView[] intersectionViews = setupViews(constraintLayout, TOTAL_INTERSECTIONS, INTERSECTION_SIZE, INTERSECTION_SIZE, (TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS), ClickableElement.INTERSECTION);
 
         constraintLayout.post(() -> {
             int layoutWidth = constraintLayout.getWidth(); //screen width and height
@@ -148,58 +155,86 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             constraintLayout.addView(view, params);
             views[i] = view;
 
-            if(clickableElement != null){
-                setOnClickListener(view,correctID,clickableElement);
+            if (clickableElement != null) {
+                setOnClickListener(view, correctID, clickableElement);
             }
         }
 
         return views;
     }
 
-    private void setOnClickListener(View view, int correctID, ClickableElement clickableElement){
+    private void setOnClickListener(View view, int correctID, ClickableElement clickableElement) {
         view.setOnClickListener(v -> {
-                try {
-                    switch (clickableElement){
-                        case CONNECTION: clickOnConnection(correctID); break;
-                        case INTERSECTION: clickOnIntersection(correctID); break;
-                        case ROBBER: clickOnRobber(correctID); break;
-                        default: break;
-                    }
-                    currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
-                    lastButtonClicked = null;
-                    gameEffectManager.playSound(R.raw.pop);
-                } catch (Exception e) {
-                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
-                    gameEffectManager.playSound(R.raw.small_error);
-                    gameEffectManager.doubleVibrate();
+            try {
+                switch (clickableElement) {
+                    case CONNECTION:
+                        clickOnConnection(correctID);
+                        break;
+                    case INTERSECTION:
+                        clickOnIntersection(correctID);
+                        break;
+                    case ROBBER:
+                        clickOnRobber(correctID);
+                        break;
+                    default:
+                        break;
                 }
+                currentButtonFragmentListener.onButtonEvent(lastButtonClicked);
+                if (clickableElement != ClickableElement.ROBBER) lastButtonClicked = null;
+                gameEffectManager.playSound(R.raw.pop);
+            } catch (Exception e) {
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+                gameEffectManager.playSound(R.raw.small_error);
+                gameEffectManager.doubleVibrate();
+            }
         });
     }
 
     private void clickOnIntersection(int correctID) throws IllegalGameMoveException {
-        if(lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY){
+        if (lastButtonClicked != ButtonType.VILLAGE && lastButtonClicked != ButtonType.CITY) {
             throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
 
-        switch (lastButtonClicked){
-            case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID)); break;
-            case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID)); break;
-            default: throw new IllegalGameMoveException("Select the correct button to build a village or city!");
+        switch (lastButtonClicked) {
+            case VILLAGE:
+                movemaker.makeMove(new BuildVillageMoveDto(correctID));
+                break;
+            case CITY:
+                movemaker.makeMove(new BuildCityMoveDto(correctID));
+                break;
+            default:
+                throw new IllegalGameMoveException("Select the correct button to build a village or city!");
         }
     }
 
     private void clickOnConnection(int correctID) throws IllegalGameMoveException {
-        if(lastButtonClicked != ButtonType.ROAD){
+        if (lastButtonClicked != ButtonType.ROAD) {
             throw new IllegalGameMoveException("Select the correct button to build a road!");
         }
         movemaker.makeMove(new BuildRoadMoveDto(correctID));
     }
 
-    private void clickOnRobber(int correctID) throws Exception {
-        //TODO:
-        // if(player is not allowed to move robber -> throw Exception)
-        // if allRobbersAreClickable already...) -> send move with correctID
-        // else make all clickable... uiDrawer.makeAllRobberViewsClickable
+    private void clickOnRobber(int correctID) {
+        if (hasRolledSeven) {
+            movemaker.makeMove(new MoveRobberDto(correctID, true));
+            hasRolledSeven = false;
+            uiDrawer.setHasRolledSeven(false);
+            uiDrawer.removeAllPossibleMovesFromUI();
+            return;
+        }
+        if (lastButtonClicked != ButtonType.ROBBER) {
+            uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+            lastButtonClicked = ButtonType.ROBBER;
+        } else {
+            try {
+                movemaker.makeMove(new MoveRobberDto(correctID, false));
+            } catch (Exception e) {
+                uiDrawer.removeAllPossibleMovesFromUI();
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+            }
+            lastButtonClicked=ButtonType.EXIT;
+            uiDrawer.removeAllPossibleMovesFromUI();
+        }
     }
 
     private TextView[] setupRollValueViews(ConstraintLayout constraintLayout) {
@@ -238,13 +273,25 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     Random random = new Random();
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
+                    if (diceRoll == 7) {
+                        hasRolledSeven = true;
+                        uiDrawer.setHasRolledSeven(true);
+                        uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+                    }
                     movemaker.makeMove(new RollDiceDto(diceRoll));
                     movemaker.setHasRolled(true);
-
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
+        });
+    }
+
+    private void setupAccuseCheatingButton() {
+        findViewById(R.id.accuseCheatingButton).setOnClickListener(v -> {
+            movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()));
+            uiDrawer.removeAllPossibleMovesFromUI();
+            lastButtonClicked = null;
         });
     }
 
@@ -262,28 +309,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
             this.localPlayer = player;
-            uiDrawer.updateUiPlayerResources(playerResourcesFragment,localPlayer);
+            uiDrawer.updateUiPlayerResources(playerResourcesFragment, localPlayer);
         });
 
-        gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto ->{
-            if(gameProgressDto.getGameMoveDto() instanceof RollDiceDto){
-                MessageBanner.makeBanner(this, MessageType.INFO, "Dice got rolled: " + ((RollDiceDto)gameProgressDto.getGameMoveDto()).getDiceRoll()).show();
+        gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto -> {
+            if (gameProgressDto.getGameMoveDto() instanceof RollDiceDto) {
+                MessageBanner.makeBanner(this, MessageType.INFO, "Dice got rolled: " + ((RollDiceDto) gameProgressDto.getGameMoveDto()).getDiceRoll()).show();
             }
-            if(gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto){
-                if(((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
+            if (gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto) {
+                if (((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
                     MessageBanner.makeBanner(this, MessageType.INFO, "Your Turn!").show();
                     gameEffectManager.vibrate();
                     gameEffectManager.playSound(R.raw.pop);
-                }
-                else {
+                } else {
                     MessageBanner.makeBanner(this, MessageType.INFO, "Turn ended! Next Player: " + ((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getDisplayName()).show();
                     gameEffectManager.vibrate();
                 }
             }
+            if (gameProgressDto.getGameMoveDto() instanceof AccuseCheatingDto) {
+                MessageBanner.makeBanner(this, MessageType.INFO, "Player " + ((AccuseCheatingDto) gameProgressDto.getGameMoveDto()).getSender().getDisplayName() + " Accused somebody of cheating!").show();
+            }
         });
 
-        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList ->{
-            if(!playerList.isEmpty()) {
+        playerListViewModel.getPlayerMutableLiveData().observe(this, playerList -> {
+            if (!playerList.isEmpty()) {
                 uiDrawer.updateUiPlayerScores(playerScoresFragment, playerList);
             }
         });
@@ -292,15 +341,18 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     @Override
     public void onButtonClicked(ButtonType button) {
         currentButtonFragmentListener.onButtonEvent(button);
-        switch (button){
+        switch (button) {
             case ROAD:
             case VILLAGE:
-            case CITY: uiDrawer.showPossibleMoves(button);
-            break;
-            case HELP: showHelpFragment();
-            break;
-            case EXIT: uiDrawer.removeAllPossibleMovesFromUI();
-            break;
+            case CITY:
+                uiDrawer.showPossibleMoves(button);
+                break;
+            case HELP:
+                showHelpFragment();
+                break;
+            case EXIT:
+                uiDrawer.removeAllPossibleMovesFromUI();
+                break;
             case PROGRESS_CARD: {
                 try {
                     movemaker.makeMove(new BuyProgressCardDto());
@@ -309,7 +361,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 }
             }
             break;
-            default: break;
+            default:
+                break;
         }
         gameEffectManager.playSound(R.raw.tap);
         lastButtonClicked = button;
@@ -329,15 +382,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         gameEffectManager.release();
     }
 
     public void makeAllRobberViewsClickableComingFromProgressCard() {
-        for (ImageView robberView: robberViews){
+        for (ImageView robberView : robberViews) {
             robberView.setVisibility(View.VISIBLE);
-            robberView.setOnClickListener(v->{
+            robberView.setOnClickListener(v -> {
                 int hexagonID = robberView.getId() - TOTAL_HEXAGONS * 2 - 1;
                 moveRobberComingFromProgressCard(hexagonID);
             });

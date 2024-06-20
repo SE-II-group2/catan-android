@@ -50,6 +50,19 @@
         app:layout_constraintHeight_percent="0.25"
         app:layout_constraintTop_toBottomOf="@+id/playerResourcesFragment" />
 
+    <FrameLayout
+        android:id="@+id/robberConfirmationFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/accuseCheatingButton"
+        app:layout_constraintDimensionRatio="2:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintTop_toTopOf="@+id/playerResourcesFragment" />
+
     <ImageView
         android:id="@+id/endTurnButton"
         android:layout_width="0dp"
@@ -80,6 +93,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/accuseCheatingButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/endTurnButton"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/endTurnButton"
+        app:srcCompat="@drawable/robber" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

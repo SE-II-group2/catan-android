@@ -22,7 +22,6 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-// fixme document the magic constants for test readability and understandability
 public class BoardUnitTests {
 
     private Board board;
@@ -50,7 +49,7 @@ public class BoardUnitTests {
     void testGenerateHexagonsDesertTileCorrectness() {
         boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.getLocation().equals(Hexagontype.DESERT)) {
+            if (hexagon.getHexagontype().equals(Hexagontype.DESERT)) {
                 assertEquals(0, hexagon.getRollValue());
                 assertArrayEquals(new int[]{0, 0, 0, 0, 0}, hexagon.getDistribution().getDistribution());
                 hasDesertTile = true;
