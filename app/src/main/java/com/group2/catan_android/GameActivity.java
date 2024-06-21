@@ -390,6 +390,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     public void makeAllRobberViewsClickableComingFromProgressCard() {
+        this.hasUsedProgressCard = true;
         uiDrawer.showPossibleMoves(ButtonType.ROBBER);
     }
 }
