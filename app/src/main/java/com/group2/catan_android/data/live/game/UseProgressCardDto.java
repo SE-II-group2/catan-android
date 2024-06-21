@@ -11,6 +11,7 @@ public class UseProgressCardDto extends GameMoveDto {
         this.progressCardType = progressCardType;
         this.chosenResources = chosenResources;
         this.monopolyResource = monopolyResource;
+        this.hexagonID = hexagonID;
         setEventType(GameMoveType.USEPROGRESSCARD);
     }
     public void setProgressCardType(ProgressCardType progressCardType){
@@ -33,8 +34,12 @@ public class UseProgressCardDto extends GameMoveDto {
     public ResourceDistribution getMonopolyResource() {
         return monopolyResource;
     }
+    public int getHexagonID(){
+        return hexagonID;
+    }
 
     private ProgressCardType progressCardType;
     private List<ResourceDistribution> chosenResources;
     private ResourceDistribution monopolyResource;
+    private int hexagonID;
 }
