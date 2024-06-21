@@ -63,8 +63,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 try {
                     moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null));
                 } catch (Exception e) {
-                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
-                    Log.d("ProgressCards", e.toString());
+                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
                 }
                 MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Resources for two roads added!").show();
                 closeFragment();
@@ -79,8 +78,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 try {
                     moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null));
                 } catch (Exception e) {
-                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
-                    Log.d("ProgressCards", e.toString());
+                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
                 }
                 MessageBanner.makeBanner(getActivity(), MessageType.INFO, "One Victory Point added!").show();
                 closeFragment();

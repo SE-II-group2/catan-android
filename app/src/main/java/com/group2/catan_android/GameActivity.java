@@ -354,6 +354,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 uiDrawer.removeAllPossibleMovesFromUI();
                 break;
             case PROGRESS_CARD: {
+                uiDrawer.removeAllPossibleMovesFromUI();
                 try {
                     movemaker.makeMove(new BuyProgressCardDto());
                 } catch (Exception e) {
