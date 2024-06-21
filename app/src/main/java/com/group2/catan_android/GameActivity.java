@@ -357,7 +357,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     movemaker.makeMove(new BuyProgressCardDto());
                 } catch (Exception e) {
-                    MessageBanner.makeBanner(this, MessageType.ERROR, "Can't do that right now!").show();
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
             }
             break;
