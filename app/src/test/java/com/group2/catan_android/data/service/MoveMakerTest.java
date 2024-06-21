@@ -277,13 +277,13 @@ public class MoveMakerTest {
     }
     @Test
     void testMakeUseProgressCardMoveDuringSetupPhase() {
-        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0);
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testMakeUseProgressCardMoveCardNotInPossession() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
-        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0);
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
 
@@ -291,7 +291,7 @@ public class MoveMakerTest {
     void testMakeUseProgressCardMoveSuccess() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
         playerList.get(0).getProgressCards().add(ProgressCardType.VICTORY_POINT);
-        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
+        GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0);
         moveMaker.makeMove(move);
         verify(moveMaker, times(1)).sendMove(move);
     }

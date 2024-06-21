@@ -2,7 +2,6 @@ package com.group2.catan_android;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -47,9 +46,6 @@ import com.group2.catan_android.viewmodel.BoardViewModel;
 import com.group2.catan_android.viewmodel.GameProgressViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
@@ -79,6 +75,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private GameEffectManager gameEffectManager;
     private boolean hasRolledSeven = false;
+    private boolean hasUsedProgressCard = false;
 
     // List of views
     ImageView[] robberViews;
@@ -221,6 +218,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             uiDrawer.setHasRolledSeven(false);
             uiDrawer.removeAllPossibleMovesFromUI();
             return;
+        } else if (hasUsedProgressCard) {
+            movemaker.makeMove(new UseProgressCardDto(ProgressCardType.KNIGHT, null, null, correctID));
+            hasUsedProgressCard = false;
+            uiDrawer.removeAllPossibleMovesFromUI();
         }
         if (lastButtonClicked != ButtonType.ROBBER) {
             uiDrawer.showPossibleMoves(ButtonType.ROBBER);
@@ -389,26 +390,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     public void makeAllRobberViewsClickableComingFromProgressCard() {
-        for (ImageView robberView : robberViews) {
-            robberView.setVisibility(View.VISIBLE);
-            robberView.setOnClickListener(v -> {
-                int hexagonID = robberView.getId() - TOTAL_HEXAGONS * 2 - 1;
-                moveRobberComingFromProgressCard(hexagonID);
-            });
-        }
+        uiDrawer.showPossibleMoves(ButtonType.ROBBER);
     }
-
-    private void moveRobberComingFromProgressCard(int hexagonID) {
-        try {
-            // TODO: temporary always true
-            MoveRobberDto moveRobberDto = new MoveRobberDto(hexagonID, true);
-            UseProgressCardDto useProgressCardDto = new UseProgressCardDto(ProgressCardType.KNIGHT, null, null);
-            movemaker.makeMove(moveRobberDto);
-            movemaker.makeMove(useProgressCardDto);
-        } catch (Exception e) {
-            Log.d("Robber", "Fehler: " + e);
-            MessageBanner.makeBanner(this, MessageType.ERROR, "An error occurred!" + e.getMessage()).show();
-        }
-    }
-
 }

@@ -37,7 +37,7 @@ public class MonopolyFragment extends PopUpFragment {
     }
     private void useProgressCard(ResourceDistribution resource){
         try {
-            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.MONOPOLY, null, resource));
+            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.MONOPOLY, null, resource, 0));
         } catch (Exception e) {
             MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
             Log.d("ProgressCards", e.toString());

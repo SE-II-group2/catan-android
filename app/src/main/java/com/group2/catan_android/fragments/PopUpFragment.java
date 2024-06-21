@@ -1,7 +1,6 @@
 package com.group2.catan_android.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +60,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 break;
             case ROAD_BUILDING:
                 try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null));
+                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null, 0));
                 } catch (Exception e) {
                     MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
                 }
@@ -76,7 +75,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 break;
             case VICTORY_POINT:
                 try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null));
+                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0));
                 } catch (Exception e) {
                     MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
                 }
