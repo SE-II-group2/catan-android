@@ -24,25 +24,25 @@ import io.reactivex.schedulers.Schedulers;
 public class TradeViewModel extends ViewModel {
     private final TradeRepository datasource;
 
-    private final MutableLiveData<TradeOfferDto> TradeOfferDtoMutableLiveData;
+    private final MutableLiveData<TradeOfferDto> tradeOfferDtoMutableLiveData;
 
     CompositeDisposable disposable;
 
     public TradeViewModel(TradeRepository datasource) {
         this.datasource = datasource;
-        this.TradeOfferDtoMutableLiveData = new MutableLiveData<>();
+        this.tradeOfferDtoMutableLiveData = new MutableLiveData<>();
         disposable = new CompositeDisposable();
         setupListeners();
     }
     public MutableLiveData<TradeOfferDto> getTradeOfferDtoMutableLiveData() {
-        return TradeOfferDtoMutableLiveData;
+        return tradeOfferDtoMutableLiveData;
     }
     private void setupListeners() {
         //Toast.makeText(getApplicationContext(), "Why does this apply when create game?", Toast.LENGTH_LONG).show();
         Disposable boardDisposable = datasource.getTradeObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(TradeOfferDtoMutableLiveData::setValue);
+                .subscribe(tradeOfferDtoMutableLiveData::setValue);
         disposable.add(boardDisposable);
     }
 

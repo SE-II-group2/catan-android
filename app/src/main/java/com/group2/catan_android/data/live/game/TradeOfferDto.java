@@ -8,16 +8,16 @@ public class TradeOfferDto extends MessageDto{
     public TradeOfferDto() {
         this.setEventType(MessageType.PLAYER_NOTIFY);
     }
-    public TradeOfferDto(int[] tradeMove_getResources, int[] tradeMove_giveResources, int playerID) {
+    public TradeOfferDto(int[] tradeMove_getResources, int[] tradeMove_giveResources, IngamePlayerDto fromPlayer) {
         this.getResources=tradeMove_giveResources;
         this.giveResources=tradeMove_getResources;
-        this.playerID = playerID;
+        this.fromPlayer = fromPlayer;
         this.setEventType(MessageType.PLAYER_NOTIFY);
     }
     //order swapped!!!
     private int[] getResources;
     private int[] giveResources;
-    private int playerID;
+    private IngamePlayerDto fromPlayer;
 
     public int[] getGetResources() {
         return getResources;
@@ -35,11 +35,11 @@ public class TradeOfferDto extends MessageDto{
         this.giveResources = giveResources;
     }
 
-    public int getPlayerID() {
-        return playerID;
+    public IngamePlayerDto getFromPlayer() {
+        return fromPlayer;
     }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
+    public void setFromPlayer(IngamePlayerDto fromPlayer) {
+        this.fromPlayer = fromPlayer;
     }
 }

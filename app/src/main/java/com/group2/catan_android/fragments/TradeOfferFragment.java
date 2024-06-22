@@ -6,12 +6,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,18 +28,29 @@ import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
+import com.group2.catan_android.viewmodel.TradeViewModel;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class TradeOfferFragment extends Fragment {
+    private TradeOfferDto tradeOfferDto;
+    private PlayerResourcesFragment getResourcesFragment;
+    private PlayerResourcesFragment giveResourcesFragment;
+    private TradeViewModel tradeViewModel;
 
+    private TextView offerFromTextView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tradeViewModel =  new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(TradeViewModel.initializer)).get(TradeViewModel.class);
     }
 
     @Override
@@ -45,83 +58,62 @@ public class TradeOfferFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_trade_offer, container, false);
     }
-    private TradeOfferDto tradeOfferDto;
-    private PlayerResourcesFragment getResourcesFragment;
-    private PlayerResourcesFragment giveResourcesFragment;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setFragmentsAndButtons(view);
-    }
+        if(savedInstanceState == null){
+            giveResourcesFragment = new PlayerResourcesFragment();
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.trade_offer_give_fragment, giveResourcesFragment)
+                    .commit();
 
-    public void setFragmentsAndButtons(View view){
-        // get used Views
-        FragmentManager manager = getChildFragmentManager();
-        TextView playerText = view.findViewById(R.id.trade_offer_player_text);
-        Button accept = view.findViewById(R.id.trade_offer_accept);
-        Button decline = view.findViewById(R.id.trade_offer_decline);
-        // configure Views
-        getResourcesFragment=new PlayerResourcesFragment();
-        giveResourcesFragment = new PlayerResourcesFragment();
-        manager.beginTransaction().add(R.id.trade_offer_get_fragment, getResourcesFragment).commitNow();
-        manager.beginTransaction().add(R.id.trade_offer_give_fragment, giveResourcesFragment).commitNow();
-        if(tradeOfferDto!=null){
-            updateResources(tradeOfferDto);
+            getResourcesFragment = new PlayerResourcesFragment();
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.trade_offer_get_fragment, getResourcesFragment)
+                    .commit();
+        } else {
+            giveResourcesFragment = (PlayerResourcesFragment) getChildFragmentManager().findFragmentById(R.id.trade_offer_give_fragment);
+            getResourcesFragment = (PlayerResourcesFragment) getChildFragmentManager().findFragmentById(R.id.trade_offer_get_fragment);
         }
 
-        PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
-        playerListViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), data ->{
-            List<Player> playerList = new ArrayList<>(data);
-            playerText.setText("Player "+findPlayerByID(tradeOfferDto.getPlayerID(), playerList).getDisplayName());
-        });
+        Button acceptButton = view.findViewById(R.id.trade_offer_accept);
+        acceptButton.setOnClickListener(v -> accept());
 
-        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
-        accept.setOnClickListener(v -> {
-            localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), player -> {
-                if(!player.resourcesSufficient(tradeOfferDto.getGiveResources())){
-                    Toast.makeText(getContext(), "You do not have the necessary resources", Toast.LENGTH_SHORT).show();
-                    closeFragment();
-                }else{
-                    try {
-                        MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto));
-                        closeFragment();
-                        //close Tradingpopup?
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+        Button declineButton = view.findViewById(R.id.trade_offer_decline);
+        declineButton.setOnClickListener(v -> closeFragment());
 
-            });
-        decline.setOnClickListener(v -> {
+        offerFromTextView = view.findViewById(R.id.trade_offer_player_text);
+
+        tradeViewModel.getTradeOfferDtoMutableLiveData().observe(getViewLifecycleOwner(), this::update);
+    }
+
+    public void update(TradeOfferDto dto){
+        this.tradeOfferDto = dto;
+        getResourcesFragment.updateResources(dto.getGetResources());
+        giveResourcesFragment.updateResources(negateAllValues(dto.getGiveResources()));
+        offerFromTextView.setText(dto.getFromPlayer().getDisplayName());
+    }
+
+    public void accept(){
+        if(tradeOfferDto == null){
+            MessageBanner.makeBanner(requireActivity(), MessageType.WARNING, "No Offer available").show();
+        } else {
+            try {
+                MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto), this::onServerError);
+            } catch (Exception e){
+                MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
+            } finally {
                 closeFragment();
-            });
-
-    }
-    public void updateResources(TradeOfferDto tradeOfferDto){
-        getResourcesFragment.setResources(tradeOfferDto.getGetResources());
-        giveResourcesFragment.setResources(negateAllValues(tradeOfferDto.getGiveResources()));// or just make them positive?
-    }
-    public void setTradeOfferDto(TradeOfferDto tradeOfferDto){
-        this.tradeOfferDto=tradeOfferDto;
-        if (getView() != null) {
-            updateResources(this.tradeOfferDto);
+            }
         }
     }
+
     private void closeFragment() {
         FragmentManager fragmentManager = getParentFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.remove(TradeOfferFragment.this);
         fragmentTransaction.commit();
-    }
-    private Player findPlayerByID(int id, List<Player> playerList){
-        for(Player p:playerList){
-            if(p.getInGameID()==id){
-                return p;
-            }
-        }
-        return null;
     }
     private int[] negateAllValues(int[] input){
         int[] result = new int[input.length];
@@ -131,4 +123,8 @@ public class TradeOfferFragment extends Fragment {
         return result;
     }
 
+    private void onServerError(Throwable t){
+        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+        closeFragment();
+    }
 }
