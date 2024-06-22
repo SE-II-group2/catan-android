@@ -18,8 +18,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.widget.Toast;
-
 import com.group2.catan_android.adapter.GameListAdapter;
 import com.group2.catan_android.data.api.JoinGameRequest;
 import com.group2.catan_android.data.model.AvailableGame;
@@ -41,7 +39,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class lobbyActivity extends AppCompatActivity {
+public class LobbyActivity extends AppCompatActivity {
     private String selectedGameID = null;
     private String playerName = "";
     private EditText playerNameEditText;
@@ -134,7 +132,7 @@ public class lobbyActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Throwable e) {
-                                MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to fetch lobbies!: " + e.getMessage()).show();
+                                MessageBanner.makeBanner(LobbyActivity.this, MessageType.ERROR, "Failed to fetch lobbies!: " + e.getMessage()).show();
                             }
                         });
     }
@@ -163,13 +161,13 @@ public class lobbyActivity extends AppCompatActivity {
 
                         @Override
                         public void onComplete() {
-                            Intent i = new Intent(getApplicationContext(), InLobby.class);
+                            Intent i = new Intent(getApplicationContext(), InLobbyActivity.class);
                             startActivity(i);
                         }
 
                         @Override
                         public void onError(Throwable e) {
-                            MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to join game" + e.getMessage()).show();
+                            MessageBanner.makeBanner(LobbyActivity.this, MessageType.ERROR, "Failed to join game" + e.getMessage()).show();
                         }
                     });
     }
@@ -216,7 +214,7 @@ public class lobbyActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        MessageBanner.makeBanner(lobbyActivity.this, MessageType.ERROR, "Failed to reconnect: " + e.getMessage()).show();
+                        MessageBanner.makeBanner(LobbyActivity.this, MessageType.ERROR, "Failed to reconnect: " + e.getMessage()).show();
                         updateTryReconnect();
                     }
         });
