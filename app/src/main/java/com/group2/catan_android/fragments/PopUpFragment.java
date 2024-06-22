@@ -61,7 +61,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 break;
             case ROAD_BUILDING:
                 try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null));
+                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null), this::doOnServerError);
                 } catch (Exception e) {
                     MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
                     Log.d("ProgressCards", e.toString());
@@ -77,7 +77,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
                 break;
             case VICTORY_POINT:
                 try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null));
+                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null), this::doOnServerError);
                 } catch (Exception e) {
                     MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
                     Log.d("ProgressCards", e.toString());
@@ -111,5 +111,9 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
         gameActivity.makeAllRobberViewsClickableComingFromProgressCard();
         MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Choose the robber position!").show();
         closeFragment();
+    }
+
+    private void doOnServerError(Throwable t){
+        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }

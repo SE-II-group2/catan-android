@@ -181,8 +181,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void clickOnIntersection(int correctID) throws Exception {
         switch (lastButtonClicked){
-            case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID)); break;
-            case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID)); break;
+            case VILLAGE: movemaker.makeMove(new BuildVillageMoveDto(correctID), this::onServerError); break;
+            case CITY: movemaker.makeMove(new BuildCityMoveDto(correctID), this::onServerError); break;
             default: throw new Exception("Select the correct button to build a village or city!");
         }
     }
@@ -191,7 +191,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         if(lastButtonClicked != ButtonType.ROAD){
             throw new Exception("Select the correct button to build a road!");
         }
-        movemaker.makeMove(new BuildRoadMoveDto(correctID));
+        movemaker.makeMove(new BuildRoadMoveDto(correctID), this::onServerError);
     }
 
     private void clickOnRobber(int correctID) throws Exception {
@@ -222,7 +222,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         findViewById(R.id.endTurnButton).setOnClickListener(v -> {
             if (movemaker.hasRolled()) {
                 try {
-                    movemaker.makeMove(new EndTurnMoveDto());
+                    movemaker.makeMove(new EndTurnMoveDto(), this::onServerError);
                     movemaker.setHasRolled(false);
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -237,7 +237,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     Random random = new Random();
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
-                    movemaker.makeMove(new RollDiceDto(diceRoll));
+                    movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
                     movemaker.setHasRolled(true);
 
                 } catch (Exception e) {
@@ -290,8 +290,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto ->{
             tradeOfferFragment = new TradeOfferFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.tradeOfferFragment,tradeOfferFragment).commitNow();
-            tradeOfferFragment.setTradeOfferDto(tradeOfferDto);
+            getSupportFragmentManager().beginTransaction().replace(R.id.tradeOfferFragment,tradeOfferFragment).commit();
         });
     }
 
@@ -309,7 +308,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             break;
             case PROGRESS_CARD: {
                 try {
-                    movemaker.makeMove(new BuyProgressCardDto());
+                    movemaker.makeMove(new BuyProgressCardDto(), this::onServerError);
                 } catch (Exception e) {
                     MessageBanner.makeBanner(this, MessageType.ERROR, "Can't do that right now!").show();
                 }
@@ -338,6 +337,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     public void onDestroy(){
         super.onDestroy();
         gameEffectManager.release();
+        MoveMaker.getInstance().clear();
     }
 
     public void makeAllRobberViewsClickableComingFromProgressCard() {
@@ -355,12 +355,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             // TODO: temporary always true
             MoveRobberDto moveRobberDto = new MoveRobberDto(hexagonID, true);
             UseProgressCardDto useProgressCardDto = new UseProgressCardDto(ProgressCardType.KNIGHT, null, null);
-            movemaker.makeMove(moveRobberDto);
-            movemaker.makeMove(useProgressCardDto);
+            movemaker.makeMove(moveRobberDto, this::onServerError);
+            movemaker.makeMove(useProgressCardDto, this::onServerError);
         } catch (Exception e) {
             Log.d("Robber", "Fehler: " + e);
             MessageBanner.makeBanner(this, MessageType.ERROR, "An error occurred!" + e.getMessage()).show();
         }
     }
 
+    private void onServerError(Throwable t){
+        MessageBanner.makeBanner(this, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+    }
 }

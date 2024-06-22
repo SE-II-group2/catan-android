@@ -25,6 +25,8 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
 
@@ -69,13 +71,13 @@ public class PopUpFragmentTrading extends DialogFragment {
     private PlayerResourcesFragment playerResources;
     public void setUp(View view){
         setFragments();
-        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
+        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
             this.localPlayer = player;
             playerResources.setResources(localPlayer.getResources());
         });
 
-        PlayerListViewModel playerListViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
+        PlayerListViewModel playerListViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
         playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
             List<Player> playerList = new ArrayList<>(data);
             playerList.sort(Comparator.comparingInt(Player::getInGameID));
@@ -96,7 +98,7 @@ public class PopUpFragmentTrading extends DialogFragment {
     }
     public void setButtonsAndListeners(View view, List<Player> playerListOriginal) {
         List<Player> playerList = new ArrayList<>(playerListOriginal);
-        // get used Views
+        // get used View
         List<Button> playerButtons = new ArrayList<>();
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p1));
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p2));
@@ -166,10 +168,10 @@ public class PopUpFragmentTrading extends DialogFragment {
             }else {
                 //could check bank-trade, but it is server duty
                 try {
-                    MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayer));
+                    MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayer), this::onServerError);
                     //close Tradingpopup?
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
             // toPlayer ID = -1 -> nicht an ihn!
@@ -192,5 +194,9 @@ public class PopUpFragmentTrading extends DialogFragment {
         for(int i=0;i<giveResources.length;i++){
             giveResources[i]=-giveResources[i];
         }
+    }
+
+    private void onServerError(Throwable t){
+        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }

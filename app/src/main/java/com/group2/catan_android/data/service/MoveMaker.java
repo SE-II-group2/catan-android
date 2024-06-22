@@ -1,5 +1,7 @@
 package com.group2.catan_android.data.service;
 
+import android.util.Log;
+
 import com.group2.catan_android.data.exception.IllegalGameMoveException;
 import com.group2.catan_android.data.live.game.AcceptMoveDto;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
@@ -18,6 +20,8 @@ import com.group2.catan_android.gamelogic.enums.ResourceCost;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -29,8 +33,10 @@ public class MoveMaker {
     private final MoveSenderRepository moveSenderRepository = MoveSenderRepository.getInstance();
     private List<Player> players;
     private boolean isSetupPhase = true;
+
     private final CurrentGamestateRepository currentGamestateRepository = CurrentGamestateRepository.getInstance();
-    private final CompositeDisposable disposable;
+    private final CompositeDisposable liveInDisposable;
+    private final CompositeDisposable sendDisposable;
     private boolean hasRolled = false;
     private boolean hasPlacedVillageInSetupPhase = false;
     private String token;
@@ -39,12 +45,14 @@ public class MoveMaker {
 
     private MoveMaker() {
         board = new Board();
-        disposable = new CompositeDisposable();
+        liveInDisposable = new CompositeDisposable();
+        sendDisposable = new CompositeDisposable();
         setupListeners();
     }
 
     protected MoveMaker(Board board, Player localPlayer, List<Player> players, Player activePlayer) {
-        disposable = new CompositeDisposable();
+        liveInDisposable = new CompositeDisposable();
+        sendDisposable = new CompositeDisposable();
         this.board = board;
         this.localPlayer = localPlayer;
         this.players = players;
@@ -60,19 +68,24 @@ public class MoveMaker {
         return moveMakerInstance;
     }
 
-    public void makeMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    public void makeMove(GameMoveDto gameMove) throws IllegalGameMoveException{
+        makeMove(gameMove, null);
+    }
+    public void makeMove(GameMoveDto gameMove, @Nullable ServerErrorCallback serverErrorCallback) throws IllegalGameMoveException {
         if (gameMove instanceof MoveRobberDto) {
-            makeMoveRobberMove((MoveRobberDto) gameMove);
+            checkMoveRobberMove((MoveRobberDto) gameMove);
+            sendMove(gameMove, serverErrorCallback);
             return;
         }
         if (gameMove instanceof AccuseCheatingDto) {
             if (isSetupPhase)
                 throw new IllegalGameMoveException("Cant accuse someone of Cheating during the Setup Phase!");
-            sendMove(gameMove);
+            sendMove(gameMove, serverErrorCallback);
             return;
         }
         if(gameMove instanceof AcceptMoveDto) {
-            makeAcceptMove(gameMove);
+            checkAcceptMove((AcceptMoveDto) gameMove);
+            sendMove(gameMove, serverErrorCallback);
             return;
         }
         if (activePlayer.getInGameID() != localPlayer.getInGameID()) {
@@ -80,103 +93,98 @@ public class MoveMaker {
         }
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
-                makeRollDiceMove((RollDiceDto) gameMove);
+                checkRollDiceMove((RollDiceDto) gameMove);
+                hasRolled = true;
                 break;
             case "BuildRoadMoveDto":
-                makeBuildRoadMove(gameMove);
+                checkBuildRoadMove(gameMove);
+                hasPlacedVillageInSetupPhase = false;
                 break;
             case "BuildVillageMoveDto":
-                makeBuildVillageMove(gameMove);
+                checkBuildVillageMove(gameMove);
+                hasPlacedVillageInSetupPhase = true;
                 break;
             case "BuildCityMoveDto":
-                makeBuildCityMove(gameMove);
+                checkBuildCityMove(gameMove);
                 break;
             case "EndTurnMoveDto":
-                makeEndTurnMove(gameMove);
+                checkEndTurnMove(gameMove);
+                hasRolled = false;
                 break;
             case "BuyProgressCardDto":
-                makeBuyProgressCardMove(gameMove);
+                checkBuyProgressCardMove(gameMove);
                 break;
             case "UseProgressCardDto":
-                makeUseProgressCardMove(gameMove);
+                checkUseProgressCardMove(gameMove);
                 break;
             case "TradeMoveDto":
-                makeTradeMove(gameMove);
+                checkTradeMove(gameMove);
                 break;
             default:
                 throw new IllegalGameMoveException("Unknown Dto format");
         }
+        sendMove(gameMove, serverErrorCallback);
     }
 
-    private void makeAcceptMove(GameMoveDto gameMove)throws Exception{
+    private void checkAcceptMove(AcceptMoveDto gameMove)throws IllegalGameMoveException{
         if (isSetupPhase)
-            throw new Exception("Cant trade during setupphase");
-        sendMove(gameMove);
+            throw new IllegalGameMoveException("Cant trade during setupphase");
+        if(!localPlayer.resourcesSufficient(gameMove.getTradeOfferDto().getGiveResources()))
+            throw new IllegalGameMoveException("Not enough Resources to accept the trade");
     }
-    private void makeTradeMove(GameMoveDto gameMove) throws Exception {
+    private void checkTradeMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new Exception("Cant trade during setupphase");
-        sendMove(gameMove);
+            throw new IllegalGameMoveException("Cant trade during setupphase");
     }
 
-    private void makeMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
+    private void checkMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
         if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHasRobber())
             throw new IllegalGameMoveException("Cant move the Robber to the same Hexagon it is currently in!");
-        sendMove(robberDto);
     }
 
-    private void makeEndTurnMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkEndTurnMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("End your turn during setup phase by placing a village and a road!");
-        sendMove(gameMove);
-        hasRolled = false;
     }
 
-    private void makeBuildVillageMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkBuildVillageMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase && hasPlacedVillageInSetupPhase)
             throw new IllegalGameMoveException("Already placed a village during your turn!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.VILLAGE.getCost()))
             throw new IllegalGameMoveException("Not enough resources to build a Village!");
         if (!board.addNewVillage(localPlayer, ((BuildVillageMoveDto) gameMove).getIntersectionID()))
             throw new IllegalGameMoveException("Can't build a Village here!");
-        hasPlacedVillageInSetupPhase = true;
-        sendMove(gameMove);
     }
 
-    private void makeBuildRoadMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkBuildRoadMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase && !hasPlacedVillageInSetupPhase)
             throw new IllegalGameMoveException("Place a Village first during the setup phase!");
         if (!isSetupPhase && !localPlayer.resourcesSufficient(ResourceCost.ROAD.getCost()))
             throw new IllegalGameMoveException("Not enough resources to build a Road!");
         if (!board.addNewRoad(localPlayer, ((BuildRoadMoveDto) gameMove).getConnectionID()))
             throw new IllegalGameMoveException("Can't build a road here!");
-        hasPlacedVillageInSetupPhase = false;
-        sendMove(gameMove);
     }
 
-    private void makeRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
+    private void checkRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant roll the Dice during SetupPhase");
         if (hasRolled) throw new IllegalGameMoveException("Has already Rolled the dice this turn");
-        sendMove(gameMove);
-        hasRolled = true;
     }
 
-    private void makeBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Can't buy progress-card during setup phase");
         if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
             throw new IllegalGameMoveException("Not enough resources");
         }
-        localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
-        sendMove(gameMove);
+        //localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
     }
 
-    private void makeUseProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkUseProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         UseProgressCardDto useProgressCardDto = (UseProgressCardDto) gameMove;
         if (isSetupPhase) {
             throw new IllegalGameMoveException("Can't use progress-card during setup phase");
@@ -184,17 +192,15 @@ public class MoveMaker {
         if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())) {
             throw new IllegalGameMoveException("Card type not in possession");
         }
-        localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
-        sendMove(gameMove);
+        //localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
     }
-    private void makeBuildCityMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkBuildCityMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("It is not possible to place cities during setup phase!");
         if (!localPlayer.resourcesSufficient(ResourceCost.CITY.getCost()))
             throw new IllegalGameMoveException("Not enough resources to build a City!");
         if (!board.addNewCity(localPlayer, ((BuildCityMoveDto) gameMove).getIntersectionID()))
             throw new IllegalGameMoveException("Can't build a city here!");
-        sendMove(gameMove);
     }
 
     void setupListeners() {
@@ -208,14 +214,25 @@ public class MoveMaker {
                 });
         Disposable localPlayerDisposable = currentGamestateRepository.getCurrentLocalPlayerObservable()
                 .subscribeOn(Schedulers.io())
-                .subscribe(localPlayer -> this.localPlayer = localPlayer);
+                .subscribe(player -> localPlayer = player);
 
-        disposable.add(gameStateDisposable);
-        disposable.add(localPlayerDisposable);
+        liveInDisposable.add(gameStateDisposable);
+        liveInDisposable.add(localPlayerDisposable);
     }
 
-    protected void sendMove(GameMoveDto gameMoveDto) {
-        moveSenderRepository.sendMove(gameMoveDto, token).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+    protected void sendMove(GameMoveDto gameMoveDto, ServerErrorCallback serverErrorCallback) {
+        Disposable d =  moveSenderRepository.sendMove(gameMoveDto, token)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(()->{},
+                        throwable -> {
+                            if(serverErrorCallback != null){
+                                serverErrorCallback.onServerError(throwable);
+                            }else{
+                                Log.e("GameServer", "Unhandled Server error", throwable.getCause());
+                            }
+                        });
+        sendDisposable.add(d);
     }
 
     public boolean hasRolled() {
@@ -228,6 +245,13 @@ public class MoveMaker {
 
     public void setHasRolled(boolean hasRolled) {
         this.hasRolled = hasRolled;
+    }
+
+    public void clear(){
+        liveInDisposable.dispose();
+        liveInDisposable.clear();
+        sendDisposable.dispose();
+        sendDisposable.clear();
     }
 }
 

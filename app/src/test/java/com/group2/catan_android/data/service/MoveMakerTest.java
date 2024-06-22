@@ -59,7 +59,7 @@ public class MoveMakerTest {
         moveMaker = spy(new MoveMaker(board, localPlayer, playerList, localPlayer));
 
         // Mock the sendMove method to do nothing
-        doNothing().when(moveMaker).sendMove(any());
+        doNothing().when(moveMaker).sendMove(any(), any());
         String token = "token";
         moveMaker.setToken(token);
 
@@ -83,7 +83,7 @@ public class MoveMakerTest {
         GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
         moveMaker.makeMove(move); // This should succeed
         assert (moveMaker.hasRolled());
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class MoveMakerTest {
     void testMakeBuildVillageMoveSuccess() {
         BuildVillageMoveDto move = new BuildVillageMoveDto(31);
         moveMaker.makeMove(move); // This should succeed
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 
 
@@ -134,7 +134,7 @@ public class MoveMakerTest {
 
         BuildRoadMoveDto roadMove = new BuildRoadMoveDto(0);
         moveMaker.makeMove(roadMove);
-        verify(moveMaker, times(2)).sendMove(any());
+        verify(moveMaker, times(2)).sendMove(any(), any());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class MoveMakerTest {
         EndTurnMoveDto endTurnMoveDto = new EndTurnMoveDto();
         moveMaker.makeMove(endTurnMoveDto);
 
-        verify(moveMaker, times(1)).sendMove(any());
+        verify(moveMaker, times(1)).sendMove(any(), any());
     }
 
     @Test
@@ -201,7 +201,7 @@ public class MoveMakerTest {
         moveMaker.makeMove(moveRobberMove);
         moveRobberMove = new MoveRobberDto(15, false);
         moveMaker.makeMove(moveRobberMove);
-        verify(moveMaker, times(2)).sendMove(any());
+        verify(moveMaker, times(2)).sendMove(any(), any());
     }
 
     @Test
@@ -217,7 +217,7 @@ public class MoveMakerTest {
         isSetupPhaseField.set(moveMaker, false);
         AccuseCheatingDto accuseCheatingDto = new AccuseCheatingDto();
         moveMaker.makeMove(accuseCheatingDto);
-        verify(moveMaker, times(1)).sendMove(accuseCheatingDto);
+        verify(moveMaker, times(1)).sendMove(accuseCheatingDto, null);
     }
 
     @Test
@@ -254,7 +254,7 @@ public class MoveMakerTest {
 
         BuildCityMoveDto move = new BuildCityMoveDto(0);
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
     @Test
     void testMakeBuyProgressCardMoveDuringSetupPhaseThrowsError() {
@@ -273,7 +273,7 @@ public class MoveMakerTest {
         playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
         GameMoveDto move = new BuyProgressCardDto();
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
     @Test
     void testMakeUseProgressCardMoveDuringSetupPhase() {
@@ -293,7 +293,7 @@ public class MoveMakerTest {
         playerList.get(0).getProgressCards().add(ProgressCardType.VICTORY_POINT);
         GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null);
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 }
 
