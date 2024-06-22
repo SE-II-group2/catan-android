@@ -93,7 +93,7 @@ public class YearOfPlentyFragment extends PopUpFragment {
     }
     private void useProgressCard(List<ResourceDistribution> resources){
         try {
-            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.YEAR_OF_PLENTY, resources, null));
+            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.YEAR_OF_PLENTY, resources, null, 0));
         } catch (Exception e) {
             MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
             Log.d("ProgressCards", e.toString());

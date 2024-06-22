@@ -25,7 +25,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="20dp"
         android:scaleType="fitCenter"
-        app:layout_constraintEnd_toStartOf="@+id/imageView2"
+        app:layout_constraintEnd_toStartOf="@+id/imageView5"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
@@ -35,10 +35,10 @@
         android:id="@+id/imageView2"
         android:layout_width="80dp"
         android:layout_height="70dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toStartOf="@+id/imageView3"
+        app:layout_constraintEnd_toStartOf="@+id/imageView4"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
         app:srcCompat="@drawable/icon_sheep" />
 
     <ImageView
@@ -46,30 +46,30 @@
         android:layout_width="123dp"
         android:layout_height="70dp"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-        app:layout_constraintEnd_toStartOf="@+id/imageView5"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
         app:srcCompat="@drawable/icon_stone" />
 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="105dp"
         android:layout_height="70dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageView3"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
         app:srcCompat="@drawable/icon_wheat" />
 
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="100dp"
         android:layout_height="70dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-        app:layout_constraintEnd_toStartOf="@+id/imageView4"
+        app:layout_constraintEnd_toStartOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
         app:srcCompat="@drawable/icon_brick" />
 
     <ImageButton
@@ -163,45 +163,56 @@
         android:id="@+id/downSheep"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/downWood"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/upSheep"
         app:layout_constraintStart_toStartOf="@+id/upSheep"
+        app:layout_constraintTop_toBottomOf="@+id/sheepText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/downStone"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/downWood"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/upStone"
         app:layout_constraintStart_toStartOf="@+id/upStone"
+        app:layout_constraintTop_toBottomOf="@+id/stoneText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/downBrick"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/downWood"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/upBrick"
         app:layout_constraintStart_toStartOf="@+id/upBrick"
+        app:layout_constraintTop_toBottomOf="@+id/brickText"
         app:srcCompat="@drawable/arrow_right" />
 
     <ImageButton
         android:id="@+id/doneWheat"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:rotation="90"
         android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="@+id/downWood"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/upWheat"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/upWheat"
+        app:layout_constraintTop_toBottomOf="@+id/wheatText"
         app:srcCompat="@drawable/arrow_right" />
 
     <TextView
