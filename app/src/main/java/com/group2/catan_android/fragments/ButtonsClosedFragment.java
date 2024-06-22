@@ -80,7 +80,6 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         });
 
         cards.setOnClickListener(v -> {
-            setButtonBorders(v);
             PopUpFragment popUpFragment = new PopUpFragment();
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             popUpFragment.show(fragmentManager, "popup_fragment");

@@ -210,12 +210,10 @@ public class BoardUnitTests {
 
     @Test
     void testGetAdjacencyMatrixCorrectRetrieval() {
-        Board board = new Board();
         Connection[][] matrix = board.getAdjacencyMatrix();
-
         assertNotNull(matrix);
         assertEquals(54, matrix.length);
-        assertTrue(matrix[0][1] instanceof Connection || matrix[0][1] == null);
+        assertTrue(matrix[0][1] != null || matrix[0][1] == null);
     }
 
     @Test

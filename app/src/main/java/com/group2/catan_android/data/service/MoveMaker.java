@@ -150,9 +150,9 @@ public class MoveMaker {
 
     private void makeBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new IllegalGameMoveException("Can't buy progress-card during setup phase");
+            throw new IllegalGameMoveException("Can't buy progress cards during setup phase!");
         if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
-            throw new IllegalGameMoveException("Not enough resources");
+            throw new IllegalGameMoveException("Not enough resources!");
         }
         localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
         sendMove(gameMove);

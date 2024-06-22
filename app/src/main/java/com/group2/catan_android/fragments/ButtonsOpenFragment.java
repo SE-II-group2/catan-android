@@ -84,13 +84,11 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
             village.setBackgroundResource(0);
             city.setBackgroundResource(0);
             road.setBackgroundResource(0);
-            progressCard.setBackgroundResource(0);
 
             switch(button){
                 case ROAD: road.setBackgroundResource(R.drawable.button_clicked_border); break;
                 case VILLAGE: village.setBackgroundResource(R.drawable.button_clicked_border); break;
                 case CITY: city.setBackgroundResource(R.drawable.button_clicked_border);break;
-                case PROGRESS_CARD: progressCard.setBackgroundResource(R.drawable.button_clicked_border); break;
                 default: //do nothing
             }
 
@@ -100,7 +98,6 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
             village.setBackgroundResource(0);
             city.setBackgroundResource(0);
             road.setBackgroundResource(0);
-            progressCard.setBackgroundResource(0);
             activeButton = null;
         }
 

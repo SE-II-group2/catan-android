@@ -8,10 +8,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,7 +24,6 @@ import com.group2.catan_android.data.repository.token.TokenRepository;
 import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
-
 
 import java.util.List;
 
@@ -79,32 +76,21 @@ public class LobbyActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         requestActiveGames();
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playerName = playerNameEditText.getText().toString();
-                joinGame(false);
-                Log.d("LobbyActivity", "Connect button pressed with playername: " + playerName + "and gameID: " + selectedGameID);
-                requestActiveGames();
-            }
+        connectButton.setOnClickListener(v -> {
+            playerName = playerNameEditText.getText().toString();
+            joinGame(false);
+            Log.d("LobbyActivity", "Connect button pressed with playername: " + playerName + "and gameID: " + selectedGameID);
+            requestActiveGames();
         });
 
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playerName = playerNameEditText.getText().toString();
-                joinGame(true);
-                requestActiveGames();
-                Log.d("LobbyActivity", "Create button pressed with playername: " + playerName);
-            }
+        createButton.setOnClickListener(v -> {
+            playerName = playerNameEditText.getText().toString();
+            joinGame(true);
+            requestActiveGames();
+            Log.d("LobbyActivity", "Create button pressed with playername: " + playerName);
         });
 
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestActiveGames();
-            }
-        });
+        refreshButton.setOnClickListener(v -> requestActiveGames());
 
         updateTryReconnect();
         tryReconnectButton.setOnClickListener(v -> tryReconnect());
@@ -139,7 +125,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     private void joinGame(boolean create) {
         GameController gc = GameController.getInstance();
-        String playerName = playerNameEditText.getText().toString().trim();
+        playerName = playerNameEditText.getText().toString().trim();
         if (playerName.isEmpty()) {
             MessageBanner.makeBanner(this, MessageType.ERROR, "Player Name is required").show();
             return;
