@@ -348,6 +348,7 @@ public class UiDrawer extends AppCompatActivity {
         for(ImageView possibleMoveView : possibleMovesViews){
             possibleMoveView.setVisibility(View.INVISIBLE);
             possibleMoveView.setClickable(false);
+            possibleMoveView.bringToFront();
             possibleMoveView.clearAnimation();
         }
     }

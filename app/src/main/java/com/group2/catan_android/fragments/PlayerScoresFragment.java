@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.Player;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class PlayerScoresFragment extends Fragment {
@@ -68,6 +69,20 @@ public class PlayerScoresFragment extends Fragment {
             if(playerList.get(i).isActive()){
                 Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");
                 activePlayerViews[i].setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void setFinalScores(List<Player> playerList){
+        playerList.sort(Comparator.comparingInt(Player::getVictoryPoints));
+        hideActivePlayerIndicators();
+
+        for(int i = 0; i < playerList.size(); i++){
+            String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
+            playerScoreViews[i].setText(playerScore);
+
+            if(i == 0){
+                playerScoreViews[i].setTextColor(0xFF1aff00);
             }
         }
     }
