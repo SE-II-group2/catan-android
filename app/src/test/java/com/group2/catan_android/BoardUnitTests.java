@@ -22,7 +22,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-public class BoardUnitTests {
+class BoardUnitTests {
 
     private Board board;
 

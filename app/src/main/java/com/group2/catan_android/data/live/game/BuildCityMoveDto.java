@@ -18,6 +18,6 @@ public class BuildCityMoveDto extends GameMoveDto{
         this.intersectionID = intersectionID;
     }
 
-    public int intersectionID;
+    private int intersectionID;
 }
 
