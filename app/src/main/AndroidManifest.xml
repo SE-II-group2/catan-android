@@ -19,11 +19,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".InLobby"
+            android:name=".InLobbyActivity"
             android:exported="false"
             android:theme="@style/Theme.Catan_android" />
         <activity
-            android:name=".lobbyActivity"
+            android:name=".LobbyActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".GameOverActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity

@@ -23,7 +23,7 @@
         <FrameLayout
             android:id="@+id/helpFragment"
             android:layout_width="227dp"
-            android:layout_height="209dp"
+            android:layout_height="309dp"
             android:layout_marginStart="95dp"
             android:layout_marginTop="0dp"></FrameLayout>
     </FrameLayout>
@@ -103,8 +103,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/endTurnButton"
-        app:srcCompat="@drawable/robber" />
+        app:srcCompat="@drawable/thief_svgrepo_com" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <!--android:name="com.group2.catan_android.buttonsOpenFragmentagment"-->

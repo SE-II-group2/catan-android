@@ -11,7 +11,7 @@ import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.objects.*;
 import com.group2.catan_android.gamelogic.enums.*;
 
-public class BuildingUnitTest {
+class BuildingUnitTest {
 
     private Player player1;
     private Player player2;
@@ -26,7 +26,7 @@ public class BuildingUnitTest {
     }
 
     @Test
-    public void testBuildingPlayerID() {
+    void testBuildingPlayerID() {
         Building building1 = new Building(player1, BuildingType.VILLAGE,1);
         Building building2 = new Building(player2, BuildingType.CITY,2);
 

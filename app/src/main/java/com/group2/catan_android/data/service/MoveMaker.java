@@ -66,7 +66,7 @@ public class MoveMaker {
         }
         if (gameMove instanceof AccuseCheatingDto) {
             if (isSetupPhase)
-                throw new IllegalGameMoveException("Cant accuse someone of Cheating during the Setup Phase!");
+                throw new IllegalGameMoveException("Can't accuse someone of cheating during the Setup Phase!");
             sendMove(gameMove);
             return;
 
@@ -103,7 +103,7 @@ public class MoveMaker {
 
     private void makeMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new IllegalGameMoveException("Cant move the Robber during the setup phase!");
+            throw new IllegalGameMoveException("Can't move the Robber during the setup phase!");
         if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHavingRobber())

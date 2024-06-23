@@ -23,7 +23,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class InLobby extends AppCompatActivity {
+public class InLobbyActivity extends AppCompatActivity {
     private ActivityInLobbyBinding binding;
     private PlayerListAdapter adapter;
     private InLobbyViewModel mViewModel;

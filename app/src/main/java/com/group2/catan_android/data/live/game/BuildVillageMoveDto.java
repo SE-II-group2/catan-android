@@ -19,6 +19,6 @@ public class BuildVillageMoveDto extends GameMoveDto {
         this.intersectionID = intersectionID;
     }
 
-    public int intersectionID;
+    private int intersectionID;
 }
 
