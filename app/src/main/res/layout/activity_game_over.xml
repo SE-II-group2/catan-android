@@ -48,7 +48,7 @@
         android:layout_width="292dp"
         android:layout_height="58dp"
         android:fontFamily="sans-serif-medium"
-        android:gravity="right"
+        android:gravity="center"
         android:text="Final Scores"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"

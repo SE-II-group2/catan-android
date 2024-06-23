@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,14 +76,27 @@ public class PlayerScoresFragment extends Fragment {
 
     public void setFinalScores(List<Player> playerList){
         playerList.sort(Comparator.comparingInt(Player::getVictoryPoints).reversed());
-        hideActivePlayerIndicators();
 
         for(int i = 0; i < playerList.size(); i++){
+            activePlayerViews[i].setVisibility(View.VISIBLE);
+
             String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
-            playerScoreViews[i].setTextColor(0xFFFFFFFF);
-            if(i == 0){
-                playerScoreViews[i].setTextColor(0xFF1aff00);
+            playerScoreViews[i].setGravity(Gravity.CENTER);
+
+            switch (i){
+                case 0: activePlayerViews[i].setColorFilter(0xFFFFD700);
+                    playerScoreViews[i].setTextColor(0xFFFFD700);
+                    break;
+                case 1: activePlayerViews[i].setColorFilter(0xFFC0C0C0);
+                    playerScoreViews[i].setTextColor(0xFFC0C0C0);
+                    break;
+                case 2: activePlayerViews[i].setColorFilter(0xFFCD7F32);
+                    playerScoreViews[i].setTextColor(0xFFCD7F32);
+                    break;
+                default: activePlayerViews[i].setColorFilter(0xFFFFFFFF);
+                    playerScoreViews[i].setTextColor(0xFFFFFFFF);
+                    break;
             }
         }
     }
