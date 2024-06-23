@@ -329,6 +329,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         boardViewModel.getBoardMutableLiveData().observe(this, board -> {
             this.board = board;
             uiDrawer.updateUiBoard(board);
+            currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
         });
 
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
