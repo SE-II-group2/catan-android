@@ -32,6 +32,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField('String', 'BASE_GAME_URL', '"http://se2-demo.aau.at:53206/catan/game/"')
+            buildConfigField('String', 'SOCKET_URL', '"ws://se2-demo.aau.at:53206/catan"')
+            signingConfig signingConfigs.debug
         }
 
         emulator {
@@ -46,8 +49,8 @@ android {
             //define your own here
             minifyEnabled false
             debuggable true
-            buildConfigField('String', 'BASE_GAME_URL', '"http://192.168.178.24:8080/catan/game/"')
-            buildConfigField('String', 'SOCKET_URL', '"ws://192.168.178.24:8080/catan"')
+            buildConfigField('String', 'BASE_GAME_URL', '"http://10.0.1.146:8080/catan/game/"')
+            buildConfigField('String', 'SOCKET_URL', '"ws://10.0.1.146:8080/catan"')
             signingConfig signingConfigs.debug
         }
     }
