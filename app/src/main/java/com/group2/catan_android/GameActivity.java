@@ -277,6 +277,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 try {
                     movemaker.makeMove(new EndTurnMoveDto());
                     movemaker.setHasRolled(false);
+                    currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
                 } catch (Exception e) {
                     MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
@@ -298,6 +299,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     }
                     movemaker.makeMove(new RollDiceDto(diceRoll));
                     movemaker.setHasRolled(true);
+                    currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
                 } catch (Exception e) {
                     MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }

@@ -82,6 +82,7 @@ public class UiDrawer extends AppCompatActivity {
 
     public void updateUiBoard(Board board) {
         removeAllPossibleMovesFromUI();
+
         updatePossibleMoves();
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
