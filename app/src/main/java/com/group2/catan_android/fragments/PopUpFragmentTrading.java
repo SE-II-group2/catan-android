@@ -1,5 +1,6 @@
 package com.group2.catan_android.fragments;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,11 +26,9 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.model.SelectablePlayer;
 import com.group2.catan_android.data.service.MoveMaker;
-import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
-import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import com.group2.catan_android.viewmodel.TradePopUpViewModel;
 
 import java.util.ArrayList;
@@ -77,6 +77,8 @@ public class PopUpFragmentTrading extends DialogFragment {
     private PlayerResourcesFragment playerResources;
     private List<Button> playerButtons;
     private Button bankButton;
+
+    private Context serverErrorContext;
     public void setUp(View view){
         setFragments();
         tradePopUpViewModel.selectAll();
@@ -157,6 +159,14 @@ public class PopUpFragmentTrading extends DialogFragment {
     }
 
     private void onServerError(Throwable t){
-        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+        if(serverErrorContext == null) return;
+        if(serverErrorContext instanceof FragmentActivity)
+            MessageBanner.makeBanner((FragmentActivity) serverErrorContext, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+        else
+            Toast.makeText(serverErrorContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void setServerErrorContext(Context c){
+        this.serverErrorContext = c;
     }
 }
