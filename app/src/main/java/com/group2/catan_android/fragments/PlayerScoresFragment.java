@@ -74,13 +74,13 @@ public class PlayerScoresFragment extends Fragment {
     }
 
     public void setFinalScores(List<Player> playerList){
-        playerList.sort(Comparator.comparingInt(Player::getVictoryPoints));
+        playerList.sort(Comparator.comparingInt(Player::getVictoryPoints).reversed());
         hideActivePlayerIndicators();
 
         for(int i = 0; i < playerList.size(); i++){
             String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
             playerScoreViews[i].setText(playerScore);
-
+            playerScoreViews[i].setTextColor(0xFFFFFFFF);
             if(i == 0){
                 playerScoreViews[i].setTextColor(0xFF1aff00);
             }
