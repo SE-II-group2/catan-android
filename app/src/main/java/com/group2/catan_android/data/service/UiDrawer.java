@@ -82,6 +82,7 @@ public class UiDrawer extends AppCompatActivity {
 
     public void updateUiBoard(Board board) {
         removeAllPossibleMovesFromUI();
+
         updatePossibleMoves();
 
         Connection[][] adjacencyMatrix = board.getAdjacencyMatrix();
@@ -348,6 +349,7 @@ public class UiDrawer extends AppCompatActivity {
         for(ImageView possibleMoveView : possibleMovesViews){
             possibleMoveView.setVisibility(View.INVISIBLE);
             possibleMoveView.setClickable(false);
+            possibleMoveView.bringToFront();
             possibleMoveView.clearAnimation();
         }
     }

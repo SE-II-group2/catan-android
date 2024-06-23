@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -7,7 +8,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,9 +21,11 @@ import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.BuyProgressCardDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
+import com.group2.catan_android.data.live.game.GameOverDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
+import com.group2.catan_android.data.service.StompManager;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.TradeOfferFragment;
@@ -49,6 +51,8 @@ import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import com.group2.catan_android.viewmodel.TradeViewModel;
 
 import java.util.Random;
+
+import io.reactivex.disposables.Disposable;
 
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
@@ -79,9 +83,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private GameEffectManager gameEffectManager;
     private boolean hasRolledSeven = false;
     private boolean hasUsedProgressCard = false;
+    private ImageView endTurnButton;
 
-    // List of views
-    ImageView[] robberViews;
+
+    Disposable gameOverDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +116,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         setupDiceRollButton();
 
         setupAccuseCheatingButton();
+
+
+        gameOverDisposable = StompManager.getInstance().filterByType(GameOverDto.class).subscribe((gameOverDto -> navigateToGameOverActivity()));
+    }
+
+    private void navigateToGameOverActivity() {
+        Intent i = new Intent(getApplicationContext(), GameOverActivity.class);
+        startActivity(i);
+        finish();
     }
 
 
@@ -132,7 +146,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void createViews(ConstraintLayout constraintLayout) {
         ImageView[] hexagonViews = setupViews(constraintLayout, TOTAL_HEXAGONS, HEXAGON_WIDTH, HEXAGON_HEIGHT, 0, null);
         TextView[] rollValueViews = setupRollValueViews(constraintLayout);
-        robberViews = setupViews(constraintLayout, TOTAL_HEXAGONS, HEXAGON_HEIGHT / 3, HEXAGON_HEIGHT / 3, TOTAL_HEXAGONS * 2, ClickableElement.ROBBER);
+        ImageView[] robberViews = setupViews(constraintLayout, TOTAL_HEXAGONS, HEXAGON_HEIGHT / 3, HEXAGON_HEIGHT / 3, TOTAL_HEXAGONS * 2, ClickableElement.ROBBER);
         ImageView[] connectionViews = setupViews(constraintLayout, TOTAL_CONNECTIONS, CONNECTION_SIZE, CONNECTION_SIZE, TOTAL_HEXAGONS * 3, ClickableElement.CONNECTION);
         ImageView[] intersectionViews = setupViews(constraintLayout, TOTAL_INTERSECTIONS, INTERSECTION_SIZE, INTERSECTION_SIZE, (TOTAL_HEXAGONS * 3 + TOTAL_CONNECTIONS), ClickableElement.INTERSECTION);
 
@@ -220,6 +234,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             hasRolledSeven = false;
             uiDrawer.setHasRolledSeven(false);
             uiDrawer.removeAllPossibleMovesFromUI();
+            endTurnButton.setClickable(true);
             return;
         } else if (hasUsedProgressCard) {
             movemaker.makeMove(new UseProgressCardDto(ProgressCardType.KNIGHT, null, null, correctID));
@@ -259,13 +274,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void setupEndTurnButton() {
-        findViewById(R.id.endTurnButton).setOnClickListener(v -> {
+        endTurnButton = findViewById(R.id.endTurnButton);
+        endTurnButton.setOnClickListener(v -> {
             if (movemaker.hasRolled()) {
                 try {
                     movemaker.makeMove(new EndTurnMoveDto(), this::onServerError);
                     movemaker.setHasRolled(false);
+                    currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
             }
         });
@@ -278,14 +295,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     Random random = new Random();
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
                     if (diceRoll == 7) {
+                        endTurnButton.setClickable(false);
                         hasRolledSeven = true;
                         uiDrawer.setHasRolledSeven(true);
                         uiDrawer.showPossibleMoves(ButtonType.ROBBER);
                     }
                     movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
                     movemaker.setHasRolled(true);
+                    currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
             }
         });
@@ -293,9 +312,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void setupAccuseCheatingButton() {
         findViewById(R.id.accuseCheatingButton).setOnClickListener(v -> {
-            movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()));
-            uiDrawer.removeAllPossibleMovesFromUI();
-            lastButtonClicked = null;
+            try{
+                movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()), this::onServerError);
+                uiDrawer.removeAllPossibleMovesFromUI();
+                lastButtonClicked = null;
+            } catch (Exception e) {
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+            }
         });
     }
 
@@ -310,6 +333,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         boardViewModel.getBoardMutableLiveData().observe(this, board -> {
             this.board = board;
             uiDrawer.updateUiBoard(board);
+            currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
         });
 
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
@@ -367,6 +391,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 uiDrawer.removeAllPossibleMovesFromUI();
                 try {
                     movemaker.makeMove(new BuyProgressCardDto(), this::onServerError);
+                    MessageBanner.makeBanner(this, MessageType.INFO, "You received a random card. Check your inventory!").show();
                 } catch (Exception e) {
                     MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }

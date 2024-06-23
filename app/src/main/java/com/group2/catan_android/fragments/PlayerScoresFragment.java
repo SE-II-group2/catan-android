@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.Player;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class PlayerScoresFragment extends Fragment {
@@ -68,6 +70,33 @@ public class PlayerScoresFragment extends Fragment {
             if(playerList.get(i).isActive()){
                 Log.d("Scores","activePlayer " + playerList.get(i).getDisplayName() + "setVisible");
                 activePlayerViews[i].setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void setFinalScores(List<Player> playerList){
+        playerList.sort(Comparator.comparingInt(Player::getVictoryPoints).reversed());
+
+        for(int i = 0; i < playerList.size(); i++){
+            activePlayerViews[i].setVisibility(View.VISIBLE);
+
+            String playerScore = playerList.get(i).getDisplayName() + ": " + playerList.get(i).getVictoryPoints();
+            playerScoreViews[i].setText(playerScore);
+            playerScoreViews[i].setGravity(Gravity.CENTER);
+
+            switch (i){
+                case 0: activePlayerViews[i].setColorFilter(0xFFFFD700);
+                    playerScoreViews[i].setTextColor(0xFFFFD700);
+                    break;
+                case 1: activePlayerViews[i].setColorFilter(0xFFC0C0C0);
+                    playerScoreViews[i].setTextColor(0xFFC0C0C0);
+                    break;
+                case 2: activePlayerViews[i].setColorFilter(0xFFCD7F32);
+                    playerScoreViews[i].setTextColor(0xFFCD7F32);
+                    break;
+                default: activePlayerViews[i].setColorFilter(0xFFFFFFFF);
+                    playerScoreViews[i].setTextColor(0xFFFFFFFF);
+                    break;
             }
         }
     }

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         logo.startAnimation(AnimationUtils.loadAnimation(this, R.anim.grow_animation));
 
         Button lobby = findViewById(R.id.lobbyActivityButton);
-        lobby.setOnClickListener(v -> navigate(lobbyActivity.class));
+        lobby.setOnClickListener(v -> navigate(LobbyActivity.class));
         lobby.startAnimation(AnimationUtils.loadAnimation(this,R.anim.blink_animation));
 
     }
