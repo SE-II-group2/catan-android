@@ -102,4 +102,20 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         cards.setBackgroundResource(0);
         trade.setBackgroundResource(0);
     }
+
+    public void makeButtonsUnclickable(){
+        build.setClickable(false);
+        cards.setClickable(false);
+        help.setClickable(false);
+        trade.setClickable(false);
+        buttonsOpenFragment.makeButtonsUnclickable();
+    }
+
+    public void makeButtonsClickable(){
+        build.setClickable(true);
+        cards.setClickable(true);
+        help.setClickable(true);
+        trade.setClickable(true);
+        buttonsOpenFragment.makeButtonsClickable();
+    }
 }

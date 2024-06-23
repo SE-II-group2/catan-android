@@ -192,7 +192,7 @@ public class UiDrawer extends AppCompatActivity {
     }
 
     public void updateUiPlayerResources(PlayerResourcesFragment playerResourcesFragment, Player player) {
-        playerResourcesFragment.updateResources(player);
+        playerResourcesFragment.updateResources(player.getResources());
     }
 
     public void updateUiPlayerScores(PlayerScoresFragment playerScoresFragment, List<Player> players){
