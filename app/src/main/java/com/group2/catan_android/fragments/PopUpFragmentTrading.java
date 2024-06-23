@@ -1,7 +1,5 @@
 package com.group2.catan_android.fragments;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 
@@ -19,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.R;
@@ -33,12 +32,18 @@ import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import com.group2.catan_android.viewmodel.TradePopUpViewModel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 
 public class PopUpFragmentTrading extends DialogFragment {
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        tradePopUpViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(TradePopUpViewModel.initializer)).get(TradePopUpViewModel.class);
+        localPlayerViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
+    }
 
     @Nullable
     @Override
@@ -63,12 +68,10 @@ public class PopUpFragmentTrading extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setUp(view);
+        setUp(view); //TODO: Use saved instance like in Trade Offer Fragment
     }
     private TradePopUpViewModel tradePopUpViewModel;
     private LocalPlayerViewModel localPlayerViewModel;
-    private PlayerListViewModel playerListViewModel;
-    private Player localPlayer;
     private TradingResourceSelectionFragment giveResourceFragment;
     private TradingResourceSelectionFragment getResourceFragment;
     private PlayerResourcesFragment playerResources;
@@ -76,38 +79,43 @@ public class PopUpFragmentTrading extends DialogFragment {
     private Button bankButton;
     public void setUp(View view){
         setFragments();
-        tradePopUpViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(TradePopUpViewModel.initializer)).get(TradePopUpViewModel.class);
-
-        observeLiveData();
+        tradePopUpViewModel.selectAll();
         playerButtons = new ArrayList<>();
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p1));
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p2));
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p3));
         for(int i=0;i<playerButtons.size();i++){
             final int j = i;
-            playerButtons.get(i).setOnClickListener(v -> {
-                tradePopUpViewModel.togglePlayer(j);
-            });
+            playerButtons.get(i).setOnClickListener(v -> tradePopUpViewModel.togglePlayer(j));
         }
+
         bankButton = view.findViewById(R.id.trading_popup_bank_button);
+        bankButton.setOnClickListener(v -> tradePopUpViewModel.deselectAll());
+
         Button confirm = view.findViewById(R.id.trading_popup_confirm);
+        confirm.setOnClickListener(v -> confirm());
 
 
+        observeLiveData();
     }
     public void setFragments(){
         this.giveResourceFragment = new TradingResourceSelectionFragment();
         this.getResourceFragment = new TradingResourceSelectionFragment();
         this.playerResources = new PlayerResourcesFragment();
         FragmentManager manager = getChildFragmentManager();
-        manager.beginTransaction().add(R.id.trading_popup_topfragment, giveResourceFragment).commitNow();
-        manager.beginTransaction().add(R.id.trading_popup_middlefragment, getResourceFragment).commitNow();
-        manager.beginTransaction().add(R.id.trading_popup_bottomfragment,playerResources).commitNow();
+        manager.beginTransaction().replace(R.id.trading_popup_topfragment, giveResourceFragment).commit();
+        manager.beginTransaction().replace(R.id.trading_popup_middlefragment, getResourceFragment).commit();
+        manager.beginTransaction().replace(R.id.trading_popup_bottomfragment,playerResources).commit();
     }
     private void observeLiveData(){
-        tradePopUpViewModel.getSelectablePlayerMutableLiveData().observe(requireActivity(), this::updateButtons);
+        tradePopUpViewModel.getSelectablePlayerMutableLiveData().observe(getViewLifecycleOwner(), this::updateButtons);
+        localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), playerResources::updateResources);
     }
     private void updateButtons(List<SelectablePlayer> selectablePlayers){
         boolean atLeastOneSelected = false;
+        for(Button b : playerButtons){
+            b.setVisibility(View.INVISIBLE);
+        }
         for(int i=0;i<selectablePlayers.size();i++){
             if(selectablePlayers.get(i).isSelected()){
                 playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.GrassGreenHighlighted)));
@@ -115,6 +123,7 @@ public class PopUpFragmentTrading extends DialogFragment {
             }else{
                 playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.red)));
             }
+            playerButtons.get(i).setVisibility(View.VISIBLE);
         }
         if(atLeastOneSelected){
             bankButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.red)));
@@ -122,106 +131,29 @@ public class PopUpFragmentTrading extends DialogFragment {
             bankButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.GrassGreenHighlighted)));
         }
     }
-    public void setButtonsAndListeners(View view, List<Player> playerListOriginal) {
-        List<Player> playerList = new ArrayList<>(playerListOriginal);
-        // get used View
-        List<Button> playerButtons = new ArrayList<>();
-        playerButtons.add(view.findViewById(R.id.trading_popup_button_p1));
-        playerButtons.add(view.findViewById(R.id.trading_popup_button_p2));
-        playerButtons.add(view.findViewById(R.id.trading_popup_button_p3));
-
-        Button bank = view.findViewById(R.id.trading_popup_bank_button);
-        Button confirm = view.findViewById(R.id.trading_popup_confirm);
-
-        // set OnClickListeners
-        int red = ContextCompat.getColor(view.getContext(), R.color.red);
-        int green = ContextCompat.getColor(view.getContext(), R.color.GrassGreenHighlighted);
-        //not including Buttons if there are no players for them
-        while(playerList.size()-1<playerButtons.size()){
-            playerButtons.get(playerButtons.size()-1).setVisibility(View.INVISIBLE);
-            playerButtons.remove(playerButtons.size()-1);
-        }
-
-        for (int i = 0; i < playerList.size(); i++) {
-            if(playerList.get(i).getInGameID()==localPlayer.getInGameID()){
-                playerList.remove(i);
-                i--;
-                continue;
-            }
-            int j = i;
-            playerButtons.get(j).setText(playerList.get(j).getDisplayName());
-            playerButtons.get(j).setOnClickListener(v -> {
-                int buttonColor = playerButtons.get(j).getBackgroundTintList().getDefaultColor();
-                if(buttonColor==red){
-                    int bankColor = bank.getBackgroundTintList().getDefaultColor();
-                    if(bankColor==green){
-                        bank.setBackgroundTintList(ColorStateList.valueOf(red));
-                    }
-                    playerButtons.get(j).setBackgroundTintList(ColorStateList.valueOf(green));
-                } else if (buttonColor==green) {
-                    playerButtons.get(j).setBackgroundTintList(ColorStateList.valueOf(red));
-                    if(areAllPlayerButtonsNotGreen(playerButtons, green)){ //=all are red
-                        bank.setBackgroundTintList(ColorStateList.valueOf(green));
-                    }
-                }
-            });
-        }
-        bank.setOnClickListener(v -> {
-            int bankColor = bank.getBackgroundTintList().getDefaultColor();
-            if(bankColor==red){
-                setAllButtonsColor(playerButtons, red);
-                bank.setBackgroundTintList(ColorStateList.valueOf(green));
-            } else if (bankColor==green) {
-                setAllButtonsColor(playerButtons, green);
-                bank.setBackgroundTintList(ColorStateList.valueOf(red));
-            }
-        });
-        confirm.setOnClickListener(v -> {
-            //toPlayer:
-            List<Integer> toPlayers = new ArrayList<>(); //playerList.size();  ?
-            if(bank.getBackgroundTintList().getDefaultColor()==green){
-                for(int i=0;i<playerButtons.size();i++){
-                    toPlayers.add(-1);
-                }
-            }else{
-                for(int i=0;i<playerButtons.size();i++){
-                    toPlayers.add((playerButtons.get(i).getBackgroundTintList().getDefaultColor()==green) ? playerList.get(i).getInGameID() : -1);
-                }
-            }
-            // check invalid Input:
-            int[] giveResources = giveResourceFragment.getSetResources();
-            negate(giveResources);
-            if(!localPlayer.resourcesSufficient(giveResources)){
-                Toast.makeText(getContext(), "You do not have the selected give-resources", Toast.LENGTH_SHORT).show();
-            }else {
-                //could check bank-trade, but it is server duty
-                try {
-                    MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayers), this::onServerError);
-                    //close Tradingpopup?
-                } catch (Exception e) {
-                    Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            // toPlayer ID = -1 -> nicht an ihn!
-        });
-    }
-    public void setAllButtonsColor(List<Button> buttons, int color){
-        for(Button b:buttons){
-            b.setBackgroundTintList(ColorStateList.valueOf(color));
+    public void confirm(){
+        try {
+            MoveMaker.getInstance().makeMove(new TradeMoveDto(negate(giveResourceFragment.getSetResources()), getResourceFragment.getSetResources(), tradePopUpViewModel.getSelectedPlayerIds()), this::onServerError);
+        } catch (Exception e){
+            MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
+        } finally {
+            closeFragment();
         }
     }
-    public boolean areAllPlayerButtonsNotGreen(List<Button> playerButtons, int colorGreen){
-        for(int i=0;i<playerButtons.size();i++){
-            if(playerButtons.get(i).getBackgroundTintList().getDefaultColor()==colorGreen){
-                return false;
-            }
-        }
-        return true;
+
+    private void closeFragment() {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(this);
+        fragmentTransaction.commit();
     }
-    public void negate(int[] giveResources){
+
+    public int[] negate(int[] giveResources){ //TODO: Should not be necessary. Refactor also serverside @daniel
+        int[] result = new int[giveResources.length];
         for(int i=0;i<giveResources.length;i++){
-            giveResources[i]=-giveResources[i];
+            result[i]=-giveResources[i];
         }
+        return result;
     }
 
     private void onServerError(Throwable t){

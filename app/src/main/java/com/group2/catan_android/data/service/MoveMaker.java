@@ -9,6 +9,7 @@ import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
@@ -118,7 +119,7 @@ public class MoveMaker {
                 checkUseProgressCardMove(gameMove);
                 break;
             case "TradeMoveDto":
-                checkTradeMove(gameMove);
+                checkTradeMove((TradeMoveDto) gameMove);
                 break;
             default:
                 throw new IllegalGameMoveException("Unknown Dto format");
@@ -132,9 +133,13 @@ public class MoveMaker {
         if(!localPlayer.resourcesSufficient(gameMove.getTradeOfferDto().getGiveResources()))
             throw new IllegalGameMoveException("Not enough Resources to accept the trade");
     }
-    private void checkTradeMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkTradeMove(TradeMoveDto tradeMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant trade during setupphase");
+        if (!localPlayer.resourcesSufficient(tradeMove.getGiveResources()))
+            throw new IllegalGameMoveException("Not enough Resources");
+        if (tradeMove.getToPlayers() == null)
+            throw new IllegalGameMoveException("Something went wrong");
     }
 
     private void checkMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {

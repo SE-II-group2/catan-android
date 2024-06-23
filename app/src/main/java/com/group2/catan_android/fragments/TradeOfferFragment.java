@@ -101,10 +101,8 @@ public class TradeOfferFragment extends Fragment {
         } else {
             try {
                 MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto), this::onServerError);
-            } catch (Exception e){
+            } catch (Exception e) {
                 MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
-            } finally {
-                closeFragment();
             }
         }
     }
@@ -124,7 +122,7 @@ public class TradeOfferFragment extends Fragment {
     }
 
     private void onServerError(Throwable t){
-        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+        MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
         closeFragment();
     }
 }
