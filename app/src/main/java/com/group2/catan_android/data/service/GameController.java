@@ -5,7 +5,6 @@ import com.group2.catan_android.data.api.JoinGameResponse;
 import com.group2.catan_android.data.live.PlayersInLobbyDto;
 import com.group2.catan_android.data.live.game.CurrentGameStateDto;
 import com.group2.catan_android.data.live.game.GameProgressDto;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
@@ -14,7 +13,6 @@ import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
 import com.group2.catan_android.data.repository.trading.TradeRepository;
 
-import java.util.concurrent.Flow;
 import java.util.function.Function;
 
 import io.reactivex.Completable;
@@ -65,9 +63,14 @@ public class GameController implements GameJoiner, GameLeaver{
         if(token == null)
             return Completable.error(new IllegalStateException("No Token in Repository"));
         tokenRepository.clear();
-        return lobbyJoiner.leaveGame(token)
-                .andThen(Completable.fromAction(stompManager::shutdown))
+        return Completable.fromAction(stompManager::shutdown)
+                .concatWith(lobbyJoiner.leaveGame(token))
                 .subscribeOn(Schedulers.io());
+    }
+
+    public void cleanupFinishedGame(){
+        tokenRepository.clear();
+        stompManager.shutdown();
     }
 
     public Completable reconnectGame(){
@@ -88,9 +91,9 @@ public class GameController implements GameJoiner, GameLeaver{
     private Completable processJoinGameResponse(JoinGameResponse joinGameResponse){
         return stompManager.connect(joinGameResponse.getToken())
                 .andThen(Completable.fromAction(() -> {
-                    initStompListeners(joinGameResponse);
                     wireUpLiveDataSources(joinGameResponse);
                     storeSession(joinGameResponse);
+                    initStompListeners(joinGameResponse);
                 }));
     }
 
