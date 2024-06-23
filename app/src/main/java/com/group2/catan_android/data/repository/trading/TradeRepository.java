@@ -7,20 +7,19 @@ import com.group2.catan_android.data.repository.LiveDataReceiver;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class TradeRepository implements TradeProvider, LiveDataReceiver<TradeOfferDto> {
 
 
-    PublishSubject<TradeOfferDto> tradeOfferDtoBehaviorSubject;
+    PublishSubject<TradeOfferDto> tradeOfferPublishSubject;
 
     private Flowable<TradeOfferDto> liveDataIn;
     private static TradeRepository instance;
     Disposable d;
 
     private TradeRepository(){
-        this.tradeOfferDtoBehaviorSubject = PublishSubject.create();
+        this.tradeOfferPublishSubject = PublishSubject.create();
 
     }
 
@@ -37,7 +36,6 @@ public class TradeRepository implements TradeProvider, LiveDataReceiver<TradeOff
 
 
     private void cleanup() {
-        this.tradeOfferDtoBehaviorSubject.onNext(new TradeOfferDto());
         if (d != null)
             d.dispose();
     }
@@ -45,16 +43,12 @@ public class TradeRepository implements TradeProvider, LiveDataReceiver<TradeOff
     private void wireDataSources() {
         d = liveDataIn
                 .doOnComplete(this::cleanup)
-                .subscribe(tradeOfferDto -> {
-
-                            tradeOfferDtoBehaviorSubject.onNext((TradeOfferDto)tradeOfferDto);
-
-                });
+                .subscribe(tradeOfferDto -> tradeOfferPublishSubject.onNext(tradeOfferDto));
     }
 
     @Override
     public Observable<TradeOfferDto> getTradeObservable() {
-        return tradeOfferDtoBehaviorSubject;
+        return tradeOfferPublishSubject;
     }
 
 }
