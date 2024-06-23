@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -75,6 +76,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
     private PlayerScoresFragment playerScoresFragment;
+    private ButtonsClosedFragment buttonsClosedFragment;
     private TradeOfferFragment tradeOfferFragment;
     private UiDrawer uiDrawer;
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
@@ -84,6 +86,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private boolean hasRolledSeven = false;
     private boolean hasUsedProgressCard = false;
     private ImageView endTurnButton;
+    private ImageView accuseCheatingButton;
 
 
     Disposable gameOverDisposable;
@@ -136,7 +139,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void createFragments() {
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
-        ButtonsClosedFragment buttonsClosedFragment = new ButtonsClosedFragment();
+        buttonsClosedFragment = new ButtonsClosedFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
@@ -235,6 +238,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             uiDrawer.setHasRolledSeven(false);
             uiDrawer.removeAllPossibleMovesFromUI();
             endTurnButton.setClickable(true);
+            buttonsClosedFragment.makeButtonsClickable();
+            accuseCheatingButton.setClickable(true);
             return;
         } else if (hasUsedProgressCard) {
             movemaker.makeMove(new UseProgressCardDto(ProgressCardType.KNIGHT, null, null, correctID));
@@ -296,6 +301,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
                     if (diceRoll == 7) {
                         endTurnButton.setClickable(false);
+                        buttonsClosedFragment.makeButtonsUnclickable();
+                        accuseCheatingButton.setClickable(false);
                         hasRolledSeven = true;
                         uiDrawer.setHasRolledSeven(true);
                         uiDrawer.showPossibleMoves(ButtonType.ROBBER);
@@ -311,7 +318,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void setupAccuseCheatingButton() {
-        findViewById(R.id.accuseCheatingButton).setOnClickListener(v -> {
+        accuseCheatingButton = findViewById(R.id.accuseCheatingButton);
+        accuseCheatingButton.setOnClickListener(v -> {
             try{
                 movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()), this::onServerError);
                 uiDrawer.removeAllPossibleMovesFromUI();

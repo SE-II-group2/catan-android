@@ -102,5 +102,19 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
         }
 
     }
+    public void makeButtonsClickable() {
+        road.setClickable(true);
+        village.setClickable(true);
+        city.setClickable(true);
+        progressCard.setClickable(true);
+        exit.setClickable(true);
+    }
 
+    public void makeButtonsUnclickable() {
+        road.setClickable(false);
+        village.setClickable(false);
+        city.setClickable(false);
+        progressCard.setClickable(false);
+        exit.setClickable(false);
+    }
 }
