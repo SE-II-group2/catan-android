@@ -37,7 +37,7 @@ public class MonopolyFragment extends PopUpFragment {
     }
     private void useProgressCard(ResourceDistribution resource){
         try {
-            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.MONOPOLY, null, resource), this::onServerError);
+            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.MONOPOLY, null, resource, 0), this::onServerError);
         } catch (Exception e) {
             MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
             Log.d("ProgressCards", e.toString());
@@ -54,6 +54,6 @@ public class MonopolyFragment extends PopUpFragment {
     }
 
     public void onServerError(Throwable t){
-        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+        MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }

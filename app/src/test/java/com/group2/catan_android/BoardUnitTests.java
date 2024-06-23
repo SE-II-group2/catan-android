@@ -22,7 +22,6 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-// fixme document the magic constants for test readability and understandability
 public class BoardUnitTests {
 
     private Board board;
@@ -50,7 +49,7 @@ public class BoardUnitTests {
     void testGenerateHexagonsDesertTileCorrectness() {
         boolean hasDesertTile = false;
         for (Hexagon hexagon : board.getHexagonList()) {
-            if (hexagon.getLocation().equals(Hexagontype.DESERT)) {
+            if (hexagon.getHexagontype().equals(Hexagontype.DESERT)) {
                 assertEquals(0, hexagon.getRollValue());
                 assertArrayEquals(new int[]{0, 0, 0, 0, 0}, hexagon.getDistribution().getDistribution());
                 hasDesertTile = true;
@@ -211,12 +210,10 @@ public class BoardUnitTests {
 
     @Test
     void testGetAdjacencyMatrixCorrectRetrieval() {
-        Board board = new Board();
         Connection[][] matrix = board.getAdjacencyMatrix();
-
         assertNotNull(matrix);
         assertEquals(54, matrix.length);
-        assertTrue(matrix[0][1] instanceof Connection || matrix[0][1] == null);
+        assertTrue(matrix[0][1] != null || matrix[0][1] == null);
     }
 
     @Test

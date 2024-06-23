@@ -4,8 +4,14 @@
         <item name="backgroundTint">@color/GrassGreen</item>
         <item name="cornerRadius">5dp</item>
     </style>
+    <style name="ButtonStyleStartScreen">
+        <item name="backgroundTint">@color/semi_transparent_black</item>
+        <item name="cornerRadius">30dp</item>
+    </style>
     <style name="ImageButtonStyle" parent="Widget.AppCompat.ImageButton">
         <item name="android:background">@color/GrassGreen</item>
+        <item name="cornerRadius">30dp</item>
+
     </style>
     <style name="Trade_ButtonStyle" parent ="Widget.Material3.Button">
         <item name="android:insetTop">2dp</item>

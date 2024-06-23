@@ -1,12 +1,7 @@
 package com.group2.catan_android.gamelogic.objects;
 
-import androidx.annotation.NonNull;
-
-import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.Hexagontype;
 import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
-
-import java.util.Locale;
 
 public class Hexagon {
     private final int id;
@@ -15,7 +10,7 @@ public class Hexagon {
         return hexagontype;
     }
 
-    public boolean isHasRobber() {
+    public boolean isHavingRobber() {
         return hasRobber;
     }
 
@@ -48,16 +43,6 @@ public class Hexagon {
         }
     }
 
-    public void distributeResources(Player player) {
-        if(hasRobber)return;
-        for (Building building : buildings) {
-            if (building != null && building.getPlayer() == player) {
-                building.giveResources(distribution);
-            }
-        }
-    }
-
-
     public void addBuilding(Building building) {
         for (int i = 0; i < buildings.length; i++) {
             if (buildings[i] == null) {
@@ -78,10 +63,6 @@ public class Hexagon {
         }
     }
 
-    public Hexagontype getLocation() {
-        return hexagontype;
-    }
-
     public ResourceDistribution getDistribution() {
         return distribution;
     }
@@ -100,10 +81,6 @@ public class Hexagon {
 
     public int getId() {
         return id;
-    }
-
-    public boolean isHavingRobber(){
-        return hasRobber;
     }
     public void setHasRobber(boolean hasRobber) {
         this.hasRobber = hasRobber;

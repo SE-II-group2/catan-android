@@ -101,6 +101,7 @@ public class TradeOfferFragment extends Fragment {
         } else {
             try {
                 MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto), this::onServerError);
+                closeFragment();
             } catch (Exception e) {
                 MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
             }

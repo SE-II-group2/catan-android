@@ -191,7 +191,7 @@ public class CurrentGamestateRepositoryTest {
         List<HexagonDto> hexagonDtoList = new ArrayList<>();
 
         for (Hexagon hexagon : hexagonList) {
-            hexagonDtoList.add(new HexagonDto(hexagon.getHexagontype(), hexagon.getDistribution(), hexagon.getRollValue(), hexagon.getId(), hexagon.isHasRobber()));
+            hexagonDtoList.add(new HexagonDto(hexagon.getHexagontype(), hexagon.getDistribution(), hexagon.getRollValue(), hexagon.getId(), hexagon.isHavingRobber()));
         }
 
         //Add board and make moves there, then get intersections and adjacency matrix and convert to DTO list

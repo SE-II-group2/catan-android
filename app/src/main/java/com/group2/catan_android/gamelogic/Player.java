@@ -1,9 +1,7 @@
 package com.group2.catan_android.gamelogic;
 
-import com.group2.catan_android.data.live.PlayerDto;
 import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.gamelogic.enums.ProgressCardType;
-import com.group2.catan_android.gamelogic.objects.ProgressCard;
 
 import java.util.List;
 
