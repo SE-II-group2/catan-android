@@ -76,6 +76,7 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
             setButtonBorders(v);
             // TODO: Write what shall happen when pressing the trade button
             PopUpFragmentTrading trading = new PopUpFragmentTrading();
+            trading.setServerErrorContext(getActivity());
             trading.show(getActivity().getSupportFragmentManager(), "popup_fragment_trading");
         });
 
