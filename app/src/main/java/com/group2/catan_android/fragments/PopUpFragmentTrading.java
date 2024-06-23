@@ -23,12 +23,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.TradeMoveDto;
+import com.group2.catan_android.data.model.SelectablePlayer;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.viewmodel.PlayerListViewModel;
+import com.group2.catan_android.viewmodel.TradePopUpViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +43,6 @@ public class PopUpFragmentTrading extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.fragment_pop_up_trading, container, false);
     }
 
@@ -64,25 +65,32 @@ public class PopUpFragmentTrading extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         setUp(view);
     }
-
+    private TradePopUpViewModel tradePopUpViewModel;
+    private LocalPlayerViewModel localPlayerViewModel;
+    private PlayerListViewModel playerListViewModel;
     private Player localPlayer;
     private TradingResourceSelectionFragment giveResourceFragment;
     private TradingResourceSelectionFragment getResourceFragment;
     private PlayerResourcesFragment playerResources;
+    private List<Button> playerButtons;
+    private Button bankButton;
     public void setUp(View view){
         setFragments();
-        LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
-        localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
-            this.localPlayer = player;
-            playerResources.setResources(localPlayer.getResources());
-        });
+        tradePopUpViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(TradePopUpViewModel.initializer)).get(TradePopUpViewModel.class);
 
-        PlayerListViewModel playerListViewModel = new ViewModelProvider(requireActivity(), ViewModelProvider.Factory.from(PlayerListViewModel.initializer)).get(PlayerListViewModel.class);
-        playerListViewModel.getPlayerMutableLiveData().observe(this, data ->{
-            List<Player> playerList = new ArrayList<>(data);
-            playerList.sort(Comparator.comparingInt(Player::getInGameID));
-            setButtonsAndListeners(view, playerList);
-        });
+        observeLiveData();
+        playerButtons = new ArrayList<>();
+        playerButtons.add(view.findViewById(R.id.trading_popup_button_p1));
+        playerButtons.add(view.findViewById(R.id.trading_popup_button_p2));
+        playerButtons.add(view.findViewById(R.id.trading_popup_button_p3));
+        for(int i=0;i<playerButtons.size();i++){
+            final int j = i;
+            playerButtons.get(i).setOnClickListener(v -> {
+                tradePopUpViewModel.togglePlayer(j);
+            });
+        }
+        bankButton = view.findViewById(R.id.trading_popup_bank_button);
+        Button confirm = view.findViewById(R.id.trading_popup_confirm);
 
 
     }
@@ -94,7 +102,25 @@ public class PopUpFragmentTrading extends DialogFragment {
         manager.beginTransaction().add(R.id.trading_popup_topfragment, giveResourceFragment).commitNow();
         manager.beginTransaction().add(R.id.trading_popup_middlefragment, getResourceFragment).commitNow();
         manager.beginTransaction().add(R.id.trading_popup_bottomfragment,playerResources).commitNow();
-        manager.beginTransaction().add(R.id.trading_popup_time_selection, new TradingTimeSelection()).commitNow();//needed?
+    }
+    private void observeLiveData(){
+        tradePopUpViewModel.getSelectablePlayerMutableLiveData().observe(requireActivity(), this::updateButtons);
+    }
+    private void updateButtons(List<SelectablePlayer> selectablePlayers){
+        boolean atLeastOneSelected = false;
+        for(int i=0;i<selectablePlayers.size();i++){
+            if(selectablePlayers.get(i).isSelected()){
+                playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.GrassGreenHighlighted)));
+                atLeastOneSelected=true;
+            }else{
+                playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.red)));
+            }
+        }
+        if(atLeastOneSelected){
+            bankButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.red)));
+        }else{
+            bankButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.GrassGreenHighlighted)));
+        }
     }
     public void setButtonsAndListeners(View view, List<Player> playerListOriginal) {
         List<Player> playerList = new ArrayList<>(playerListOriginal);
@@ -152,12 +178,14 @@ public class PopUpFragmentTrading extends DialogFragment {
         });
         confirm.setOnClickListener(v -> {
             //toPlayer:
-            int[] toPlayer = new int[playerButtons.size()]; //playerList.size();  ?
+            List<Integer> toPlayers = new ArrayList<>(); //playerList.size();  ?
             if(bank.getBackgroundTintList().getDefaultColor()==green){
-                Arrays.fill(toPlayer, -1);
+                for(int i=0;i<playerButtons.size();i++){
+                    toPlayers.add(-1);
+                }
             }else{
                 for(int i=0;i<playerButtons.size();i++){
-                    toPlayer[i] = (playerButtons.get(i).getBackgroundTintList().getDefaultColor()==green) ? playerList.get(i).getInGameID() : -1;
+                    toPlayers.add((playerButtons.get(i).getBackgroundTintList().getDefaultColor()==green) ? playerList.get(i).getInGameID() : -1);
                 }
             }
             // check invalid Input:
@@ -168,7 +196,7 @@ public class PopUpFragmentTrading extends DialogFragment {
             }else {
                 //could check bank-trade, but it is server duty
                 try {
-                    MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayer), this::onServerError);
+                    MoveMaker.getInstance().makeMove(new TradeMoveDto(giveResources, getResourceFragment.getSetResources(), toPlayers), this::onServerError);
                     //close Tradingpopup?
                 } catch (Exception e) {
                     Toast.makeText(requireActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
