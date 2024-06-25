@@ -18,8 +18,6 @@ import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.gamelogic.enums.ResourceCost;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -152,6 +150,8 @@ public class MoveMaker {
             throw new IllegalGameMoveException("Can't move the Robber during the setup phase!");
         if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
+        if(!robberDto.isLegal() && activePlayer.getInGameID() == localPlayer.getInGameID())
+            throw new IllegalGameMoveException("Cheating is only possible when you are not the active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHavingRobber())
             throw new IllegalGameMoveException("Can't move the Robber to the same Hexagon it is currently in!");
     }
