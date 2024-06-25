@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.group2.catan_android.GameActivity;
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.FragmentSwitcher;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 
@@ -30,9 +31,8 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
     ImageView cards;
     ImageView help;
 
-    ButtonsOpenFragment buttonsOpenFragment;
-
     private OnButtonClickListener mListener;
+    private FragmentSwitcher mFragmentSwitcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,14 +61,8 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
 
         build.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.BUILD);
-            buttonsOpenFragment = new ButtonsOpenFragment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.leftButtonsFragment, buttonsOpenFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-
-            if (getActivity() instanceof GameActivity) {
-                ((GameActivity) getActivity()).setCurrentButtonFragmentListener(buttonsOpenFragment);
+            if(mFragmentSwitcher != null){
+                mFragmentSwitcher.onSwitchButtonPressed();
             }
         });
 
@@ -90,6 +84,9 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
 
     }
 
+    public void setFragmentSwitcher(FragmentSwitcher switcher){
+        mFragmentSwitcher = switcher;
+    }
     @Override
     public void onButtonEvent(ButtonType button) {
         cards.setBackgroundResource(0);
@@ -101,7 +98,6 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         cards.setClickable(false);
         help.setClickable(false);
         trade.setClickable(false);
-        if(buttonsOpenFragment != null) buttonsOpenFragment.makeButtonsUnclickable();
     }
 
     public void makeButtonsClickable(){
@@ -109,6 +105,5 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         cards.setClickable(true);
         help.setClickable(true);
         trade.setClickable(true);
-        if(buttonsOpenFragment != null) buttonsOpenFragment.makeButtonsClickable();
     }
 }

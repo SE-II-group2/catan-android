@@ -9,10 +9,10 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.FragmentSwitcher;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 
@@ -27,6 +27,8 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
     private OnButtonClickListener mListener;
 
     private ButtonType activeButton;
+
+    private FragmentSwitcher mFragmentSwitcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,9 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
 
         exit.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.EXIT);
-            Fragment newFragment = new ButtonsClosedFragment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.leftButtonsFragment, newFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+            if(mFragmentSwitcher != null){
+                mFragmentSwitcher.onSwitchButtonPressed();
+            }
         });
 
         road.setOnClickListener(v -> {
@@ -101,6 +101,10 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
             activeButton = null;
         }
 
+    }
+
+    public void setFragmentSwitcher(FragmentSwitcher switcher){
+        mFragmentSwitcher = switcher;
     }
     public void makeButtonsClickable() {
         road.setClickable(true);

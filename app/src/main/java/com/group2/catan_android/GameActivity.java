@@ -27,6 +27,7 @@ import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.service.StompManager;
 import com.group2.catan_android.data.service.UiDrawer;
+import com.group2.catan_android.fragments.ButtonsOpenFragment;
 import com.group2.catan_android.fragments.HelpFragment;
 import com.group2.catan_android.fragments.TradeOfferFragment;
 import com.group2.catan_android.fragments.enums.ClickableElement;
@@ -76,7 +77,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     // fragments and button listeners
     private PlayerResourcesFragment playerResourcesFragment;
     private PlayerScoresFragment playerScoresFragment;
-    private ButtonsClosedFragment buttonsClosedFragment;
+    private ButtonsClosedFragment baseMenuFragment;
+    private ButtonsOpenFragment buildMenuFragment;
     private TradeOfferFragment tradeOfferFragment;
     private UiDrawer uiDrawer;
     private OnButtonEventListener currentButtonFragmentListener; // listens to which button was clicked in the currently active button fragment
@@ -89,7 +91,10 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private boolean hasUsedProgressCard = false;
     private ImageView endTurnButton;
     private ImageView accuseCheatingButton;
+    private ImageView rollDiceButton;
     private Random random;
+
+    private boolean buildMenuOpened;
 
 
     Disposable gameOverDisposable;
@@ -159,11 +164,17 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void createFragments() {
         playerResourcesFragment = new PlayerResourcesFragment();
         playerScoresFragment = new PlayerScoresFragment();
-        buttonsClosedFragment = new ButtonsClosedFragment();
+        baseMenuFragment = new ButtonsClosedFragment();
+        buildMenuFragment = new ButtonsOpenFragment();
+
+        baseMenuFragment.setFragmentSwitcher(this::switchFragment);
+        buildMenuFragment.setFragmentSwitcher(this::switchFragment);
+        currentButtonFragmentListener = baseMenuFragment;
+        buildMenuOpened = false;
+
         getSupportFragmentManager().beginTransaction().add(R.id.playerResourcesFragment, playerResourcesFragment).commit();
         getSupportFragmentManager().beginTransaction().add(R.id.playerScoresFragment, playerScoresFragment).commit();
-        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, buttonsClosedFragment).commit();
-        currentButtonFragmentListener = buttonsClosedFragment;
+        getSupportFragmentManager().beginTransaction().add(R.id.leftButtonsFragment, baseMenuFragment).commit();
     }
 
     private void createViews(ConstraintLayout constraintLayout) {
@@ -257,16 +268,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             hasRolledSeven = false;
             uiDrawer.setHasRolledSeven(false);
             uiDrawer.removeAllPossibleMovesFromUI();
-            endTurnButton.setClickable(true);
-            buttonsClosedFragment.makeButtonsClickable();
-            accuseCheatingButton.setClickable(true);
+            baseMenuFragment.makeButtonsClickable();
+            buildMenuFragment.makeButtonsClickable();
+            makeActivityButtonsClickable();
             return;
         } else if (hasUsedProgressCard) {
             movemaker.makeMove(new UseProgressCardDto(ProgressCardType.KNIGHT, null, null, correctID));
             hasUsedProgressCard = false;
             uiDrawer.removeAllPossibleMovesFromUI();
         }
-        if (lastButtonClicked != ButtonType.ROBBER) {
+        if (lastButtonClicked != ButtonType.ROBBER && !localPlayer.isActive()) {
             uiDrawer.showPossibleMoves(ButtonType.ROBBER);
             lastButtonClicked = ButtonType.ROBBER;
         } else {
@@ -312,7 +323,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void setupDiceRollButton() {
-        findViewById(R.id.diceRollButton).setOnClickListener(v -> {
+        rollDiceButton = findViewById(R.id.diceRollButton);
+
+        rollDiceButton.setOnClickListener(v -> {
             if(board.isSetupPhase()){
                 MessageBanner.makeBanner(this, MessageType.ERROR, "Dice can not be rolled during setup phase!").show();
             }
@@ -322,7 +335,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 rollDice();
             }
         });
-        findViewById(R.id.diceRollButton).setOnLongClickListener(v -> {
+        rollDiceButton.setOnLongClickListener(v -> {
             rollDice();
             if (mUsingShakeListener) mShakeListener.pause();
             return true;
@@ -468,9 +481,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
                 movemaker.setHasRolled(true);
                 if (diceRoll == 7 && localPlayer.isActive()) {
-                    endTurnButton.setClickable(false);
-                    buttonsClosedFragment.makeButtonsUnclickable();
-                    accuseCheatingButton.setClickable(false);
+                    makeActivityButtonsUnclickable();
+                    baseMenuFragment.makeButtonsUnclickable();
+                    buildMenuFragment.makeButtonsUnclickable();
                     hasRolledSeven = true;
                     uiDrawer.setHasRolledSeven(true);
                     uiDrawer.showPossibleMoves(ButtonType.ROBBER);
@@ -480,6 +493,31 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             } catch (Exception e) {
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
             }
+    }
+
+    private void makeActivityButtonsClickable(){
+        accuseCheatingButton.setClickable(true);
+        endTurnButton.setClickable(true);
+        rollDiceButton.setClickable(true);
+        rollDiceButton.setLongClickable(true);
+    }
+    private void makeActivityButtonsUnclickable(){
+        accuseCheatingButton.setClickable(false);
+        endTurnButton.setClickable(false);
+        rollDiceButton.setClickable(false);
+        rollDiceButton.setLongClickable(false);
+    }
+
+    private void switchFragment(){
+        if(buildMenuOpened){
+            getSupportFragmentManager().beginTransaction().replace(R.id.leftButtonsFragment, baseMenuFragment).commit();
+            currentButtonFragmentListener = baseMenuFragment;
+            buildMenuOpened = false;
+        } else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.leftButtonsFragment, buildMenuFragment).commit();
+            currentButtonFragmentListener = buildMenuFragment;
+            buildMenuOpened = true;
+        }
     }
 
     private void onServerError(Throwable t) {
