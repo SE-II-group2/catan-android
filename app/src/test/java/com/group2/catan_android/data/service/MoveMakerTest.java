@@ -33,7 +33,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoveMakerTest {
+class MoveMakerTest {
     private MoveMaker moveMaker;
     private List<Player> playerList;
     private Field isSetupPhaseField;
@@ -201,11 +201,11 @@ public class MoveMakerTest {
             hexagon.setHasRobber(false);
         }
         isSetupPhaseField.set(moveMaker, false);
-        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
-        moveMaker.makeMove(moveRobberMove);
-        moveRobberMove = new MoveRobberDto(15, false);
-        moveMaker.makeMove(moveRobberMove);
-        verify(moveMaker, times(2)).sendMove(any(), any());
+        MoveRobberDto moveRobberMoveLegal = new MoveRobberDto(10, true);
+        moveMaker.makeMove(moveRobberMoveLegal);
+        MoveRobberDto moveRobberMoveIllegal = new MoveRobberDto(15, false);
+        assertThrows(IllegalGameMoveException.class, ()-> moveMaker.makeMove(moveRobberMoveIllegal));
+        verify(moveMaker, times(1)).sendMove(eq(moveRobberMoveLegal), any());
     }
 
     @Test
