@@ -73,8 +73,6 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         });
 
         trade.setOnClickListener(v -> {
-            setButtonBorders(v);
-            // TODO: Write what shall happen when pressing the trade button
             PopUpFragmentTrading trading = new PopUpFragmentTrading();
             trading.setServerErrorContext(getActivity());
             trading.show(getActivity().getSupportFragmentManager(), "popup_fragment_trading");
@@ -90,12 +88,6 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
             mListener.onButtonClicked(ButtonType.HELP);
         });
 
-    }
-
-    private void setButtonBorders(View v) {
-        cards.setBackgroundResource(0);
-        trade.setBackgroundResource(0);
-        v.setBackgroundResource(R.drawable.button_clicked_border);
     }
 
     @Override

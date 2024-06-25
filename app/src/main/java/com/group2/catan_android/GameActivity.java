@@ -301,7 +301,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private void setupEndTurnButton() {
         endTurnButton = findViewById(R.id.endTurnButton);
         endTurnButton.setOnClickListener(v -> {
-            if (movemaker.hasRolled()) {
                 try {
                     movemaker.makeMove(new EndTurnMoveDto(), this::onServerError);
                     movemaker.setHasRolled(false);
@@ -309,14 +308,16 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 } catch (Exception e) {
                     MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 }
-            }
         });
     }
 
     private void setupDiceRollButton() {
         findViewById(R.id.diceRollButton).setOnClickListener(v -> {
+            if(board.isSetupPhase()){
+                MessageBanner.makeBanner(this, MessageType.ERROR, "Dice can not be rolled during setup phase!").show();
+            }
             if (mUsingShakeListener) {
-                MessageBanner.makeBanner(this, MessageType.WARNING, "Shake your device to roll. Long Press to Override").show();
+                MessageBanner.makeBanner(this, MessageType.WARNING, "Shake your device or make a long press to roll!").show();
             } else {
                 rollDice();
             }
@@ -352,6 +353,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         boardViewModel.getBoardMutableLiveData().observe(this, newBoard -> {
             this.board = newBoard;
             uiDrawer.updateUiBoard(newBoard);
+            lastButtonClicked = null;
             currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
         });
 
@@ -458,11 +460,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void rollDice() {
-        if (!movemaker.hasRolled() && !board.isSetupPhase()) {
             try {
                 if(random == null)
                     random = new Random();
                 int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
+                movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
+                movemaker.setHasRolled(true);
                 if (diceRoll == 7 && localPlayer.isActive()) {
                     endTurnButton.setClickable(false);
                     buttonsClosedFragment.makeButtonsUnclickable();
@@ -470,14 +473,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     hasRolledSeven = true;
                     uiDrawer.setHasRolledSeven(true);
                     uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+                    lastButtonClicked = ButtonType.ROBBER;
                 }
-                movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
-                movemaker.setHasRolled(true);
                 currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
             } catch (Exception e) {
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
             }
-        }
     }
 
     private void onServerError(Throwable t) {

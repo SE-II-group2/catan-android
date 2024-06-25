@@ -129,13 +129,13 @@ public class MoveMaker {
 
     private void checkAcceptMove(AcceptMoveDto gameMove)throws IllegalGameMoveException{
         if (isSetupPhase)
-            throw new IllegalGameMoveException("Cant trade during setupphase");
+            throw new IllegalGameMoveException("Can't trade during setup phase");
         if(!localPlayer.resourcesSufficient(gameMove.getTradeOfferDto().getGiveResources()))
             throw new IllegalGameMoveException("Not enough Resources to accept the trade");
     }
     private void checkTradeMove(TradeMoveDto tradeMove) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new IllegalGameMoveException("Cant trade during setupphase");
+            throw new IllegalGameMoveException("Can't trade during setup phase");
         if (!localPlayer.resourcesSufficient(tradeMove.getGiveResources()))
             throw new IllegalGameMoveException("Not enough Resources");
         if (tradeMove.getToPlayers() == null)
@@ -148,12 +148,14 @@ public class MoveMaker {
         if (robberDto.isLegal() && activePlayer.getInGameID() != localPlayer.getInGameID())
             throw new IllegalGameMoveException("Not active player!");
         if (board.getHexagonList().get(robberDto.getHexagonID()).isHavingRobber())
-            throw new IllegalGameMoveException("Cant move the Robber to the same Hexagon it is currently in!");
+            throw new IllegalGameMoveException("Can't move the Robber to the same Hexagon it is currently in!");
     }
 
     private void checkEndTurnMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("End your turn during setup phase by placing a village and a road!");
+        if (!hasRolled)
+            throw new IllegalGameMoveException("Dice needs to be rolled before you can end your turn!");
     }
 
     private void checkBuildVillageMove(GameMoveDto gameMove) throws IllegalGameMoveException {
@@ -176,7 +178,7 @@ public class MoveMaker {
 
     private void checkRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
-            throw new IllegalGameMoveException("Cant roll the Dice during SetupPhase");
+            throw new IllegalGameMoveException("Can't roll the dice during setup phase");
         if (hasRolled) throw new IllegalGameMoveException("Has already Rolled the dice this turn");
     }
 
