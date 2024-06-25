@@ -1,153 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.TradeOfferFragment">
+    android:layout_width="200dp"
+    android:layout_height="300dp"
+    tools:context=".fragments.TradeOfferFragment"
+    android:orientation="vertical"
+    android:padding="5dp">
 
-    <ImageView
-        android:id="@+id/trade_offer_give_arrow"
-        android:src="@drawable/arrow_right"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/trade_offer_give_fragment"
-        />
-    <TextView
-        android:id="@+id/trade_offer_give_text"
-        android:text="Give"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="1:2"
-        app:layout_constraintStart_toStartOf="@id/trade_offer_give_arrow"
-        app:layout_constraintEnd_toEndOf="@id/trade_offer_give_arrow"
-        app:layout_constraintTop_toTopOf="@id/trade_offer_give_arrow"
-        app:layout_constraintBottom_toBottomOf="@id/trade_offer_give_arrow"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:autoSizeTextType="uniform"
-        android:maxLines="1"
-        />
-    <FrameLayout
-        android:id="@+id/trade_offer_give_fragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="2.5:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-    <FrameLayout
-        android:id="@+id/trade_offer_get_fragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="2.5:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/trade_offer_give_fragment"
-        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/trade_button_svg"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/trade_offer_player_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:text="Player 1"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="15sp"
+            android:text="wants to trade:"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/trade_offer_give_fragment"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="-30dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/trade_offer_give_arrow"
+            android:src="@drawable/arrow_right"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/trade_offer_player_text"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.13"
-        android:text="Player X"
-        android:gravity="center"
-        android:textColor="@color/black"
-        app:autoSizeTextType="uniform"
-        android:maxLines="1"
-        app:layout_constraintTop_toBottomOf="@id/trade_offer_get_fragment"
-        app:layout_constraintStart_toEndOf="@id/trade_offer_accept"
-        />
-    <TextView
-        android:id="@+id/trade_offer_text_2"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.13"
-        android:text="wants to trade"
-        android:gravity="center"
-        android:textColor="@color/black"
-        app:autoSizeTextType="uniform"
-        android:maxLines="1"
-        app:layout_constraintStart_toEndOf="@id/trade_offer_accept"
-        app:layout_constraintTop_toBottomOf="@+id/trade_offer_player_text"
-        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
 
+        <FrameLayout
+            android:id="@+id/trade_offer_get_fragment"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="-30dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/trade_offer_get_arrow"
+            android:src="@drawable/arrow_left"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
 
     <Button
         android:id="@+id/trade_offer_accept"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.13"
-        app:layout_constraintDimensionRatio="3:1"
-        app:layout_constraintTop_toBottomOf="@id/trade_offer_get_fragment"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
         android:gravity="center"
-        app:autoSizeTextType="uniform"
         android:backgroundTint="@color/GrassGreenHighlighted"
         android:textColor="@color/black"
         style="@style/Trade_ButtonStyle"
-        android:text="Accept"
-        />
-    <Button
-        android:id="@+id/trade_offer_decline"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.13"
-        app:layout_constraintDimensionRatio="3:1"
-        app:layout_constraintTop_toBottomOf="@id/trade_offer_accept"
-        app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center"
-        app:autoSizeTextType="uniform"
-        android:backgroundTint="@color/red"
-        android:textColor="@color/black"
-        style="@style/Trade_ButtonStyle"
-        android:text="Decline"
-        />
+        android:text="Accept" />
 
-    <ImageView
-        android:id="@+id/trade_offer_get_arrow"
-        android:src="@drawable/arrow_left"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintStart_toEndOf="@id/trade_offer_get_fragment"
-        app:layout_constraintTop_toBottomOf="@id/trade_offer_give_arrow"
-        />
-    <TextView
-        android:id="@+id/trade_offer_get_text"
-        android:text="Get"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.25"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="1:2"
-        app:layout_constraintStart_toStartOf="@id/trade_offer_get_arrow"
-        app:layout_constraintEnd_toEndOf="@id/trade_offer_get_arrow"
-        app:layout_constraintTop_toTopOf="@id/trade_offer_get_arrow"
-        app:layout_constraintBottom_toBottomOf="@id/trade_offer_get_arrow"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:autoSizeTextType="uniform"
-        android:maxLines="1"
-        />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/trade_offer_decline"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/black"
+            style="@style/Trade_ButtonStyle"
+            android:text="Decline" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</LinearLayout>
