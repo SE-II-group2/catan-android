@@ -29,6 +29,7 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
     private ButtonType activeButton;
 
     private FragmentSwitcher mFragmentSwitcher;
+    private boolean viewsCreated = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
             mListener.onButtonClicked(ButtonType.PROGRESS_CARD);
         });
 
+        viewsCreated = true;
     }
 
     @Override
@@ -107,18 +109,22 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
         mFragmentSwitcher = switcher;
     }
     public void makeButtonsClickable() {
-        road.setClickable(true);
-        village.setClickable(true);
-        city.setClickable(true);
-        progressCard.setClickable(true);
-        exit.setClickable(true);
+        if(viewsCreated) {
+            road.setClickable(true);
+            village.setClickable(true);
+            city.setClickable(true);
+            progressCard.setClickable(true);
+            exit.setClickable(true);
+        }
     }
 
     public void makeButtonsUnclickable() {
-        road.setClickable(false);
-        village.setClickable(false);
-        city.setClickable(false);
-        progressCard.setClickable(false);
-        exit.setClickable(false);
+        if(viewsCreated) {
+            road.setClickable(false);
+            village.setClickable(false);
+            city.setClickable(false);
+            progressCard.setClickable(false);
+            exit.setClickable(false);
+        }
     }
 }

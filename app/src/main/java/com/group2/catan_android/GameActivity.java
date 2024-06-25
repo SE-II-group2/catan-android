@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -124,7 +125,12 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         setUpShakeListener();
 
-        createFragments();
+        if(savedInstanceState == null){
+            createFragments();
+        } else {
+            currentButtonFragmentListener = buildMenuOpened ? buildMenuFragment : baseMenuFragment;
+            Log.d("instance", "some saved instance used");
+        }
 
         setupViewModels();
 
@@ -376,7 +382,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             this.board = newBoard;
             uiDrawer.updateUiBoard(newBoard);
             lastButtonClicked = null;
-            currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
         });
 
         localPlayerViewModel.getPlayerMutableLiveData().observe(this, player -> {
@@ -545,7 +550,5 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.BLACK);
         dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
-
-
     }
 }

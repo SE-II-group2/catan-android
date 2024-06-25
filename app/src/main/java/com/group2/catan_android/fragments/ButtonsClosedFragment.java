@@ -34,6 +34,8 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
     private OnButtonClickListener mListener;
     private FragmentSwitcher mFragmentSwitcher;
 
+    private boolean viewsCreated = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +84,7 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
             mListener.onButtonClicked(ButtonType.HELP);
         });
 
+        viewsCreated = true;
     }
 
     public void setFragmentSwitcher(FragmentSwitcher switcher){
@@ -94,16 +97,20 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
     }
 
     public void makeButtonsUnclickable(){
-        build.setClickable(false);
-        cards.setClickable(false);
-        help.setClickable(false);
-        trade.setClickable(false);
+        if(viewsCreated) {
+            build.setClickable(false);
+            cards.setClickable(false);
+            help.setClickable(false);
+            trade.setClickable(false);
+        }
     }
 
     public void makeButtonsClickable(){
-        build.setClickable(true);
-        cards.setClickable(true);
-        help.setClickable(true);
-        trade.setClickable(true);
+        if(viewsCreated) {
+            build.setClickable(true);
+            cards.setClickable(true);
+            help.setClickable(true);
+            trade.setClickable(true);
+        }
     }
 }

@@ -40,11 +40,12 @@ public class MoveMaker {
     private static MoveMaker moveMakerInstance;
     private Player activePlayer;
 
+    boolean isReceivingData;
+
     private MoveMaker() {
         board = new Board();
         liveInDisposable = new CompositeDisposable();
         sendDisposable = new CompositeDisposable();
-        setupListeners();
     }
 
     public void reset(){
@@ -52,7 +53,6 @@ public class MoveMaker {
         setupListeners();
         hasRolled = false;
         hasPlacedVillageInSetupPhase = false;
-        isSetupPhase = true;
     }
 
     protected MoveMaker(Board board, Player localPlayer, Player activePlayer) {
@@ -61,6 +61,7 @@ public class MoveMaker {
         this.board = board;
         this.localPlayer = localPlayer;
         this.activePlayer = activePlayer;
+        isReceivingData = false;
     }
 
     public void setToken(String token) {
@@ -69,6 +70,8 @@ public class MoveMaker {
 
     public static MoveMaker getInstance() {
         if (moveMakerInstance == null) moveMakerInstance = new MoveMaker();
+        if(!moveMakerInstance.isReceivingData)
+            moveMakerInstance.reset();
         return moveMakerInstance;
     }
 
@@ -227,6 +230,7 @@ public class MoveMaker {
 
         liveInDisposable.add(gameStateDisposable);
         liveInDisposable.add(localPlayerDisposable);
+        isReceivingData = true;
     }
 
     protected void sendMove(GameMoveDto gameMoveDto, ServerErrorCallback serverErrorCallback) {
@@ -259,6 +263,7 @@ public class MoveMaker {
     public void clear(){
         liveInDisposable.clear();
         sendDisposable.clear();
+        isReceivingData = false;
     }
 }
 

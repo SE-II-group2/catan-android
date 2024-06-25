@@ -30,6 +30,7 @@ android {
         }
 
         release {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField('String', 'BASE_GAME_URL', '"http://se2-demo.aau.at:53206/catan/game/"')
