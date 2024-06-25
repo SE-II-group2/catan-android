@@ -461,7 +461,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 if(random == null)
                     random = new Random();
                 int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
-                if (diceRoll == 7) {
+                if (diceRoll == 7 && localPlayer.isActive()) {
                     endTurnButton.setClickable(false);
                     buttonsClosedFragment.makeButtonsUnclickable();
                     accuseCheatingButton.setClickable(false);
