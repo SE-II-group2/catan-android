@@ -108,6 +108,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         gameEffectManager.loadSound(R.raw.pop);
         gameEffectManager.loadSound(R.raw.small_error);
         gameEffectManager.loadSound(R.raw.tap);
+        gameEffectManager.loadSound(R.raw.dice_roll);
 
         setToFullScreen();
 
@@ -362,6 +363,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         gameProgressViewModel.getGameProgressDtoMutableLiveData().observe(this, gameProgressDto -> {
             if (gameProgressDto.getGameMoveDto() instanceof RollDiceDto) {
                 MessageBanner.makeBanner(this, MessageType.INFO, "Dice got rolled: " + ((RollDiceDto) gameProgressDto.getGameMoveDto()).getDiceRoll()).show();
+                gameEffectManager.playSound(R.raw.dice_roll);
             }
             if (gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto) {
                 if (((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
