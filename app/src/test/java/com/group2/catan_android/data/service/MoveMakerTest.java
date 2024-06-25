@@ -57,7 +57,7 @@ public class MoveMakerTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a spy of MoveMaker with mock dependencies
-        moveMaker = spy(new MoveMaker(board, localPlayer, playerList, localPlayer));
+        moveMaker = spy(new MoveMaker(board, localPlayer, localPlayer));
 
         // Mock the sendMove method to do nothing
         doNothing().when(moveMaker).sendMove(any(), any());

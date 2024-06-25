@@ -12,7 +12,6 @@ import com.group2.catan_android.data.live.game.GameMoveDto;
 import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
-import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.moves.MoveSenderRepository;
 import com.group2.catan_android.gamelogic.Board;
@@ -32,7 +31,6 @@ public class MoveMaker {
     private Board board;
     private Player localPlayer;
     private final MoveSenderRepository moveSenderRepository = MoveSenderRepository.getInstance();
-    private List<Player> players;
     private boolean isSetupPhase = true;
 
     private final CurrentGamestateRepository currentGamestateRepository = CurrentGamestateRepository.getInstance();
@@ -59,12 +57,11 @@ public class MoveMaker {
         isSetupPhase = true;
     }
 
-    protected MoveMaker(Board board, Player localPlayer, List<Player> players, Player activePlayer) {
+    protected MoveMaker(Board board, Player localPlayer, Player activePlayer) {
         liveInDisposable = new CompositeDisposable();
         sendDisposable = new CompositeDisposable();
         this.board = board;
         this.localPlayer = localPlayer;
-        this.players = players;
         this.activePlayer = activePlayer;
     }
 
@@ -102,7 +99,7 @@ public class MoveMaker {
         }
         switch (gameMove.getClass().getSimpleName()) {
             case "RollDiceDto":
-                checkRollDiceMove((RollDiceDto) gameMove);
+                checkRollDiceMove();
                 hasRolled = true;
                 break;
             case "BuildRoadMoveDto":
@@ -117,11 +114,11 @@ public class MoveMaker {
                 checkBuildCityMove(gameMove);
                 break;
             case "EndTurnMoveDto":
-                checkEndTurnMove(gameMove);
+                checkEndTurnMove();
                 hasRolled = false;
                 break;
             case "BuyProgressCardDto":
-                checkBuyProgressCardMove(gameMove);
+                checkBuyProgressCardMove();
                 break;
             case "UseProgressCardDto":
                 checkUseProgressCardMove(gameMove);
@@ -159,7 +156,7 @@ public class MoveMaker {
             throw new IllegalGameMoveException("Can't move the Robber to the same Hexagon it is currently in!");
     }
 
-    private void checkEndTurnMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkEndTurnMove() throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("End your turn during setup phase by placing a village and a road!");
         if (!hasRolled)
@@ -184,19 +181,18 @@ public class MoveMaker {
             throw new IllegalGameMoveException("Can't build a road here!");
     }
 
-    private void checkRollDiceMove(RollDiceDto gameMove) throws IllegalGameMoveException {
+    private void checkRollDiceMove() throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Can't roll the dice during setup phase");
         if (hasRolled) throw new IllegalGameMoveException("Has already Rolled the dice this turn");
     }
 
-    private void checkBuyProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
+    private void checkBuyProgressCardMove() throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Can't buy progress cards during setup phase!");
         if (!localPlayer.resourcesSufficient(ResourceCost.PROGRESS_CARD.getCost())){
             throw new IllegalGameMoveException("Not enough resources!");
         }
-        //localPlayer.adjustResources(ResourceCost.PROGRESS_CARD.getCost());
     }
 
     private void checkUseProgressCardMove(GameMoveDto gameMove) throws IllegalGameMoveException {
@@ -207,7 +203,6 @@ public class MoveMaker {
         if (!localPlayer.getProgressCards().contains(useProgressCardDto.getProgressCardType())) {
             throw new IllegalGameMoveException("Card type not in possession");
         }
-        //localPlayer.removeProgressCard(useProgressCardDto.getProgressCardType());
     }
     private void checkBuildCityMove(GameMoveDto gameMove) throws IllegalGameMoveException {
         if (isSetupPhase)
@@ -223,7 +218,6 @@ public class MoveMaker {
                 .subscribeOn(Schedulers.io())
                 .subscribe(currentGameState -> {
                     this.board = currentGameState.getBoard();
-                    this.players = currentGameState.getPlayers();
                     this.isSetupPhase = board.isSetupPhase();
                     this.activePlayer = currentGameState.getActivePlayer();
                 });
