@@ -109,7 +109,7 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         cards.setClickable(false);
         help.setClickable(false);
         trade.setClickable(false);
-        buttonsOpenFragment.makeButtonsUnclickable();
+        if(buttonsOpenFragment != null) buttonsOpenFragment.makeButtonsUnclickable();
     }
 
     public void makeButtonsClickable(){
@@ -117,6 +117,6 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
         cards.setClickable(true);
         help.setClickable(true);
         trade.setClickable(true);
-        buttonsOpenFragment.makeButtonsClickable();
+        if(buttonsOpenFragment != null) buttonsOpenFragment.makeButtonsClickable();
     }
 }
