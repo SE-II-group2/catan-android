@@ -1,13 +1,13 @@
 package com.group2.catan_android.fragments;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,26 +18,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.data.live.game.AcceptMoveDto;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.service.MoveMaker;
-import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
-import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
-import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import com.group2.catan_android.viewmodel.TradeViewModel;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class TradeOfferFragment extends Fragment {
@@ -47,6 +37,8 @@ public class TradeOfferFragment extends Fragment {
     private TradeViewModel tradeViewModel;
 
     private TextView offerFromTextView;
+
+    private Context mServerErrorContext;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +115,18 @@ public class TradeOfferFragment extends Fragment {
     }
 
     private void onServerError(Throwable t){
-        MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
-        closeFragment();
+        if(mServerErrorContext != null) {
+            if (mServerErrorContext instanceof FragmentActivity)
+                MessageBanner.makeBanner((FragmentActivity) mServerErrorContext, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+            else
+                Toast.makeText(mServerErrorContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.e("Trading", "Uncaught serverError", t);
+        }
+    }
+
+    public void setServerErrorContext(Context context){
+        mServerErrorContext = context;
     }
 }

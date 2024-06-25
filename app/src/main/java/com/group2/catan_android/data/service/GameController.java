@@ -113,13 +113,15 @@ public class GameController implements GameJoiner, GameLeaver{
         gameProgressRepository.setLiveData(gameProgressFlowable);
         Flowable<TradeOfferDto> tradeOfferDtoFlowable = stompManager.filterByType(TradeOfferDto.class);
         tradeRepository.setLiveData(tradeOfferDtoFlowable);
+
+        MoveMaker.getInstance().reset();
+        MoveMaker.getInstance().setToken(joinGameResponse.getToken());
     }
 
     private void storeSession(JoinGameResponse joinGameResponse){
         tokenRepository.storeToken(joinGameResponse.getToken());
         tokenRepository.storeGameID(joinGameResponse.getGameID());
         tokenRepository.storeInGameID(joinGameResponse.getInGameID());
-        MoveMaker.getInstance().setToken(joinGameResponse.getToken());
     }
 
 

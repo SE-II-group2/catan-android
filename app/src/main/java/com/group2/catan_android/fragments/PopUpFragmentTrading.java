@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +79,7 @@ public class PopUpFragmentTrading extends DialogFragment {
     private List<Button> playerButtons;
     private Button bankButton;
 
-    private Context serverErrorContext;
+    private Context mServerErrorContext;
     public void setUp(View view){
         setFragments();
         tradePopUpViewModel.selectAll();
@@ -121,6 +122,7 @@ public class PopUpFragmentTrading extends DialogFragment {
         for(int i=0;i<selectablePlayers.size();i++){
             if(selectablePlayers.get(i).isSelected()){
                 playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.GrassGreenHighlighted)));
+                playerButtons.get(i).setText(selectablePlayers.get(i).getPlayer().getDisplayName());
                 atLeastOneSelected=true;
             }else{
                 playerButtons.get(i).setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), R.color.red)));
@@ -159,14 +161,18 @@ public class PopUpFragmentTrading extends DialogFragment {
     }
 
     private void onServerError(Throwable t){
-        if(serverErrorContext == null) return;
-        if(serverErrorContext instanceof FragmentActivity)
-            MessageBanner.makeBanner((FragmentActivity) serverErrorContext, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
-        else
-            Toast.makeText(serverErrorContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+        if(mServerErrorContext != null) {
+            if (mServerErrorContext instanceof FragmentActivity)
+                MessageBanner.makeBanner((FragmentActivity) mServerErrorContext, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+            else
+                Toast.makeText(mServerErrorContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Log.e("Trading", "Uncaught serverError", t);
+        }
     }
 
-    public void setServerErrorContext(Context c){
-        this.serverErrorContext = c;
+    public void setServerErrorContext(Context context){
+        mServerErrorContext = context;
     }
 }

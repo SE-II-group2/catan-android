@@ -391,6 +391,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto -> {
             tradeOfferFragment = new TradeOfferFragment();
+            tradeOfferFragment.setServerErrorContext(this);
             getSupportFragmentManager().beginTransaction().replace(R.id.tradeOfferFragment, tradeOfferFragment).commit();
         });
     }

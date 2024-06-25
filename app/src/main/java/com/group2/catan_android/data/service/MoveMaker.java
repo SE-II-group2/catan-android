@@ -51,6 +51,14 @@ public class MoveMaker {
         setupListeners();
     }
 
+    public void reset(){
+        clear();
+        setupListeners();
+        hasRolled = false;
+        hasPlacedVillageInSetupPhase = false;
+        isSetupPhase = true;
+    }
+
     protected MoveMaker(Board board, Player localPlayer, List<Player> players, Player activePlayer) {
         liveInDisposable = new CompositeDisposable();
         sendDisposable = new CompositeDisposable();
@@ -255,9 +263,7 @@ public class MoveMaker {
     }
 
     public void clear(){
-        liveInDisposable.dispose();
         liveInDisposable.clear();
-        sendDisposable.dispose();
         sendDisposable.clear();
     }
 }
