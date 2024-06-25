@@ -1,5 +1,6 @@
 package com.group2.catan_android;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,6 +28,7 @@ import com.group2.catan_android.data.live.game.GameOverDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
+import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.data.service.StompManager;
 import com.group2.catan_android.data.service.UiDrawer;
 import com.group2.catan_android.fragments.ButtonsOpenFragment;
@@ -54,7 +58,7 @@ import com.group2.catan_android.viewmodel.TradeViewModel;
 
 import java.util.Random;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class GameActivity extends AppCompatActivity implements OnButtonClickListener {
 
@@ -97,14 +101,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private boolean buildMenuOpened;
 
 
-    Disposable gameOverDisposable;
+    CompositeDisposable disposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
-
         ConstraintLayout constraintLayout = findViewById(R.id.main);
         movemaker = MoveMaker.getInstance();
         uiDrawer = new UiDrawer(GameActivity.this);
@@ -131,8 +134,15 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         setupAccuseCheatingButton();
 
+        disposable = new CompositeDisposable();
+        disposable.add(StompManager.getInstance().filterByType(GameOverDto.class).subscribe((gameOverDto -> navigateToGameOverActivity())));
 
-        gameOverDisposable = StompManager.getInstance().filterByType(GameOverDto.class).subscribe((gameOverDto -> navigateToGameOverActivity()));
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                showExitConfirmationDialog();
+            }
+        });
     }
 
     private void navigateToGameOverActivity() {
@@ -450,10 +460,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         }
     }
 
-    public void setCurrentButtonFragmentListener(OnButtonEventListener listener) {
-        currentButtonFragmentListener = listener;
-    }
-
     @Override
     public void onPause(){
         super.onPause();
@@ -464,6 +470,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     @Override
     public void onDestroy() {
         super.onDestroy();
+        disposable.dispose();
+        mShakeListener.pause();
         gameEffectManager.release();
         MoveMaker.getInstance().clear();
     }
@@ -487,6 +495,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     hasRolledSeven = true;
                     uiDrawer.setHasRolledSeven(true);
                     uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+                    lastButtonClicked = ButtonType.ROBBER;
                 }
                 currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
             } catch (Exception e) {
@@ -521,5 +530,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void onServerError(Throwable t) {
         MessageBanner.makeBanner(this, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
+    }
+
+    private void showExitConfirmationDialog() {
+        AlertDialog dialog =  new AlertDialog.Builder(this)
+                .setTitle("You are about to leave!")
+                .setMessage("You will not be able to reconnect to this game")
+                .setPositiveButton("Keep playing", null)
+                .setNegativeButton("Leave", (dialog1, which) -> {
+                    disposable.add(GameController.getInstance().leaveGame().subscribe(this::finish, throwable -> finish()));
+                })
+                .create();
+
+        dialog.show();
+
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+
+
     }
 }

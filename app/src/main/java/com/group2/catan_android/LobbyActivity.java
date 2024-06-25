@@ -75,7 +75,6 @@ public class LobbyActivity extends AppCompatActivity {
         recyclerView.setAdapter(gameListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        requestActiveGames();
         connectButton.setOnClickListener(v -> {
             playerName = playerNameEditText.getText().toString();
             joinGame(false);
@@ -92,9 +91,15 @@ public class LobbyActivity extends AppCompatActivity {
 
         refreshButton.setOnClickListener(v -> requestActiveGames());
 
-        updateTryReconnect();
         tryReconnectButton.setOnClickListener(v -> tryReconnect());
 
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        requestActiveGames();
+        updateTryReconnect();
     }
 
     private void requestActiveGames() {
@@ -168,13 +173,13 @@ public class LobbyActivity extends AppCompatActivity {
         Button createButton = findViewById(R.id.LobbyCreateButton);
 
         if(selectedGameID != null){
-            connectButton.setBackgroundColor(getResources().getColor(R.color.button_available));
-            createButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
+            connectButton.setBackgroundColor(getResources().getColor(R.color.button_available, null));
+            createButton.setBackgroundColor(getResources().getColor(R.color.button_not_available, null));
             createButton.setEnabled(false);
             connectButton.setEnabled(true);
         } else {
-            connectButton.setBackgroundColor(getResources().getColor(R.color.button_not_available));
-            createButton.setBackgroundColor(getResources().getColor(R.color.button_available));
+            connectButton.setBackgroundColor(getResources().getColor(R.color.button_not_available, null));
+            createButton.setBackgroundColor(getResources().getColor(R.color.button_available, null));
             createButton.setEnabled(true);
             connectButton.setEnabled(false);
         }
