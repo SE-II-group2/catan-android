@@ -263,6 +263,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     private void clickOnRobber(int correctID) {
+        lastButtonClicked = ButtonType.ROBBER;
         if (hasRolledSeven) {
             movemaker.makeMove(new MoveRobberDto(correctID, true));
             hasRolledSeven = false;
@@ -277,9 +278,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             hasUsedProgressCard = false;
             uiDrawer.removeAllPossibleMovesFromUI();
         }
-        if (lastButtonClicked != ButtonType.ROBBER && !localPlayer.isActive()) {
+        if (!uiDrawer.showingPossibleRobberMoves()) {
             uiDrawer.showPossibleMoves(ButtonType.ROBBER);
-            lastButtonClicked = ButtonType.ROBBER;
         } else {
             try {
                 movemaker.makeMove(new MoveRobberDto(correctID, false));
@@ -487,7 +487,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                     hasRolledSeven = true;
                     uiDrawer.setHasRolledSeven(true);
                     uiDrawer.showPossibleMoves(ButtonType.ROBBER);
-                    lastButtonClicked = ButtonType.ROBBER;
                 }
                 currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
             } catch (Exception e) {
