@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,6 +41,7 @@ import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.gamelogic.Player;
 
 import com.group2.catan_android.gamelogic.enums.ProgressCardType;
+import com.group2.catan_android.util.ShakeListener;
 import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
 import com.group2.catan_android.util.GameEffectManager;
 import com.group2.catan_android.util.MessageBanner;
@@ -83,10 +83,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     private ButtonType lastButtonClicked; // stores the last button clicked, the "active button"
 
     private GameEffectManager gameEffectManager;
+    private ShakeListener mShakeListener;
+    private boolean mUsingShakeListener;
     private boolean hasRolledSeven = false;
     private boolean hasUsedProgressCard = false;
     private ImageView endTurnButton;
     private ImageView accuseCheatingButton;
+    private Random random;
 
 
     Disposable gameOverDisposable;
@@ -110,6 +113,8 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
         createViews(constraintLayout);
 
+        setUpShakeListener();
+
         createFragments();
 
         setupViewModels();
@@ -130,6 +135,20 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         finish();
     }
 
+    private void setUpShakeListener() {
+        mShakeListener = new ShakeListener(this);
+        try {
+            mShakeListener.resume();
+            mShakeListener.doOnShake(() -> {
+                rollDice();
+                gameEffectManager.vibrate(200, 200);
+                mShakeListener.pause();
+            });
+            mUsingShakeListener = true;
+        } catch (UnsupportedOperationException e) {
+            mUsingShakeListener = false;
+        }
+    }
 
     private void setToFullScreen() {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
@@ -256,7 +275,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
                 uiDrawer.removeAllPossibleMovesFromUI();
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
             }
-            lastButtonClicked=ButtonType.EXIT;
+            lastButtonClicked = ButtonType.EXIT;
             uiDrawer.removeAllPossibleMovesFromUI();
         }
     }
@@ -295,32 +314,23 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
 
     private void setupDiceRollButton() {
         findViewById(R.id.diceRollButton).setOnClickListener(v -> {
-            if (!movemaker.hasRolled() && !board.isSetupPhase()) {
-                try {
-                    Random random = new Random();
-                    int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
-                    if (diceRoll == 7) {
-                        endTurnButton.setClickable(false);
-                        buttonsClosedFragment.makeButtonsUnclickable();
-                        accuseCheatingButton.setClickable(false);
-                        hasRolledSeven = true;
-                        uiDrawer.setHasRolledSeven(true);
-                        uiDrawer.showPossibleMoves(ButtonType.ROBBER);
-                    }
-                    movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
-                    movemaker.setHasRolled(true);
-                    currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
-                } catch (Exception e) {
-                    MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
-                }
+            if (mUsingShakeListener) {
+                MessageBanner.makeBanner(this, MessageType.WARNING, "Shake your device to roll. Long Press to Override").show();
+            } else {
+                rollDice();
             }
+        });
+        findViewById(R.id.diceRollButton).setOnLongClickListener(v -> {
+            rollDice();
+            if (mUsingShakeListener) mShakeListener.pause();
+            return true;
         });
     }
 
     private void setupAccuseCheatingButton() {
         accuseCheatingButton = findViewById(R.id.accuseCheatingButton);
         accuseCheatingButton.setOnClickListener(v -> {
-            try{
+            try {
                 movemaker.makeMove(new AccuseCheatingDto(localPlayer.toIngamePlayerDto()), this::onServerError);
                 uiDrawer.removeAllPossibleMovesFromUI();
                 lastButtonClicked = null;
@@ -338,9 +348,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         GameProgressViewModel gameProgressViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(GameProgressViewModel.initializer)).get(GameProgressViewModel.class);
         TradeViewModel tradeViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(TradeViewModel.initializer)).get(TradeViewModel.class);
 
-        boardViewModel.getBoardMutableLiveData().observe(this, board -> {
-            this.board = board;
-            uiDrawer.updateUiBoard(board);
+        boardViewModel.getBoardMutableLiveData().observe(this, newBoard -> {
+            this.board = newBoard;
+            uiDrawer.updateUiBoard(newBoard);
             currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
         });
 
@@ -356,6 +366,7 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             if (gameProgressDto.getGameMoveDto() instanceof EndTurnMoveDto) {
                 if (((EndTurnMoveDto) gameProgressDto.getGameMoveDto()).getNextPlayer().getInGameID() == localPlayer.getInGameID()) {
                     MessageBanner.makeBanner(this, MessageType.INFO, "Your Turn!").show();
+                    mShakeListener.resume();
                     gameEffectManager.vibrate();
                     gameEffectManager.playSound(R.raw.pop);
                 } else {
@@ -374,9 +385,9 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             }
         });
 
-        tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto ->{
+        tradeViewModel.getTradeOfferDtoMutableLiveData().observe(this, tradeOfferDto -> {
             tradeOfferFragment = new TradeOfferFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.tradeOfferFragment,tradeOfferFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.tradeOfferFragment, tradeOfferFragment).commit();
         });
     }
 
@@ -426,6 +437,13 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+        if(mUsingShakeListener)
+            mShakeListener.pause();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         gameEffectManager.release();
@@ -437,7 +455,30 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
         uiDrawer.showPossibleMoves(ButtonType.ROBBER);
     }
 
-    private void onServerError(Throwable t){
+    private void rollDice() {
+        if (!movemaker.hasRolled() && !board.isSetupPhase()) {
+            try {
+                if(random == null)
+                    random = new Random();
+                int diceRoll = random.nextInt(6) + 1 + random.nextInt(6) + 1;
+                if (diceRoll == 7) {
+                    endTurnButton.setClickable(false);
+                    buttonsClosedFragment.makeButtonsUnclickable();
+                    accuseCheatingButton.setClickable(false);
+                    hasRolledSeven = true;
+                    uiDrawer.setHasRolledSeven(true);
+                    uiDrawer.showPossibleMoves(ButtonType.ROBBER);
+                }
+                movemaker.makeMove(new RollDiceDto(diceRoll), this::onServerError);
+                movemaker.setHasRolled(true);
+                currentButtonFragmentListener.onButtonEvent(ButtonType.EXIT);
+            } catch (Exception e) {
+                MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
+            }
+        }
+    }
+
+    private void onServerError(Throwable t) {
         MessageBanner.makeBanner(this, MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }
