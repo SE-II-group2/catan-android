@@ -243,7 +243,6 @@ public class GameActivity extends AppCompatActivity implements OnButtonClickList
             } catch (Exception e) {
                 MessageBanner.makeBanner(this, MessageType.ERROR, e.getMessage()).show();
                 gameEffectManager.playSound(R.raw.small_error);
-                gameEffectManager.doubleVibrate();
             }
         });
     }
