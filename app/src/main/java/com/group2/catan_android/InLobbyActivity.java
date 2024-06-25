@@ -25,7 +25,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class InLobbyActivity extends AppCompatActivity {
     private ActivityInLobbyBinding binding;
-    private PlayerListAdapter adapter;
     private InLobbyViewModel mViewModel;
 
     Disposable leaveDisposable;
@@ -43,19 +42,15 @@ public class InLobbyActivity extends AppCompatActivity {
 
         gameStartDisposable = StompManager.getInstance().filterByType(GameStartedDto.class).subscribe((gameStartedDto -> navigateToGameActivity()));
 
-        adapter = new PlayerListAdapter(this);
+        PlayerListAdapter adapter = new PlayerListAdapter(this);
         binding.playerList.setAdapter(adapter);
         binding.playerList.setLayoutManager(new LinearLayoutManager(this));
 
         mViewModel.getPlayersLiveData().observe(this, displayablePlayers -> adapter.setPlayers(displayablePlayers));
         mViewModel.getPlayerIsAdminLiveData().observe(this, this::setAdmin );
 
-        binding.leave.setOnClickListener(v -> {
-            doLeave();
-        });
-        binding.start.setOnClickListener(v ->{
-            doStart();
-        });
+        binding.leave.setOnClickListener(v -> doLeave());
+        binding.start.setOnClickListener(v -> doStart());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -90,7 +85,7 @@ public class InLobbyActivity extends AppCompatActivity {
 
     private void doLeave(){
         leaveDisposable = mViewModel.leaveGame()
-                .subscribe(this::finish);
+                .subscribe(this::finish, throwable -> finish());
     }
 
     @Override
