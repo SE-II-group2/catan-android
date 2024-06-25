@@ -93,7 +93,7 @@ public class YearOfPlentyFragment extends PopUpFragment {
     }
     private void useProgressCard(List<ResourceDistribution> resources){
         try {
-            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.YEAR_OF_PLENTY, resources, null, 0));
+            moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.YEAR_OF_PLENTY, resources, null, 0), this::onServerError);
         } catch (Exception e) {
             MessageBanner.makeBanner(getActivity(), MessageType.ERROR, "An error occurred!").show();
             Log.d("ProgressCards", e.toString());
@@ -107,5 +107,9 @@ public class YearOfPlentyFragment extends PopUpFragment {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.remove(this);
         fragmentTransaction.commit();
+    }
+
+    private void onServerError(Throwable t){
+        MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }

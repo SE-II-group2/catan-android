@@ -1,6 +1,7 @@
 package com.group2.catan_android.data.service;
 
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
@@ -32,7 +33,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoveMakerTest {
+class MoveMakerTest {
     private MoveMaker moveMaker;
     private List<Player> playerList;
     private Field isSetupPhaseField;
@@ -56,10 +57,10 @@ public class MoveMakerTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a spy of MoveMaker with mock dependencies
-        moveMaker = spy(new MoveMaker(board, localPlayer, playerList, localPlayer));
+        moveMaker = spy(new MoveMaker(board, localPlayer, localPlayer));
 
         // Mock the sendMove method to do nothing
-        doNothing().when(moveMaker).sendMove(any());
+        doNothing().when(moveMaker).sendMove(any(), any());
         String token = "token";
         moveMaker.setToken(token);
 
@@ -83,7 +84,7 @@ public class MoveMakerTest {
         GameMoveDto move = new RollDiceDto(5); // Use a proper RollDiceDto instance
         moveMaker.makeMove(move); // This should succeed
         assert (moveMaker.hasRolled());
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 
     @Test
@@ -110,7 +111,7 @@ public class MoveMakerTest {
     void testMakeBuildVillageMoveSuccess() {
         BuildVillageMoveDto move = new BuildVillageMoveDto(31);
         moveMaker.makeMove(move); // This should succeed
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 
 
@@ -134,7 +135,7 @@ public class MoveMakerTest {
 
         BuildRoadMoveDto roadMove = new BuildRoadMoveDto(0);
         moveMaker.makeMove(roadMove);
-        verify(moveMaker, times(2)).sendMove(any());
+        verify(moveMaker, times(2)).sendMove(any(), any());
     }
 
     @Test
@@ -150,10 +151,13 @@ public class MoveMakerTest {
     @Test
     void testEndTurnMoveOutOfSetupPhaseSuccess() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
+        RollDiceDto rollDiceDto = new RollDiceDto();
+        moveMaker.makeMove(rollDiceDto);
+
         EndTurnMoveDto endTurnMoveDto = new EndTurnMoveDto();
         moveMaker.makeMove(endTurnMoveDto);
 
-        verify(moveMaker, times(1)).sendMove(any());
+        verify(moveMaker, times(1)).sendMove(eq(endTurnMoveDto), any());
     }
 
     @Test
@@ -197,11 +201,11 @@ public class MoveMakerTest {
             hexagon.setHasRobber(false);
         }
         isSetupPhaseField.set(moveMaker, false);
-        MoveRobberDto moveRobberMove = new MoveRobberDto(10, true);
-        moveMaker.makeMove(moveRobberMove);
-        moveRobberMove = new MoveRobberDto(15, false);
-        moveMaker.makeMove(moveRobberMove);
-        verify(moveMaker, times(2)).sendMove(any());
+        MoveRobberDto moveRobberMoveLegal = new MoveRobberDto(10, true);
+        moveMaker.makeMove(moveRobberMoveLegal);
+        MoveRobberDto moveRobberMoveIllegal = new MoveRobberDto(15, false);
+        assertThrows(IllegalGameMoveException.class, ()-> moveMaker.makeMove(moveRobberMoveIllegal));
+        verify(moveMaker, times(1)).sendMove(eq(moveRobberMoveLegal), any());
     }
 
     @Test
@@ -217,7 +221,7 @@ public class MoveMakerTest {
         isSetupPhaseField.set(moveMaker, false);
         AccuseCheatingDto accuseCheatingDto = new AccuseCheatingDto();
         moveMaker.makeMove(accuseCheatingDto);
-        verify(moveMaker, times(1)).sendMove(accuseCheatingDto);
+        verify(moveMaker, times(1)).sendMove(accuseCheatingDto, null);
     }
 
     @Test
@@ -254,7 +258,7 @@ public class MoveMakerTest {
 
         BuildCityMoveDto move = new BuildCityMoveDto(0);
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
     @Test
     void testMakeBuyProgressCardMoveDuringSetupPhaseThrowsError() {
@@ -273,7 +277,7 @@ public class MoveMakerTest {
         playerList.get(0).adjustResources(new int[]{5, 5, 5, 5, 5});
         GameMoveDto move = new BuyProgressCardDto();
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
     @Test
     void testMakeUseProgressCardMoveDuringSetupPhase() {
@@ -293,7 +297,7 @@ public class MoveMakerTest {
         playerList.get(0).getProgressCards().add(ProgressCardType.VICTORY_POINT);
         GameMoveDto move = new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0);
         moveMaker.makeMove(move);
-        verify(moveMaker, times(1)).sendMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
     }
 }
 

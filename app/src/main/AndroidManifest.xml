@@ -21,7 +21,8 @@
         <activity
             android:name=".InLobbyActivity"
             android:exported="false"
-            android:theme="@style/Theme.Catan_android" />
+            android:theme="@style/Theme.Catan_android"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".LobbyActivity"
             android:exported="false"

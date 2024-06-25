@@ -2,6 +2,8 @@ package com.group2.catan_android.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -13,7 +15,7 @@ import com.group2.catan_android.R;
 import com.group2.catan_android.gamelogic.Player;
 
 public class PlayerResourcesFragment extends Fragment {
-
+    private int[] resources;
     private TextView woodCount;
     private TextView brickCount;
     private TextView sheepCount;
@@ -37,6 +39,19 @@ public class PlayerResourcesFragment extends Fragment {
 
         return view;
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (resources!=null) {
+            updateResources(resources);
+        }
+    }
+    public void setResources(int[] resources) {
+        this.resources = resources;
+        if (getView() != null) {
+            updateResources(resources);
+        }
+    }
 
     public void updateResources(Player player) {
         wheatCount.setText(String.valueOf(player.getResources()[0]));
@@ -44,6 +59,14 @@ public class PlayerResourcesFragment extends Fragment {
         woodCount.setText(String.valueOf(player.getResources()[2]));
         brickCount.setText(String.valueOf(player.getResources()[3]));
         stoneCount.setText(String.valueOf(player.getResources()[4]));
+    }
+
+    public void updateResources(int[] resources) {
+        wheatCount.setText(String.valueOf(resources[0]));
+        sheepCount.setText(String.valueOf(resources[1]));
+        woodCount.setText(String.valueOf(resources[2]));
+        brickCount.setText(String.valueOf(resources[3]));
+        stoneCount.setText(String.valueOf(resources[4]));
     }
 
 }

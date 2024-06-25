@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="200dp"
+    android:layout_height="300dp"
+    tools:context=".fragments.TradeOfferFragment"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/trade_button_svg"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/trade_offer_player_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="5dp"
+            android:text="Player 1"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="15sp"
+            android:text="wants to trade:"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/trade_offer_give_fragment"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="-30dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/trade_offer_give_arrow"
+            android:src="@drawable/arrow_right"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/trade_offer_get_fragment"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="-30dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/trade_offer_get_arrow"
+            android:src="@drawable/arrow_left"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/trade_offer_accept"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:backgroundTint="@color/GrassGreenHighlighted"
+        android:textColor="@color/black"
+        style="@style/Trade_ButtonStyle"
+        android:text="Accept" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/trade_offer_decline"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/black"
+            style="@style/Trade_ButtonStyle"
+            android:text="Decline" />
+
+    </LinearLayout>
+
+</LinearLayout>

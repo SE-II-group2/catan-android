@@ -18,6 +18,7 @@ import com.group2.catan_android.data.repository.gamestate.CurrentGamestateReposi
 import com.group2.catan_android.data.repository.lobby.LobbyJoiner;
 import com.group2.catan_android.data.repository.player.PlayerRepository;
 import com.group2.catan_android.data.repository.token.TokenRepository;
+import com.group2.catan_android.data.repository.trading.TradeRepository;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,10 +50,12 @@ class GameControllerTests {
 
     @Mock
     GameProgressRepository gameProgressRepository;
+    @Mock
+    TradeRepository tradeRepository;
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.openMocks(this);
-        GameController.initialize(stompManager, tokenRepository, playerRepository, lobbyJoiner, currentGamestateRepository, gameProgressRepository);
+        GameController.initialize(stompManager, tokenRepository, playerRepository, lobbyJoiner, currentGamestateRepository, gameProgressRepository, tradeRepository);
         gameController = GameController.getInstance();
     }
 

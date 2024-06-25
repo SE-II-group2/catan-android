@@ -9,15 +9,19 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
+import com.group2.catan_android.data.service.GameController;
 import com.group2.catan_android.fragments.PlayerScoresFragment;
 import com.group2.catan_android.gamelogic.Player;
 
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
+
 public class GameOverActivity extends AppCompatActivity {
 
     private PlayerScoresFragment playerScoresFragment;
     private List<Player> players;
+    Disposable finalGamestateDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +34,10 @@ public class GameOverActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.playerFinalScoresFragment, playerScoresFragment).commit();
 
         CurrentGamestateRepository currentGamestateRepository = CurrentGamestateRepository.getInstance();
-        currentGamestateRepository.getAllPlayerObservable().subscribe(playerList -> this.players = playerList);
+        finalGamestateDisposable = currentGamestateRepository.getAllPlayerObservable().subscribe(playerList -> this.players = playerList);
 
         Button lobbyButton = findViewById(R.id.leave);
-        lobbyButton.setOnClickListener(v -> navigate(LobbyActivity.class));
+        lobbyButton.setOnClickListener(v -> {leave(); navigate(LobbyActivity.class);});
 
         setToFullScreen();
     }
@@ -53,8 +57,19 @@ public class GameOverActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
     }
 
+    private void leave(){
+        GameController.getInstance().cleanupFinishedGame();
+    }
+
     private void navigate(Class<?> cl){
         Intent i = new Intent(getApplicationContext(), cl);
         startActivity(i);
+        finish();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        finalGamestateDisposable.dispose();
     }
 }

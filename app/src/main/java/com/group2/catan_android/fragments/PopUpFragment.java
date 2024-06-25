@@ -31,6 +31,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
 
     private DevelopmentCardListAdapter devCardAdapter;
     private MoveMaker moveMaker;
+    private Player localPlayer;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
         recyclerView.setAdapter(devCardAdapter);
         LocalPlayerViewModel localPlayerViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(LocalPlayerViewModel.initializer)).get(LocalPlayerViewModel.class);
         localPlayerViewModel.getPlayerMutableLiveData().observe(getViewLifecycleOwner(), player -> {
+            localPlayer = player;
             if(player != null){
                 updateAdapterWithPlayerData(player);
             }
@@ -54,36 +56,40 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
     }
 
     public void onDevelopmentCardClick(ProgressCardType cardType){
-        switch(cardType) {
-            case KNIGHT:
-                makeAllRobbersVisible();
-                break;
-            case ROAD_BUILDING:
-                try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null, 0));
-                } catch (Exception e) {
-                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
-                }
-                MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Resources for two roads added!").show();
-                closeFragment();
-                break;
-            case YEAR_OF_PLENTY:
-                replaceFragment(new YearOfPlentyFragment());
-                break;
-            case MONOPOLY:
-                replaceFragment(new MonopolyFragment());
-                break;
-            case VICTORY_POINT:
-                try {
-                    moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0));
-                } catch (Exception e) {
-                    MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
-                }
-                MessageBanner.makeBanner(getActivity(), MessageType.INFO, "One Victory Point added!").show();
-                closeFragment();
-                break;
-            default:
-                break;
+        if(localPlayer.isActive()) {
+            switch (cardType) {
+                case KNIGHT:
+                    makeAllRobbersVisible();
+                    break;
+                case ROAD_BUILDING:
+                    try {
+                        moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.ROAD_BUILDING, null, null, 0), this::doOnServerError);
+                        MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Resources for two roads added!").show();
+                    } catch (Exception e) {
+                        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
+                    }
+                    closeFragment();
+                    break;
+                case YEAR_OF_PLENTY:
+                    replaceFragment(new YearOfPlentyFragment());
+                    break;
+                case MONOPOLY:
+                    replaceFragment(new MonopolyFragment());
+                    break;
+                case VICTORY_POINT:
+                    try {
+                        moveMaker.makeMove(new UseProgressCardDto(ProgressCardType.VICTORY_POINT, null, null, 0), this::doOnServerError);
+                        MessageBanner.makeBanner(getActivity(), MessageType.INFO, "One Victory Point added!").show();
+                    } catch (Exception e) {
+                        MessageBanner.makeBanner(getActivity(), MessageType.ERROR, e.getMessage()).show();
+                    }
+                    closeFragment();
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "Not active Player!").show();
         }
     }
 
@@ -108,5 +114,9 @@ public class PopUpFragment extends DialogFragment implements OnDevelopmentCardCl
         gameActivity.makeAllRobberViewsClickableComingFromProgressCard();
         MessageBanner.makeBanner(getActivity(), MessageType.INFO, "Choose the robber position!").show();
         closeFragment();
+    }
+
+    private void doOnServerError(Throwable t){
+        MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "SERVER: " + t.getMessage()).show();
     }
 }
