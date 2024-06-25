@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/trading_options"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/popup_background">
+    android:padding="10dp"
+    android:background="@drawable/wood_texture">
 
     <FrameLayout
         android:id="@+id/trading_popup_topfragment"
@@ -50,10 +52,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="Give"
+            android:text="give"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="30dp"
+            android:textSize="20sp"
             android:paddingBottom="2dp"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -101,10 +103,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Get"
+        android:text="get"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="30dp"
+        android:textSize="20sp"
         android:paddingBottom="4dp"
         />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -207,79 +209,63 @@
         android:id="@+id/trading_popup_bottomfragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:paddingStart="2dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="2dp"
+        android:paddingBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="2.5:1"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.33"
-        app:layout_constraintDimensionRatio="2.5:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:paddingStart="2dp"
-        android:paddingEnd="2dp"
-        />
-    <FrameLayout
-        android:id="@+id/trading_popup_bank_trades"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.34"
-        app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.25"
-        app:layout_constraintStart_toEndOf="@+id/trading_popup_bottomfragment"
-        app:layout_constraintTop_toBottomOf="@+id/get_layout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/trading_popup_bottom_right_fragment"
-        />
+        app:layout_constraintStart_toEndOf="@+id/yourResourcesText">
+
+    </FrameLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/trading_popup_bottom_right_fragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.34"
-        app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.25"
         app:layout_constraintTop_toBottomOf="@id/trading_popup_selection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        >
-
-        <FrameLayout
-            android:id="@+id/trading_popup_time_selection"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.66"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/trading_popup_confirm"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp"
-            />
-
-
-
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.25">
 
 
         <Button
             android:id="@+id/trading_popup_confirm"
+            style="@style/Trade_ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.34"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:backgroundTint="@color/GrassGreenHighlighted"
             android:gravity="center"
             android:text="Confirm"
-            app:autoSizeTextType="uniform"
-            android:backgroundTint="@color/GrassGreenHighlighted"
             android:textColor="@color/black"
-            style="@style/Trade_ButtonStyle"
-            />
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintHeight_percent="0.34"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/yourResourcesText"
+        android:layout_width="127dp"
+        android:layout_height="69dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/rounded_background_text_view_trading"
+        android:gravity="center"
+        android:text="Your current\nresources:"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/trading_popup_bottomfragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/trading_popup_bottomfragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
