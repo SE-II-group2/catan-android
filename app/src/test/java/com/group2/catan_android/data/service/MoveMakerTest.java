@@ -1,6 +1,7 @@
 package com.group2.catan_android.data.service;
 
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
@@ -150,10 +151,13 @@ public class MoveMakerTest {
     @Test
     void testEndTurnMoveOutOfSetupPhaseSuccess() throws Exception {
         isSetupPhaseField.set(moveMaker, false);
+        RollDiceDto rollDiceDto = new RollDiceDto();
+        moveMaker.makeMove(rollDiceDto);
+
         EndTurnMoveDto endTurnMoveDto = new EndTurnMoveDto();
         moveMaker.makeMove(endTurnMoveDto);
 
-        verify(moveMaker, times(1)).sendMove(any(), any());
+        verify(moveMaker, times(1)).sendMove(eq(endTurnMoveDto), any());
     }
 
     @Test
