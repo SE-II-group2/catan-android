@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
 import com.group2.catan_android.viewmodel.TradePopUpViewModel;
 import com.group2.catan_android.viewmodel.TradeResourcesViewModel;
 
@@ -27,7 +29,7 @@ public class TradingResourceSelectionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tradeResourcesViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(TradeResourcesViewModel.initializer)).get(TradeResourcesViewModel.class);
+        tradeResourcesViewModel = new ViewModelProvider(this).get(TradeResourcesViewModel.class);
     }
 
     @Override
@@ -35,7 +37,6 @@ public class TradingResourceSelectionFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_trading_resource_selection, container, false);
     }
-    // fixme extract methods
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -69,51 +70,19 @@ public class TradingResourceSelectionFragment extends Fragment {
         for(int i=0;i<plus.length;i++){
             final int j = i;
             plus[j].setOnClickListener(v -> {
-                int num = getNumberofTextView(count[j]);
-                if (num == -1) {
-                    return;
-                }//Error
-                count[j].setText(Integer.toString(++num));
+                count[j].setText(Integer.toString(tradeResourcesViewModel.togglePlus(j)));
             });
             minus[j].setOnClickListener(v -> {
-                int num = getNumberofTextView(count[j]);
-                if (num == -1) {
-                    return;
-                }//Error
-                num--;
-                if (num < 0) {
-                    return;
+                int result= tradeResourcesViewModel.toggleMinus(j);
+                if(result<=-1){
+                    MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, "Clicked Resource can not me less than zero!").show();
+                }else {
+                    count[j].setText(Integer.toString(result));
                 }
-                count[j].setText(Integer.toString(num));
             });
-        }
-    }
-
-    public int getNumberofTextView(TextView view){
-        CharSequence content = view.getText();
-        if(content==null){
-            Toast.makeText(getContext(), "clicked resource does not have a count! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
-        }
-        String num = content.toString();
-        if(num.isEmpty()){
-            Toast.makeText(getContext(), "clicked resource increasing did not work! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
-        }
-        try {
-            return Integer.parseInt(num);
-        }catch(NumberFormatException e){
-            Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
         }
     }
     public int[] getSetResources(){
-        int[] resources = new int[5];
-        resources[2]=getNumberofTextView(count[0]);
-        resources[3]=getNumberofTextView(count[1]);
-        resources[1]=getNumberofTextView(count[2]);
-        resources[0]=getNumberofTextView(count[3]);
-        resources[4]=getNumberofTextView(count[4]);
-        return resources;
+        return tradeResourcesViewModel.getResources();
     }
 }
