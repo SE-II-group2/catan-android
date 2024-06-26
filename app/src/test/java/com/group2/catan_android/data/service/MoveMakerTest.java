@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.group2.catan_android.data.exception.IllegalGameMoveException;
+import com.group2.catan_android.data.live.game.AcceptTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
@@ -16,9 +17,11 @@ import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.BuyProgressCardDto;
 import com.group2.catan_android.data.live.game.EndTurnMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
+import com.group2.catan_android.data.live.game.IngamePlayerDto;
 import com.group2.catan_android.data.live.game.MakeTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
+import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.gamelogic.Board;
 import com.group2.catan_android.gamelogic.Player;
@@ -301,25 +304,25 @@ class MoveMakerTest {
         verify(moveMaker, times(1)).sendMove(move, null);
     }
     @Test
+    void testAcceptTradeOfferWorking()throws Exception{
+        isSetupPhaseField.set(moveMaker, false);
+        localPlayer.adjustResources(new int[]{1,1,1,1,1});
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
+        moveMaker.makeMove(move);
+        verify(moveMaker, times(1)).sendMove(move, null);
+    }
+    @Test
     void testAcceptTradeOfferInSetupPhase()throws Exception{
         isSetupPhaseField.set(moveMaker, true);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{1,1,1,1,1}, new ArrayList<>());
-        assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
-    }
-    @Test
-    void testAcceptTradeOfferNotActivePlayer()throws Exception{
-        isSetupPhaseField.set(moveMaker, false);
-        activePlayerField.set(moveMaker, otherPlayer);
-        localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, new ArrayList<>());
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testAcceptTradeOfferNotEnoughResources()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
         localPlayer.adjustResources(new int[]{1,1,1,1,0});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, new ArrayList<>());
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, otherPlayer.toIngamePlayerDto()));
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
