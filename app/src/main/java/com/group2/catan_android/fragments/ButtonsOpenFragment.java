@@ -9,10 +9,10 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.FragmentSwitcher;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 
@@ -27,6 +27,9 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
     private OnButtonClickListener mListener;
 
     private ButtonType activeButton;
+
+    private FragmentSwitcher mFragmentSwitcher;
+    private boolean viewsCreated = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,11 +56,9 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
 
         exit.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.EXIT);
-            Fragment newFragment = new ButtonsClosedFragment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.leftButtonsFragment, newFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+            if(mFragmentSwitcher != null){
+                mFragmentSwitcher.onSwitchButtonPressed();
+            }
         });
 
         road.setOnClickListener(v -> {
@@ -76,6 +77,7 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
             mListener.onButtonClicked(ButtonType.PROGRESS_CARD);
         });
 
+        viewsCreated = true;
     }
 
     @Override
@@ -102,19 +104,27 @@ public class ButtonsOpenFragment extends Fragment implements OnButtonEventListen
         }
 
     }
+
+    public void setFragmentSwitcher(FragmentSwitcher switcher){
+        mFragmentSwitcher = switcher;
+    }
     public void makeButtonsClickable() {
-        road.setClickable(true);
-        village.setClickable(true);
-        city.setClickable(true);
-        progressCard.setClickable(true);
-        exit.setClickable(true);
+        if(viewsCreated) {
+            road.setClickable(true);
+            village.setClickable(true);
+            city.setClickable(true);
+            progressCard.setClickable(true);
+            exit.setClickable(true);
+        }
     }
 
     public void makeButtonsUnclickable() {
-        road.setClickable(false);
-        village.setClickable(false);
-        city.setClickable(false);
-        progressCard.setClickable(false);
-        exit.setClickable(false);
+        if(viewsCreated) {
+            road.setClickable(false);
+            village.setClickable(false);
+            city.setClickable(false);
+            progressCard.setClickable(false);
+            exit.setClickable(false);
+        }
     }
 }

@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.group2.catan_android.GameActivity;
 import com.group2.catan_android.R;
 import com.group2.catan_android.fragments.enums.ButtonType;
+import com.group2.catan_android.fragments.interfaces.FragmentSwitcher;
 import com.group2.catan_android.fragments.interfaces.OnButtonClickListener;
 import com.group2.catan_android.fragments.interfaces.OnButtonEventListener;
 
@@ -30,9 +31,10 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
     ImageView cards;
     ImageView help;
 
-    ButtonsOpenFragment buttonsOpenFragment;
-
     private OnButtonClickListener mListener;
+    private FragmentSwitcher mFragmentSwitcher;
+
+    private boolean viewsCreated = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,20 +63,12 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
 
         build.setOnClickListener(v -> {
             mListener.onButtonClicked(ButtonType.BUILD);
-            buttonsOpenFragment = new ButtonsOpenFragment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.leftButtonsFragment, buttonsOpenFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-
-            if (getActivity() instanceof GameActivity) {
-                ((GameActivity) getActivity()).setCurrentButtonFragmentListener(buttonsOpenFragment);
+            if(mFragmentSwitcher != null){
+                mFragmentSwitcher.onSwitchButtonPressed();
             }
         });
 
         trade.setOnClickListener(v -> {
-            setButtonBorders(v);
-            // TODO: Write what shall happen when pressing the trade button
             PopUpFragmentTrading trading = new PopUpFragmentTrading();
             trading.setServerErrorContext(getActivity());
             trading.show(getActivity().getSupportFragmentManager(), "popup_fragment_trading");
@@ -90,14 +84,12 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
             mListener.onButtonClicked(ButtonType.HELP);
         });
 
+        viewsCreated = true;
     }
 
-    private void setButtonBorders(View v) {
-        cards.setBackgroundResource(0);
-        trade.setBackgroundResource(0);
-        v.setBackgroundResource(R.drawable.button_clicked_border);
+    public void setFragmentSwitcher(FragmentSwitcher switcher){
+        mFragmentSwitcher = switcher;
     }
-
     @Override
     public void onButtonEvent(ButtonType button) {
         cards.setBackgroundResource(0);
@@ -105,18 +97,20 @@ public class ButtonsClosedFragment extends Fragment implements OnButtonEventList
     }
 
     public void makeButtonsUnclickable(){
-        build.setClickable(false);
-        cards.setClickable(false);
-        help.setClickable(false);
-        trade.setClickable(false);
-        buttonsOpenFragment.makeButtonsUnclickable();
+        if(viewsCreated) {
+            build.setClickable(false);
+            cards.setClickable(false);
+            help.setClickable(false);
+            trade.setClickable(false);
+        }
     }
 
     public void makeButtonsClickable(){
-        build.setClickable(true);
-        cards.setClickable(true);
-        help.setClickable(true);
-        trade.setClickable(true);
-        buttonsOpenFragment.makeButtonsClickable();
+        if(viewsCreated) {
+            build.setClickable(true);
+            cards.setClickable(true);
+            help.setClickable(true);
+            trade.setClickable(true);
+        }
     }
 }

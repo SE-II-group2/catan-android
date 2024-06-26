@@ -82,7 +82,6 @@ public class TradingResourceSelectionFragment extends Fragment {
                 }//Error
                 num--;
                 if (num < 0) {
-                    Toast.makeText(getContext(), "clicked resource can not be less than zero", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 count[j].setText(Integer.toString(num));
