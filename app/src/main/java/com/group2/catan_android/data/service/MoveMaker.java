@@ -3,13 +3,13 @@ package com.group2.catan_android.data.service;
 import android.util.Log;
 
 import com.group2.catan_android.data.exception.IllegalGameMoveException;
-import com.group2.catan_android.data.live.game.AcceptMoveDto;
+import com.group2.catan_android.data.live.game.AcceptTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.AccuseCheatingDto;
 import com.group2.catan_android.data.live.game.BuildCityMoveDto;
 import com.group2.catan_android.data.live.game.BuildRoadMoveDto;
 import com.group2.catan_android.data.live.game.BuildVillageMoveDto;
 import com.group2.catan_android.data.live.game.GameMoveDto;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
+import com.group2.catan_android.data.live.game.MakeTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.UseProgressCardDto;
 import com.group2.catan_android.data.live.game.MoveRobberDto;
 import com.group2.catan_android.data.live.game.RollDiceDto;
@@ -84,8 +84,8 @@ public class MoveMaker {
             sendMove(gameMove, serverErrorCallback);
             return;
         }
-        if(gameMove instanceof AcceptMoveDto) {
-            checkAcceptMove((AcceptMoveDto) gameMove);
+        if(gameMove instanceof AcceptTradeOfferMoveDto) {
+            checkAcceptTradeOfferMove((AcceptTradeOfferMoveDto) gameMove);
             sendMove(gameMove, serverErrorCallback);
             return;
         }
@@ -118,8 +118,8 @@ public class MoveMaker {
             case "UseProgressCardDto":
                 checkUseProgressCardMove(gameMove);
                 break;
-            case "TradeMoveDto":
-                checkTradeMove((TradeMoveDto) gameMove);
+            case "MakeTradeOfferMoveDto":
+                checkMakeTradeOfferMove((MakeTradeOfferMoveDto) gameMove);
                 break;
             default:
                 throw new IllegalGameMoveException("Unknown Dto format");
@@ -127,13 +127,13 @@ public class MoveMaker {
         sendMove(gameMove, serverErrorCallback);
     }
 
-    private void checkAcceptMove(AcceptMoveDto gameMove)throws IllegalGameMoveException{
+    private void checkAcceptTradeOfferMove(AcceptTradeOfferMoveDto gameMove)throws IllegalGameMoveException{
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant trade during setupphase");
         if(!localPlayer.resourcesSufficient(gameMove.getTradeOfferDto().getGiveResources()))
             throw new IllegalGameMoveException("Not enough Resources to accept the trade");
     }
-    private void checkTradeMove(TradeMoveDto tradeMove) throws IllegalGameMoveException {
+    private void checkMakeTradeOfferMove(MakeTradeOfferMoveDto tradeMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Cant trade during setupphase");
         if (!localPlayer.resourcesSufficient(tradeMove.getGiveResources()))

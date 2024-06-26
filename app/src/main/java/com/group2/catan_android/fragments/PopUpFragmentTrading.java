@@ -23,7 +23,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.group2.catan_android.R;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
+import com.group2.catan_android.data.live.game.MakeTradeOfferMoveDto;
 import com.group2.catan_android.data.model.SelectablePlayer;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.util.MessageBanner;
@@ -68,7 +68,12 @@ public class PopUpFragmentTrading extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setUp(view); //TODO: Use saved instance like in Trade Offer Fragment
+        if(savedInstanceState==null){
+            setNewFragments();
+        }else {
+            getOldFragments();
+        }
+        setUp(view);
     }
     private TradePopUpViewModel tradePopUpViewModel;
     private LocalPlayerViewModel localPlayerViewModel;
@@ -80,7 +85,6 @@ public class PopUpFragmentTrading extends DialogFragment {
 
     private Context serverErrorContext;
     public void setUp(View view){
-        setFragments();
         tradePopUpViewModel.selectAll();
         playerButtons = new ArrayList<>();
         playerButtons.add(view.findViewById(R.id.trading_popup_button_p1));
@@ -100,14 +104,26 @@ public class PopUpFragmentTrading extends DialogFragment {
 
         observeLiveData();
     }
-    public void setFragments(){
-        this.giveResourceFragment = new TradingResourceSelectionFragment();
-        this.getResourceFragment = new TradingResourceSelectionFragment();
-        this.playerResources = new PlayerResourcesFragment();
+    public void setNewFragments(){
         FragmentManager manager = getChildFragmentManager();
-        manager.beginTransaction().replace(R.id.trading_popup_topfragment, giveResourceFragment).commit();
-        manager.beginTransaction().replace(R.id.trading_popup_middlefragment, getResourceFragment).commit();
-        manager.beginTransaction().replace(R.id.trading_popup_bottomfragment,playerResources).commit();
+        giveResourceFragment = new TradingResourceSelectionFragment();
+        manager.beginTransaction()
+                .replace(R.id.trading_popup_topfragment, giveResourceFragment)
+                .commit();
+        getResourceFragment = new TradingResourceSelectionFragment();
+        manager.beginTransaction()
+                .replace(R.id.trading_popup_middlefragment, getResourceFragment)
+                .commit();
+        playerResources = new PlayerResourcesFragment();
+        manager.beginTransaction()
+                .replace(R.id.trading_popup_bottomfragment, playerResources)
+                .commit();
+    }
+    private void getOldFragments(){
+        FragmentManager manager = getChildFragmentManager();
+        giveResourceFragment = (TradingResourceSelectionFragment) manager.findFragmentById(R.id.trading_popup_topfragment);
+        getResourceFragment = (TradingResourceSelectionFragment) manager.findFragmentById(R.id.trading_popup_middlefragment);
+        playerResources = (PlayerResourcesFragment) manager.findFragmentById(R.id.trading_popup_bottomfragment);
     }
     private void observeLiveData(){
         tradePopUpViewModel.getSelectablePlayerMutableLiveData().observe(getViewLifecycleOwner(), this::updateButtons);
@@ -135,7 +151,7 @@ public class PopUpFragmentTrading extends DialogFragment {
     }
     public void confirm(){
         try {
-            MoveMaker.getInstance().makeMove(new TradeMoveDto(negate(giveResourceFragment.getSetResources()), getResourceFragment.getSetResources(), tradePopUpViewModel.getSelectedPlayerIds()), this::onServerError);
+            MoveMaker.getInstance().makeMove(new MakeTradeOfferMoveDto(negate(giveResourceFragment.getSetResources()), getResourceFragment.getSetResources(), tradePopUpViewModel.getSelectedPlayerIds()), this::onServerError);
         } catch (Exception e){
             MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
         } finally {

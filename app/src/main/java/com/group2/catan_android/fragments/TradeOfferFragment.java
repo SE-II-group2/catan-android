@@ -1,43 +1,28 @@
 package com.group2.catan_android.fragments;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.group2.catan_android.R;
-import com.group2.catan_android.data.live.game.AcceptMoveDto;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
+import com.group2.catan_android.data.live.game.AcceptTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.service.MoveMaker;
-import com.group2.catan_android.gamelogic.Player;
 import com.group2.catan_android.util.MessageBanner;
 import com.group2.catan_android.util.MessageType;
-import com.group2.catan_android.viewmodel.LocalPlayerViewModel;
-import com.group2.catan_android.viewmodel.PlayerListViewModel;
 import com.group2.catan_android.viewmodel.TradeViewModel;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class TradeOfferFragment extends Fragment {
@@ -100,7 +85,7 @@ public class TradeOfferFragment extends Fragment {
             MessageBanner.makeBanner(requireActivity(), MessageType.WARNING, "No Offer available").show();
         } else {
             try {
-                MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto), this::onServerError);
+                MoveMaker.getInstance().makeMove(new AcceptTradeOfferMoveDto(tradeOfferDto), this::onServerError);
                 closeFragment();
             } catch (Exception e) {
                 MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 
 import android.view.LayoutInflater;
@@ -15,14 +16,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.viewmodel.TradePopUpViewModel;
+import com.group2.catan_android.viewmodel.TradeResourcesViewModel;
 
 
 public class TradingResourceSelectionFragment extends Fragment {
     TextView[] count;
+    private TradeResourcesViewModel tradeResourcesViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tradeResourcesViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(TradeResourcesViewModel.initializer)).get(TradeResourcesViewModel.class);
     }
 
     @Override
