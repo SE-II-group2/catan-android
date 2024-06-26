@@ -142,10 +142,10 @@ public class MoveMaker {
     private void checkMakeTradeOfferMove(MakeTradeOfferMoveDto tradeMove) throws IllegalGameMoveException {
         if (isSetupPhase)
             throw new IllegalGameMoveException("Can't trade during setup phase");
+        if (tradeMove.getToPlayers() == null||tradeMove.getGetResources()==null||tradeMove.getGiveResources()==null)
+            throw new IllegalGameMoveException("Something went wrong");
         if (!localPlayer.resourcesSufficient(tradeMove.getGiveResources()))
             throw new IllegalGameMoveException("Not enough Resources");
-        if (tradeMove.getToPlayers() == null)
-            throw new IllegalGameMoveException("Something went wrong");
     }
 
     private void checkMoveRobberMove(MoveRobberDto robberDto) throws IllegalGameMoveException {
