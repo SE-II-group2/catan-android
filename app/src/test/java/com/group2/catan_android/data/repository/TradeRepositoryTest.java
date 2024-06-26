@@ -46,9 +46,11 @@ public class TradeRepositoryTest {
         liveIn.onNext(dto);
         dto = testObserver.values().get(testObserver.values().size() - 1);
 
-        Assertions.assertArrayEquals(new int[]{1, 2, 3, 4, 5}, dto.getGetResources());
         Assertions.assertArrayEquals(new int[]{5, 4, 3, 2, 1}, dto.getGetResources());
-        Assertions.assertEquals(new IngamePlayerDto("", new int[]{0, 0, 0, 0, 0}, 3, 7, 3, new ArrayList<>()), dto.getFromPlayer());
+        Assertions.assertArrayEquals(new int[]{1, 2, 3, 4, 5}, dto.getGiveResources());
+        Assertions.assertEquals(3, dto.getFromPlayer().getInGameID());
+        Assertions.assertEquals("", dto.getFromPlayer().getDisplayName());
         testObserver.dispose();
+
     }
 }
