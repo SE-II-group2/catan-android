@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.data.Constants;
 import com.group2.catan_android.gamelogic.Player;
 
 public class PlayerResourcesFragment extends Fragment {
@@ -54,19 +55,19 @@ public class PlayerResourcesFragment extends Fragment {
     }
 
     public void updateResources(Player player) {
-        wheatCount.setText(String.valueOf(player.getResources()[0]));
-        sheepCount.setText(String.valueOf(player.getResources()[1]));
-        woodCount.setText(String.valueOf(player.getResources()[2]));
-        brickCount.setText(String.valueOf(player.getResources()[3]));
-        stoneCount.setText(String.valueOf(player.getResources()[4]));
+        wheatCount.setText(String.valueOf(player.getResources()[Constants.LOGIC_KEY_WHEAT]));
+        sheepCount.setText(String.valueOf(player.getResources()[Constants.LOGIC_KEY_SHEEP]));
+        woodCount.setText(String.valueOf(player.getResources()[Constants.LOGIC_KEY_WOOD]));
+        brickCount.setText(String.valueOf(player.getResources()[Constants.LOGIC_KEY_BRICK]));
+        stoneCount.setText(String.valueOf(player.getResources()[Constants.LOGIC_KEY_STONE]));
     }
 
     public void updateResources(int[] resources) {
-        wheatCount.setText(String.valueOf(resources[0]));
-        sheepCount.setText(String.valueOf(resources[1]));
-        woodCount.setText(String.valueOf(resources[2]));
-        brickCount.setText(String.valueOf(resources[3]));
-        stoneCount.setText(String.valueOf(resources[4]));
+        wheatCount.setText(String.valueOf(resources[Constants.LOGIC_KEY_WHEAT]));
+        sheepCount.setText(String.valueOf(resources[Constants.LOGIC_KEY_SHEEP]));
+        woodCount.setText(String.valueOf(resources[Constants.LOGIC_KEY_WOOD]));
+        brickCount.setText(String.valueOf(resources[Constants.LOGIC_KEY_BRICK]));
+        stoneCount.setText(String.valueOf(resources[Constants.LOGIC_KEY_STONE]));
     }
 
 }

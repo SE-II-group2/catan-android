@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        include = JsonTypeInfo.As.PROPERTY,
         property = "eventType"
 )
 @JsonSubTypes({
@@ -20,22 +20,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 
 //no longer abstract because this causes issues with serialization and deserialization
-public class GameMoveDto {
-    private String eventType;
-
-    public GameMoveDto(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public GameMoveDto() {
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
+public abstract class GameMoveDto {
 }
 

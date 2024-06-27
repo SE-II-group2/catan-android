@@ -6,13 +6,13 @@ import com.group2.catan_android.gamelogic.enums.ResourceDistribution;
 import java.util.List;
 
 public class UseProgressCardDto extends GameMoveDto {
+    public UseProgressCardDto(){}
 
     public UseProgressCardDto(ProgressCardType progressCardType, List<ResourceDistribution> chosenResources, ResourceDistribution monopolyResource, int hexagonID) {
         this.progressCardType = progressCardType;
         this.chosenResources = chosenResources;
         this.monopolyResource = monopolyResource;
         this.hexagonID = hexagonID;
-        setEventType(GameMoveType.USEPROGRESSCARD);
     }
     public void setProgressCardType(ProgressCardType progressCardType){
         this.progressCardType = progressCardType;

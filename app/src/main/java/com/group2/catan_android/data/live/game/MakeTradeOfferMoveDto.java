@@ -4,14 +4,12 @@ import java.util.List;
 
 public class MakeTradeOfferMoveDto extends GameMoveDto {
     public MakeTradeOfferMoveDto() {
-        this.setEventType(GameMoveType.MAKETRADEMOVE);
     }
 
     public MakeTradeOfferMoveDto(int[] giveResources, int[] getResources, List<Integer> toPlayers) {
         this.giveResources = giveResources;
         this.getResources = getResources;
         this.toPlayers = toPlayers;
-        this.setEventType(GameMoveType.MAKETRADEMOVE);
     }
 
     private int[] giveResources;
