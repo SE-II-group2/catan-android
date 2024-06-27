@@ -307,7 +307,7 @@ class MoveMakerTest {
     void testAcceptTradeOfferWorking()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{1,1,1,1,1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
         moveMaker.makeMove(move);
         verify(moveMaker, times(1)).sendMove(move, null);
     }
@@ -315,41 +315,41 @@ class MoveMakerTest {
     void testAcceptTradeOfferInSetupPhase()throws Exception{
         isSetupPhaseField.set(moveMaker, true);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{1,1,1,1,1}, new int[]{1,1,1,1,1}, otherPlayer.toIngamePlayerDto()));
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testAcceptTradeOfferNotEnoughResources()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
         localPlayer.adjustResources(new int[]{1,1,1,1,0});
-        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, otherPlayer.toIngamePlayerDto()));
+        GameMoveDto move = new AcceptTradeOfferMoveDto(new TradeOfferDto(new int[]{1,1,1,1,1}, new int[]{0,0,0,0,0}, otherPlayer.toIngamePlayerDto()));
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testMakeTradeOfferInSetupPhase()throws Exception{
         isSetupPhaseField.set(moveMaker, true);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, new ArrayList<>());
+        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{1,1,1,1,1}, new int[]{0,0,0,0,0}, new ArrayList<>());
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testMakeTradeOfferNotEnoughResources()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, new ArrayList<>());
+        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{1,1,1,1,1}, new int[]{0,0,0,0,0}, new ArrayList<>());
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testMakeTradeOfferWrongInitialized1()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, new int[]{0,0,0,0,0}, null);
+        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{1,1,1,1,1}, new int[]{0,0,0,0,0}, null);
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
     void testMakeTradeOfferWrongInitialized2()throws Exception{
         isSetupPhaseField.set(moveMaker, false);
         localPlayer.adjustResources(new int[]{1,1,1,1,1});
-        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{-1,-1,-1,-1,-1}, null, new ArrayList<>());
+        GameMoveDto move = new MakeTradeOfferMoveDto(new int[]{1,1,1,1,1}, null, new ArrayList<>());
         assertThrows(IllegalGameMoveException.class, () -> moveMaker.makeMove(move));
     }
     @Test
