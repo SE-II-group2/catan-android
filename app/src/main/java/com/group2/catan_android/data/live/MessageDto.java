@@ -26,7 +26,6 @@ import com.group2.catan_android.data.live.game.TradeOfferDto;
 })
 
 public abstract class MessageDto {
-    public MessageDto(){
-    }
+
 }
 
