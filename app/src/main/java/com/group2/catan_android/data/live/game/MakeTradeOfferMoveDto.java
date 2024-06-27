@@ -2,16 +2,14 @@ package com.group2.catan_android.data.live.game;
 
 import java.util.List;
 
-public class TradeMoveDto extends GameMoveDto {
-    public TradeMoveDto() {
-        this.setEventType(GameMoveType.TRADEMOVE);
+public class MakeTradeOfferMoveDto extends GameMoveDto {
+    public MakeTradeOfferMoveDto() {
     }
 
-    public TradeMoveDto(int[] giveResources, int[] getResources, List<Integer> toPlayers) {
+    public MakeTradeOfferMoveDto(int[] giveResources, int[] getResources, List<Integer> toPlayers) {
         this.giveResources = giveResources;
         this.getResources = getResources;
         this.toPlayers = toPlayers;
-        this.setEventType(GameMoveType.TRADEMOVE);
     }
 
     private int[] giveResources;

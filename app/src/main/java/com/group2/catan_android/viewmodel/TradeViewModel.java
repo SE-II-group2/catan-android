@@ -1,20 +1,11 @@
 package com.group2.catan_android.viewmodel;
 
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-
-import android.widget.Toast;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
-import com.group2.catan_android.data.live.game.GameProgressDto;
-import com.group2.catan_android.data.live.game.TradeMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
-import com.group2.catan_android.data.repository.gameprogress.GameProgressRepository;
-import com.group2.catan_android.data.repository.gamestate.CurrentGamestateRepository;
 import com.group2.catan_android.data.repository.trading.TradeRepository;
-import com.group2.catan_android.gamelogic.Board;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -38,7 +29,6 @@ public class TradeViewModel extends ViewModel {
         return tradeOfferDtoMutableLiveData;
     }
     private void setupListeners() {
-        //Toast.makeText(getApplicationContext(), "Why does this apply when create game?", Toast.LENGTH_LONG).show();
         Disposable boardDisposable = datasource.getTradeObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

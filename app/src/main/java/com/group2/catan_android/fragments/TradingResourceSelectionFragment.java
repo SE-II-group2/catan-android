@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 
 import android.view.LayoutInflater;
@@ -15,14 +16,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.R;
+import com.group2.catan_android.data.Constants;
+import com.group2.catan_android.util.MessageBanner;
+import com.group2.catan_android.util.MessageType;
+import com.group2.catan_android.viewmodel.TradePopUpViewModel;
+import com.group2.catan_android.viewmodel.TradeResourcesViewModel;
+
+import java.util.Locale;
 
 
 public class TradingResourceSelectionFragment extends Fragment {
+    public static final int UI_KEY_WOOD = 0;
+    public static final int UI_KEY_BRICK = 1;
+    public static final int UI_KEY_SHEEP = 2;
+    public static final int UI_KEY_WHEAT = 3;
+    public static final int UI_KEY_STONE = 4;
     TextView[] count;
+    private TradeResourcesViewModel tradeResourcesViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tradeResourcesViewModel = new ViewModelProvider(this).get(TradeResourcesViewModel.class);
     }
 
     @Override
@@ -30,7 +45,6 @@ public class TradingResourceSelectionFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_trading_resource_selection, container, false);
     }
-    // fixme extract methods
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -60,55 +74,30 @@ public class TradingResourceSelectionFragment extends Fragment {
                 view.findViewById(R.id.resource_selection_wheat_count),
                 view.findViewById(R.id.resource_selection_stone_count)
         };
-        // set OnClickListeners
-        for(int i=0;i<plus.length;i++){
-            final int j = i;
-            plus[j].setOnClickListener(v -> {
-                int num = getNumberofTextView(count[j]);
-                if (num == -1) {
-                    return;
-                }//Error
-                count[j].setText(Integer.toString(++num));
-            });
-            minus[j].setOnClickListener(v -> {
-                int num = getNumberofTextView(count[j]);
-                if (num == -1) {
-                    return;
-                }//Error
-                num--;
-                if (num < 0) {
-                    return;
-                }
-                count[j].setText(Integer.toString(num));
-            });
-        }
-    }
 
-    public int getNumberofTextView(TextView view){
-        CharSequence content = view.getText();
-        if(content==null){
-            Toast.makeText(getContext(), "clicked resource does not have a count! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
-        }
-        String num = content.toString();
-        if(num.isEmpty()){
-            Toast.makeText(getContext(), "clicked resource increasing did not work! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
-        }
-        try {
-            return Integer.parseInt(num);
-        }catch(NumberFormatException e){
-            Toast.makeText(getContext(), "clicked resource parsing failed! ERROR!", Toast.LENGTH_SHORT).show();
-            return -1;
-        }
+        // set OnClickListeners
+        plus[UI_KEY_WOOD].setOnClickListener(v -> tradeResourcesViewModel.increase(Constants.LOGIC_KEY_WOOD));
+        plus[UI_KEY_BRICK].setOnClickListener(v -> tradeResourcesViewModel.increase(Constants.LOGIC_KEY_BRICK));
+        plus[UI_KEY_SHEEP].setOnClickListener(v -> tradeResourcesViewModel.increase(Constants.LOGIC_KEY_SHEEP));
+        plus[UI_KEY_WHEAT].setOnClickListener(v -> tradeResourcesViewModel.increase(Constants.LOGIC_KEY_WHEAT));
+        plus[UI_KEY_STONE].setOnClickListener(v -> tradeResourcesViewModel.increase(Constants.LOGIC_KEY_STONE));
+
+        minus[UI_KEY_WOOD].setOnClickListener(v -> tradeResourcesViewModel.decrease(Constants.LOGIC_KEY_WOOD));
+        minus[UI_KEY_BRICK].setOnClickListener(v -> tradeResourcesViewModel.decrease(Constants.LOGIC_KEY_BRICK));
+        minus[UI_KEY_SHEEP].setOnClickListener(v -> tradeResourcesViewModel.decrease(Constants.LOGIC_KEY_SHEEP));
+        minus[UI_KEY_WHEAT].setOnClickListener(v -> tradeResourcesViewModel.decrease(Constants.LOGIC_KEY_WHEAT));
+        minus[UI_KEY_STONE].setOnClickListener(v -> tradeResourcesViewModel.decrease(Constants.LOGIC_KEY_STONE));
+
+        //Observe Viewmodel
+        tradeResourcesViewModel.getResourceLiveData().observe(getViewLifecycleOwner(), resources -> {
+            count[UI_KEY_WOOD].setText(String.format(Locale.getDefault(), "%d", resources[Constants.LOGIC_KEY_WOOD]));
+            count[UI_KEY_BRICK].setText(String.format(Locale.getDefault(), "%d", resources[Constants.LOGIC_KEY_BRICK]));
+            count[UI_KEY_SHEEP].setText(String.format(Locale.getDefault(), "%d", resources[Constants.LOGIC_KEY_SHEEP]));
+            count[UI_KEY_WHEAT].setText(String.format(Locale.getDefault(), "%d", resources[Constants.LOGIC_KEY_WHEAT]));
+            count[UI_KEY_STONE].setText(String.format(Locale.getDefault(), "%d", resources[Constants.LOGIC_KEY_STONE]));
+        });
     }
     public int[] getSetResources(){
-        int[] resources = new int[5];
-        resources[2]=getNumberofTextView(count[0]);
-        resources[3]=getNumberofTextView(count[1]);
-        resources[1]=getNumberofTextView(count[2]);
-        resources[0]=getNumberofTextView(count[3]);
-        resources[4]=getNumberofTextView(count[4]);
-        return resources;
+        return tradeResourcesViewModel.getResources();
     }
 }

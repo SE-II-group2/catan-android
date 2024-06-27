@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group2.catan_android.R;
-import com.group2.catan_android.data.live.game.AcceptMoveDto;
+import com.group2.catan_android.data.live.game.AcceptTradeOfferMoveDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 import com.group2.catan_android.data.service.MoveMaker;
 import com.group2.catan_android.util.MessageBanner;
@@ -83,7 +83,7 @@ public class TradeOfferFragment extends Fragment {
     public void update(TradeOfferDto dto){
         this.tradeOfferDto = dto;
         getResourcesFragment.updateResources(dto.getGetResources());
-        giveResourcesFragment.updateResources(negateAllValues(dto.getGiveResources()));
+        giveResourcesFragment.updateResources(dto.getGiveResources());
         offerFromTextView.setText(dto.getFromPlayer().getDisplayName());
     }
 
@@ -92,7 +92,7 @@ public class TradeOfferFragment extends Fragment {
             MessageBanner.makeBanner(requireActivity(), MessageType.WARNING, "No Offer available").show();
         } else {
             try {
-                MoveMaker.getInstance().makeMove(new AcceptMoveDto(tradeOfferDto), this::onServerError);
+                MoveMaker.getInstance().makeMove(new AcceptTradeOfferMoveDto(tradeOfferDto), this::onServerError);
                 closeFragment();
             } catch (Exception e) {
                 MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();

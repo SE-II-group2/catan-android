@@ -1,12 +1,10 @@
 package com.group2.catan_android.data.live.game;
-public class AcceptMoveDto extends GameMoveDto {
-    public AcceptMoveDto() {
-        this.setEventType(GameMoveType.ACCEPTMOVE);
+public class AcceptTradeOfferMoveDto extends GameMoveDto {
+    public AcceptTradeOfferMoveDto() {
     }
 
-    public AcceptMoveDto(TradeOfferDto tradeOfferDto) {
+    public AcceptTradeOfferMoveDto(TradeOfferDto tradeOfferDto) {
         this.tradeOfferDto = tradeOfferDto;
-        this.setEventType(GameMoveType.ACCEPTMOVE);
     }
     private TradeOfferDto tradeOfferDto;
 

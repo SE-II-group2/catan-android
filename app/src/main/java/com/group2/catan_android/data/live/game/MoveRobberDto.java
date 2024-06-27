@@ -3,13 +3,11 @@ package com.group2.catan_android.data.live.game;
 public class MoveRobberDto extends GameMoveDto{
 
     public MoveRobberDto(int hexagonID, boolean legal) {
-        this.setEventType(GameMoveType.MOVEROBBERMOVE);
         this.hexagonID=hexagonID;
         this.legal=legal;
     }
 
     public MoveRobberDto(){
-        this.setEventType(GameMoveType.MOVEROBBERMOVE);
     }
 
     public int getHexagonID() {

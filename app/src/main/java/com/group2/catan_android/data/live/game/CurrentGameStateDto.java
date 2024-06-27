@@ -12,13 +12,11 @@ public class CurrentGameStateDto extends MessageDto {
         this.intersections=intersections;
         this.connections = connections;
         this.players=players;
-        this.setEventType(MessageType.GAME_OBJECT);
         this.isSetupPhase=isSetupPhase;
         this.activePlayer = activePlayer;
     }
 
     public CurrentGameStateDto() {
-        this.setEventType(MessageType.GAME_OBJECT);
     }
 
     public List<HexagonDto> getHexagons() {

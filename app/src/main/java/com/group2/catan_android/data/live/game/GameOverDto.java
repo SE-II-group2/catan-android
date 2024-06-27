@@ -12,7 +12,6 @@ import java.util.List;
 public class GameOverDto extends MessageDto {
 
     public GameOverDto() {
-        this.setEventType(MessageType.GAME_OVER);
     }
 
 }
