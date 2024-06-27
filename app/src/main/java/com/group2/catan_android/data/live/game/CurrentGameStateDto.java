@@ -8,7 +8,6 @@ import java.util.List;
 
 public class CurrentGameStateDto extends MessageDto {
     public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<IngamePlayerDto> players, IngamePlayerDto activePlayer,  boolean isSetupPhase) {
-        super(MessageType.GAME_OBJECT);
         this.hexagons = hexagons;
         this.intersections=intersections;
         this.connections = connections;
@@ -18,7 +17,6 @@ public class CurrentGameStateDto extends MessageDto {
     }
 
     public CurrentGameStateDto() {
-        super(MessageType.GAME_OBJECT);
     }
 
     public List<HexagonDto> getHexagons() {

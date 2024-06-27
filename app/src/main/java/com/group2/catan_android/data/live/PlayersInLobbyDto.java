@@ -7,7 +7,6 @@ public class PlayersInLobbyDto extends MessageDto {
     PlayerDto admin;
 
     public PlayersInLobbyDto(){
-        super(MessageType.PLAYERS_CHANGED);
     }
 
     public List<PlayerDto> getPlayers() {
