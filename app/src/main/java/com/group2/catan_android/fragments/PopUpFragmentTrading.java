@@ -153,7 +153,7 @@ public class PopUpFragmentTrading extends DialogFragment {
     }
     public void confirm(){
         try {
-            MoveMaker.getInstance().makeMove(new MakeTradeOfferMoveDto(negate(giveResourceFragment.getSetResources()), getResourceFragment.getSetResources(), tradePopUpViewModel.getSelectedPlayerIds()), this::onServerError);
+            MoveMaker.getInstance().makeMove(new MakeTradeOfferMoveDto(giveResourceFragment.getSetResources(), getResourceFragment.getSetResources(), tradePopUpViewModel.getSelectedPlayerIds()), this::onServerError);
         } catch (Exception e){
             MessageBanner.makeBanner(requireActivity(), MessageType.ERROR, e.getMessage()).show();
         } finally {
@@ -168,13 +168,6 @@ public class PopUpFragmentTrading extends DialogFragment {
         fragmentTransaction.commit();
     }
 
-    public int[] negate(int[] giveResources){ //TODO: Should not be necessary. Refactor also serverside @daniel
-        int[] result = new int[giveResources.length];
-        for(int i=0;i<giveResources.length;i++){
-            result[i]=-giveResources[i];
-        }
-        return result;
-    }
 
     private void onServerError(Throwable t){
         if(mServerErrorContext != null) {

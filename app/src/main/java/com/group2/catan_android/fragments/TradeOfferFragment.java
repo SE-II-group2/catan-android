@@ -83,7 +83,7 @@ public class TradeOfferFragment extends Fragment {
     public void update(TradeOfferDto dto){
         this.tradeOfferDto = dto;
         getResourcesFragment.updateResources(dto.getGetResources());
-        giveResourcesFragment.updateResources(negateAllValues(dto.getGiveResources()));
+        giveResourcesFragment.updateResources(dto.getGiveResources());
         offerFromTextView.setText(dto.getFromPlayer().getDisplayName());
     }
 

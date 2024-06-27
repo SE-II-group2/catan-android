@@ -136,7 +136,7 @@ public class MoveMaker {
     private void checkAcceptTradeOfferMove(AcceptTradeOfferMoveDto gameMove)throws IllegalGameMoveException{
         if (isSetupPhase)
             throw new IllegalGameMoveException("Can't trade during setup phase");
-        if(!localPlayer.resourcesSufficient(gameMove.getTradeOfferDto().getGiveResources()))
+        if(!localPlayer.resourcesSufficient(negate(gameMove.getTradeOfferDto().getGiveResources())))
             throw new IllegalGameMoveException("Not enough Resources to accept the trade");
     }
     private void checkMakeTradeOfferMove(MakeTradeOfferMoveDto tradeMove) throws IllegalGameMoveException {
@@ -144,7 +144,7 @@ public class MoveMaker {
             throw new IllegalGameMoveException("Can't trade during setup phase");
         if (tradeMove.getToPlayers() == null||tradeMove.getGetResources()==null||tradeMove.getGiveResources()==null)
             throw new IllegalGameMoveException("Something went wrong");
-        if (!localPlayer.resourcesSufficient(tradeMove.getGiveResources()))
+        if (!localPlayer.resourcesSufficient(negate(tradeMove.getGiveResources())))
             throw new IllegalGameMoveException("Not enough Resources");
     }
 
@@ -264,6 +264,13 @@ public class MoveMaker {
         liveInDisposable.clear();
         sendDisposable.clear();
         isReceivingData = false;
+    }
+    public int[] negate(int[] giveResources){
+        int[] result = new int[giveResources.length];
+        for(int i=0;i<giveResources.length;i++){
+            result[i]=-giveResources[i];
+        }
+        return result;
     }
 }
 

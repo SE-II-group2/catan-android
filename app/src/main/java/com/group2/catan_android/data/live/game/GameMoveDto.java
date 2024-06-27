@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value= MoveRobberDto.class, name = GameMoveType.MOVEROBBERMOVE),
         @JsonSubTypes.Type(value = AccuseCheatingDto.class, name = GameMoveType.ACCUSECHEATINGMOVE),
         @JsonSubTypes.Type(value = MakeTradeOfferMoveDto.class, name = GameMoveType.MAKETRADEMOVE),
-        @JsonSubTypes.Type(value = AcceptTradeOfferMoveDto.class, name = GameMoveType.ACCEPTRADETMOVE)
+        @JsonSubTypes.Type(value = AcceptTradeOfferMoveDto.class, name = GameMoveType.ACCEPTTRADEMOVE)
 })
 
 //no longer abstract because this causes issues with serialization and deserialization
