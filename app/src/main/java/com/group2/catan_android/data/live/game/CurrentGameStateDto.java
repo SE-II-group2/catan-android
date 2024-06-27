@@ -8,17 +8,17 @@ import java.util.List;
 
 public class CurrentGameStateDto extends MessageDto {
     public CurrentGameStateDto(List<HexagonDto> hexagons, List<IntersectionDto> intersections, List<ConnectionDto> connections, List<IngamePlayerDto> players, IngamePlayerDto activePlayer,  boolean isSetupPhase) {
+        super(MessageType.GAME_OBJECT);
         this.hexagons = hexagons;
         this.intersections=intersections;
         this.connections = connections;
         this.players=players;
-        this.setEventType(MessageType.GAME_OBJECT);
         this.isSetupPhase=isSetupPhase;
         this.activePlayer = activePlayer;
     }
 
     public CurrentGameStateDto() {
-        this.setEventType(MessageType.GAME_OBJECT);
+        super(MessageType.GAME_OBJECT);
     }
 
     public List<HexagonDto> getHexagons() {

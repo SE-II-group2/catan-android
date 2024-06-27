@@ -6,13 +6,13 @@ import com.group2.catan_android.data.live.MessageType;
 
 public class TradeOfferDto extends MessageDto{
     public TradeOfferDto() {
-        this.setEventType(MessageType.TRADE_OFFERED);
+        super(MessageType.TRADE_OFFERED);
     }
     public TradeOfferDto(int[] tradeMove_getResources, int[] tradeMove_giveResources, IngamePlayerDto fromPlayer) {
+        super(MessageType.TRADE_OFFERED);
         this.getResources=tradeMove_giveResources;
         this.giveResources=tradeMove_getResources;
         this.fromPlayer = fromPlayer;
-        this.setEventType(MessageType.TRADE_OFFERED);
     }
     //order swapped!!!
     private int[] getResources;

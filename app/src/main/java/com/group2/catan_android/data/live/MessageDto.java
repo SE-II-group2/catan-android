@@ -26,13 +26,13 @@ import com.group2.catan_android.data.live.game.TradeOfferDto;
 })
 
 public abstract class MessageDto {
-    private String eventType;
+    private final String eventType;
 
     public String getEventType() {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
+    public MessageDto(String eventType){
         this.eventType = eventType;
     }
 }

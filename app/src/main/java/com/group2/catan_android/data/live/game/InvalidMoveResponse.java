@@ -6,13 +6,14 @@ import com.group2.catan_android.data.live.MessageType;
 
 public class InvalidMoveResponse extends MessageDto {
     public InvalidMoveResponse(String message) {
+        super(MessageType.INVALID_GAME_MOVE);
         this.message = message;
-        this.setEventType(MessageType.INVALID_GAME_MOVE);
     }
 
     String message;
 
     public InvalidMoveResponse() {
+        super(MessageType.INVALID_GAME_MOVE);
     }
 
     public String getMessage() {
