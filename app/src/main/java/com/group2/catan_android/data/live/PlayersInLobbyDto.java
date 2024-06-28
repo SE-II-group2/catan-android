@@ -5,10 +5,6 @@ import java.util.List;
 public class PlayersInLobbyDto extends MessageDto {
     List<PlayerDto> players;
     PlayerDto admin;
-
-    public PlayersInLobbyDto(){
-    }
-
     public List<PlayerDto> getPlayers() {
         return players;
     }
