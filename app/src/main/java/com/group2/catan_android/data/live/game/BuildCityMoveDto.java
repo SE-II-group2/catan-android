@@ -5,8 +5,7 @@ public class BuildCityMoveDto extends GameMoveDto{
         this.intersectionID = intersectionID;
     }
 
-    public BuildCityMoveDto() {
-    }
+    public BuildCityMoveDto() {}
 
     public int getIntersectionID() {
         return intersectionID;

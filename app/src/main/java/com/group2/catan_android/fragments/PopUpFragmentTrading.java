@@ -61,7 +61,7 @@ public class PopUpFragmentTrading extends DialogFragment {
         if(width==null||one==null||params==null){
             Toast.makeText(getContext(), "Getting width or one or params failed!", Toast.LENGTH_SHORT).show();return;}
         params.width=width.getWidth()-one.getHeight();
-        params.height=WindowManager.LayoutParams.MATCH_PARENT;
+        params.height=ViewGroup.LayoutParams.MATCH_PARENT;
         params.horizontalMargin=one.getHeight();
         getDialog().getWindow().setAttributes(params);
     }

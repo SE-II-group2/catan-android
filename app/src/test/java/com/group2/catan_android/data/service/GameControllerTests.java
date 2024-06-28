@@ -2,8 +2,6 @@ package com.group2.catan_android.data.service;
 
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,7 +101,7 @@ class GameControllerTests {
        gameController.joinGame(request).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                //We do nothing
             }
 
             @Override
@@ -137,7 +135,7 @@ class GameControllerTests {
         gameController.joinGame(request).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                //We do nothing
             }
 
             @Override
@@ -236,7 +234,7 @@ class GameControllerTests {
         gameController.leaveGame().subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                //We do nothing
             }
 
             @Override

@@ -67,7 +67,6 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         return games.size();
     }
 
-    // fixme dont use inner classes, especially public ones
     public class GameListViewHolder extends RecyclerView.ViewHolder{
 
         GameItemBinding binding;
@@ -97,7 +96,6 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListAdapter.GameLi
         }
     }
 
-    // fixme dont use inner interfaces either
     public interface ItemClickListener{
         void onItemClicked(AvailableGame game);
     }

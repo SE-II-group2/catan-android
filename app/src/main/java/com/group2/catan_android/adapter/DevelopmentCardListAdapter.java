@@ -77,7 +77,7 @@ public class DevelopmentCardListAdapter extends RecyclerView.Adapter<Development
         return items.size();
     }
 
-    public static class DevelopmentCardViewHolder extends RecyclerView.ViewHolder {
+    static class DevelopmentCardViewHolder extends RecyclerView.ViewHolder {
         TextView cardTitle;
         ImageView cardImage;
         public DevelopmentCardViewHolder(@NonNull View itemView) {

@@ -7,7 +7,6 @@ import com.group2.catan_android.data.live.game.GameProgressDto;
 import com.group2.catan_android.data.live.game.GameOverDto;
 import com.group2.catan_android.data.live.game.TradeOfferDto;
 
-// fixme see backend comments
 /**
  * Defines the Basic Structure of a Stomp Message to the client
  */

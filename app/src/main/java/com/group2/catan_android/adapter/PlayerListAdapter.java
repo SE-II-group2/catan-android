@@ -48,8 +48,7 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
     @Override
     public int getItemCount(){return players.size();}
 
-    // fixme dont use inner classes
-    public static class PlayerListViewHolder extends RecyclerView.ViewHolder{
+    static class PlayerListViewHolder extends RecyclerView.ViewHolder{
         PlayerInLobbyItemBinding binding;
         Context context;
         PlayerListViewHolder(PlayerInLobbyItemBinding itemBinding, Context c){
